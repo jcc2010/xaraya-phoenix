@@ -39,6 +39,7 @@ final class UlidTest extends TestCase
         self::assertFalse(Ulid::isValid('01m3t19wn8reaww81zg1m47tj'), 'too short');
         self::assertFalse(Ulid::isValid('01m3t19wn8reaww81zg1m47tji'), 'contains i');
         self::assertFalse(Ulid::isValid('81m3t19wn8reaww81zg1m47tjq'), 'overflows 48 bits');
+        self::assertFalse(Ulid::isValid("01m3t19wn8reaww81zg1m47tjq\n"), 'trailing newline');
     }
 
     public function testRejectsOutOfRangeTimestamp(): void

@@ -35,7 +35,7 @@ final class Ulid
 
     public static function isValid(string $value): bool
     {
-        return preg_match('/^[0-7][0-9a-hjkmnp-tv-z]{25}$/', $value) === 1;
+        return preg_match('/^[0-7][0-9a-hjkmnp-tv-z]{25}$/D', $value) === 1;
     }
 
     public static function timestamp(string $ulid): int
