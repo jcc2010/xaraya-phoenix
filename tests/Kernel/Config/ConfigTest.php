@@ -78,4 +78,51 @@ final class ConfigTest extends TestCase
             }
         }
     }
+
+    public function testStaleCacheIsRebuiltFromNewerSourceOrWatchedFile(): void
+    {
+        $dir = sys_get_temp_dir() . '/xar-config-' . bin2hex(random_bytes(4));
+        mkdir($dir);
+        $file = $dir . '/app.php';
+        $env = $dir . '/.env';
+        $cache = $dir . '/cache/config.php';
+        $now = time();
+        file_put_contents($env, 'X=1');
+        touch($env, $now - 100);
+        file_put_contents($file, "<?php return ['app' => ['debug' => false, 'name' => 'one']];");
+        touch($file, $now - 100);
+
+        self::assertSame('one', Config::load($file, $cache, [$env])->get('app.name'));
+        touch($cache, $now - 50);
+
+        file_put_contents($file, "<?php return ['app' => ['debug' => false, 'name' => 'two']];");
+        touch($file, $now - 10);
+        self::assertSame('two', Config::load($file, $cache, [$env])->get('app.name'), 'a newer config source invalidates the cache');
+        self::assertSame('two', (require $cache)['app']['name'], 'and the cache is rewritten');
+
+        touch($cache, $now - 5);
+        file_put_contents($file, "<?php return ['app' => ['debug' => false, 'name' => 'three']];");
+        touch($file, $now - 20);
+        self::assertSame('two', Config::load($file, $cache, [$env])->get('app.name'), 'a fresh cache is still used');
+
+        touch($env, $now);
+        self::assertSame('three', Config::load($file, $cache, [$env, $dir . '/missing'])->get('app.name'), 'a newer watched file invalidates the cache');
+
+        array_map('unlink', [$file, $env, $cache]);
+        rmdir($dir . '/cache');
+        rmdir($dir);
+    }
+
+    public function testModulePathsComeFromTheEnvironment(): void
+    {
+        $config = dirname(__DIR__, 3) . '/config/app.php';
+        putenv('MODULE_PATHS');
+        self::assertSame(['modules'], (require $config)['modules']['paths']);
+        putenv('MODULE_PATHS=modules, examples');
+        try {
+            self::assertSame(['modules', 'examples'], (require $config)['modules']['paths']);
+        } finally {
+            putenv('MODULE_PATHS');
+        }
+    }
 }

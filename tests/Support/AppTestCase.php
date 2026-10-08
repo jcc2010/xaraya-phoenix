@@ -34,12 +34,22 @@ abstract class AppTestCase extends TestCase
      */
     protected function boot(array $modulePaths = [], array $overrides = []): App
     {
+        return App::boot(dirname(__DIR__, 2), $this->overrides($modulePaths, $overrides));
+    }
+
+    /**
+     * @param list<string> $modulePaths
+     * @param array<string, mixed> $overrides
+     * @return array<string, mixed>
+     */
+    protected function overrides(array $modulePaths = [], array $overrides = []): array
+    {
         $db = DbTestCase::dbConfig();
         if ($this->usesSqlite()) {
             $db['dsn'] = 'sqlite:' . $this->tmp . '/test.sqlite';
         }
 
-        return App::boot(dirname(__DIR__, 2), [
+        return [
             'app.debug' => true,
             'app.url' => 'http://xar.test',
             'app.cache' => $this->tmp . '/cache',
@@ -47,7 +57,7 @@ abstract class AppTestCase extends TestCase
             'modules.paths' => $modulePaths,
             'log.path' => $this->tmp . '/logs',
             ...$overrides,
-        ]);
+        ];
     }
 
     private function usesSqlite(): bool

@@ -127,4 +127,87 @@ final class ApplicationTest extends AppTestCase
         self::assertStringContainsString("-t '" . $app->path('public') . "'", $line);
         self::assertStringEndsWith("'" . $app->path('public/index.php') . "'", $line);
     }
+
+    /** Writes a module "delta" into a temp module path and enables it. */
+    /** @param array<string, string> $classes class name => body after the namespace line */
+    private function deltaModule(string $manifestExtra, array $classes): string
+    {
+        $path = $this->tmp . '/modules';
+        mkdir($path . '/delta/src', 0775, true);
+        file_put_contents($path . '/delta/module.json', '{"name":"delta","version":"1.0.0"' . $manifestExtra . '}');
+        foreach ($classes as $class => $source) {
+            file_put_contents("{$path}/delta/src/{$class}.php", "<?php\n\nnamespace Xaraya\\Module\\Delta;\n\n" . $source);
+        }
+        $this->boot([$path])->container()->get(\Xaraya\Kernel\Module\ModuleRegistry::class)->enable('delta');
+
+        return $path;
+    }
+
+    /** @param list<string> $args */
+    private function xarIn(string $modulePath, array $args): int
+    {
+        $this->out = fopen('php://memory', 'w+') ?: throw new \RuntimeException();
+        $this->err = fopen('php://memory', 'w+') ?: throw new \RuntimeException();
+
+        return Application::main(dirname(__DIR__, 3), ['xar', ...$args], $this->overrides([$modulePath]), new Output($this->out, $this->err));
+    }
+
+    public function testBadModuleCommandsAreSkippedWithWarnings(): void
+    {
+        $path = $this->deltaModule(
+            ',"commands":["Xaraya\\\\Module\\\\Delta\\\\Missing","Xaraya\\\\Module\\\\Delta\\\\NotACommand","Xaraya\\\\Module\\\\Delta\\\\Shadow"]',
+            [
+                'NotACommand' => 'final class NotACommand {}',
+                'Shadow' => <<<'PHP'
+                    use Xaraya\Kernel\Cli\Command;
+                    use Xaraya\Kernel\Cli\Input;
+                    use Xaraya\Kernel\Cli\Output;
+
+                    final class Shadow extends Command
+                    {
+                        public function name(): string { return 'migrate'; }
+                        public function description(): string { return 'shadowed migrate'; }
+                        public function run(Input $input, Output $output): int { $output->line('hijacked'); return 0; }
+                    }
+                    PHP,
+            ],
+        );
+
+        self::assertSame(0, $this->xarIn($path, ['help']));
+        self::assertStringContainsString('module:disable', $this->stdout());
+        self::assertStringNotContainsString('shadowed migrate', $this->stdout());
+        self::assertStringContainsString('Missing', $this->stderr());
+        self::assertStringContainsString('NotACommand', $this->stderr());
+        self::assertStringContainsString("'migrate'", $this->stderr());
+
+        self::assertSame(0, $this->xarIn($path, ['migrate']));
+        self::assertStringNotContainsString('hijacked', $this->stdout());
+
+        self::assertSame(0, $this->xarIn($path, ['module:disable', 'delta']));
+        self::assertStringContainsString("Disabled module 'delta'", $this->stdout());
+    }
+
+    public function testBrokenProviderFallsBackToSafeMode(): void
+    {
+        $path = $this->deltaModule(
+            ',"provider":"Xaraya\\\\Module\\\\Delta\\\\Provider"',
+            ['Provider' => <<<'PHP'
+                use Xaraya\Kernel\Container\Container;
+                use Xaraya\Kernel\Container\ServiceProvider;
+
+                final class Provider implements ServiceProvider
+                {
+                    public function register(Container $c): void { throw new \RuntimeException('provider exploded'); }
+                }
+                PHP],
+        );
+
+        self::assertSame(0, $this->xarIn($path, ['module:disable', 'delta']));
+        self::assertStringContainsString('provider exploded', $this->stderr());
+        self::assertStringContainsString('safe mode', $this->stderr());
+        self::assertStringContainsString("Disabled module 'delta'", $this->stdout());
+
+        self::assertSame(0, $this->xarIn($path, ['help']));
+        self::assertSame('', $this->stderr(), 'boots normally once the module is disabled');
+    }
 }

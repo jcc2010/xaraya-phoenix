@@ -46,17 +46,25 @@ final class App
     /** @var list<string> */
     private array $globalMiddleware = [];
 
-    /** @param array<string, mixed> $overrides */
-    public static function boot(string $root, array $overrides = []): self
+    /**
+     * @param array<string, mixed> $overrides
+     * @param bool $safe skip module service providers and event subscribers, so a broken module cannot
+     *                   stop the CLI from disabling it
+     */
+    public static function boot(string $root, array $overrides = [], bool $safe = false): self
     {
-        return new self(rtrim($root, '/'), $overrides);
+        return new self(rtrim($root, '/'), $overrides, $safe);
     }
 
     /** @param array<string, mixed> $overrides */
-    private function __construct(private readonly string $root, array $overrides)
+    private function __construct(private readonly string $root, array $overrides, private readonly bool $safe)
     {
         Env::load($root . '/.env');
-        $config = Config::load($root . '/config/app.php', $overrides === [] ? $this->configCachePath() : null);
+        $config = Config::load(
+            $root . '/config/app.php',
+            $overrides === [] ? $this->configCachePath() : null,
+            [$root . '/.env'],
+        );
         foreach ($overrides as $key => $value) {
             $config->set($key, $value);
         }
@@ -99,6 +107,11 @@ final class App
     public function container(): Container
     {
         return $this->container;
+    }
+
+    public function safe(): bool
+    {
+        return $this->safe;
     }
 
     public function config(): Config
@@ -206,6 +219,9 @@ final class App
     {
         $registry = $this->container->get(ModuleRegistry::class);
         $registry->registerAutoloader();
+        if ($this->safe) {
+            return;
+        }
         $events = $this->container->get(EventDispatcher::class);
         foreach ($registry->enabled() as $manifest) {
             $providerClass = $manifest->provider();

@@ -11,9 +11,15 @@ final class Config
     /** @param array<string, mixed> $items */
     public function __construct(private array $items = []) {}
 
-    public static function load(string $file, ?string $cacheFile = null): self
+    /**
+     * Loads $file, or the cache when one exists and is not stale. The cache is stale when it is older than
+     * $file or than any existing file in $watch (such as .env); it is then rebuilt and rewritten.
+     *
+     * @param list<string> $watch
+     */
+    public static function load(string $file, ?string $cacheFile = null, array $watch = []): self
     {
-        if ($cacheFile !== null && is_file($cacheFile)) {
+        if ($cacheFile !== null && is_file($cacheFile) && !self::stale($cacheFile, [$file, ...$watch])) {
             $cached = require $cacheFile;
             if (is_array($cached)) {
                 /** @var array<string, mixed> $cached */
@@ -31,6 +37,21 @@ final class Config
         }
 
         return $config;
+    }
+
+    /** @param list<string> $sources */
+    private static function stale(string $cacheFile, array $sources): bool
+    {
+        clearstatcache();
+        $cached = filemtime($cacheFile);
+        foreach ($sources as $source) {
+            $modified = is_file($source) ? filemtime($source) : false;
+            if ($cached === false || ($modified !== false && $modified > $cached)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     public function get(string $key, mixed $default = null): mixed

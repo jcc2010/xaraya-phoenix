@@ -15,9 +15,15 @@ Status: early development on the `next` branch. Release codenames follow the X-M
 
 ```sh
 composer install
+cp .env.example .env
 bin/xar migrate
+MODULE_PATHS=modules,examples bin/xar module:enable hello   # optional: the example module
 bin/xar serve
 ```
+
+Set `MODULE_PATHS` in `.env` to keep the example module discoverable. With `APP_DEBUG=false`
+(production), config and routes are cached under `var/cache`; config is rebuilt when
+`config/app.php` or `.env` changes, and `bin/xar cache:clear` clears both caches.
 
 ## Development
 

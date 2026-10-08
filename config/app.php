@@ -23,7 +23,8 @@ return [
         'prefix' => env('DB_PREFIX', 'xar_'),
     ],
     'modules' => [
-        'paths' => ['modules'],
+        // MODULE_PATHS is a comma-separated list of directories, relative to the project root.
+        'paths' => array_values(array_filter(array_map('trim', explode(',', (string) env('MODULE_PATHS', 'modules'))))),
     ],
     'log' => [
         'path' => $root . '/var/logs',
