@@ -12,6 +12,7 @@ use FastRoute\RouteCollector as FastCollector;
 use function FastRoute\simpleDispatcher;
 
 use Nyholm\Psr7\Response;
+use RuntimeException;
 use Xaraya\Kernel\Http\Exception\MethodNotAllowed;
 use Xaraya\Kernel\Http\Exception\NotFound;
 
@@ -31,12 +32,21 @@ final class Router
                 $collector->addRoute($route->methods, $route->path, $index);
             }
         };
-        if ($cacheFile !== null && !is_dir(dirname($cacheFile))) {
-            mkdir(dirname($cacheFile), 0775, true);
+        if ($cacheFile === null) {
+            $this->dispatcher = simpleDispatcher($define);
+
+            return;
         }
-        $this->dispatcher = $cacheFile === null
-            ? simpleDispatcher($define)
-            : cachedDispatcher($define, ['cacheFile' => $cacheFile]);
+        $dir = dirname($cacheFile);
+        if (!is_dir($dir) && !@mkdir($dir, 0775, true) && !is_dir($dir)) {
+            throw new RuntimeException("Cannot create route cache directory '{$dir}'");
+        }
+        $fingerprint = substr(sha1(implode("\n", array_map(
+            static fn(Route $r): string => implode(',', $r->methods) . ' ' . $r->path,
+            $this->routes,
+        ))), 0, 12);
+        $keyed = $dir . '/' . basename($cacheFile, '.php') . '-' . $fingerprint . '.php';
+        $this->dispatcher = cachedDispatcher($define, ['cacheFile' => $keyed]);
     }
 
     public function match(string $method, string $path): RouteMatch

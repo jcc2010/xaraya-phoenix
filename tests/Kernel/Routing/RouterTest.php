@@ -73,12 +73,35 @@ final class RouterTest extends TestCase
 
     public function testCachedDispatcher(): void
     {
-        $cache = sys_get_temp_dir() . '/xar-routes-' . bin2hex(random_bytes(4)) . '.php';
-        $r = new RouteCollector();
-        $r->get('/x', 'X', 'x');
-        self::assertSame('x', (new Router($r->routes(), $cache))->match('GET', '/x')->route->name);
-        self::assertFileExists($cache);
-        self::assertSame('x', (new Router($r->routes(), $cache))->match('GET', '/x')->route->name);
-        unlink($cache);
+        $base = sys_get_temp_dir() . '/xar-routes-' . bin2hex(random_bytes(4));
+        $cache = $base . '.php';
+        try {
+            $r = new RouteCollector();
+            $r->get('/x', 'X', 'x');
+            self::assertSame('x', (new Router($r->routes(), $cache))->match('GET', '/x')->route->name);
+            self::assertNotEmpty(glob($base . '-*.php'));
+            self::assertSame('x', (new Router($r->routes(), $cache))->match('GET', '/x')->route->name);
+        } finally {
+            array_map('unlink', glob($base . '-*.php') ?: []);
+        }
+    }
+
+    public function testStaleCacheIsNotUsedWhenRoutesChange(): void
+    {
+        $base = sys_get_temp_dir() . '/xar-routes-' . bin2hex(random_bytes(4));
+        $cache = $base . '.php';
+        try {
+            $r = new RouteCollector();
+            $r->get('/a', 'A', 'a');
+            $r->get('/b', 'B', 'b');
+            (new Router($r->routes(), $cache))->match('GET', '/a');
+
+            $r2 = new RouteCollector();
+            $r2->get('/b', 'B', 'b');
+            $r2->get('/a', 'A', 'a');
+            self::assertSame('a', (new Router($r2->routes(), $cache))->match('GET', '/a')->route->name);
+        } finally {
+            array_map('unlink', glob($base . '-*.php') ?: []);
+        }
     }
 }
