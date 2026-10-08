@@ -71,10 +71,21 @@ final class Config
     {
         $dir = dirname($file);
         if (!is_dir($dir)) {
-            mkdir($dir, 0775, true);
+            $result = @mkdir($dir, 0775, true);
+            if (!$result && !is_dir($dir)) {
+                throw new RuntimeException("Failed to create cache directory: {$dir}");
+            }
         }
         $tmp = $file . '.' . bin2hex(random_bytes(4));
-        file_put_contents($tmp, '<?php return ' . var_export($this->items, true) . ";\n");
-        rename($tmp, $file);
+        $content = '<?php return ' . var_export($this->items, true) . ";\n";
+        $bytes = file_put_contents($tmp, $content);
+        if ($bytes === false || $bytes !== strlen($content)) {
+            @unlink($tmp);
+            throw new RuntimeException("Failed to write cache file: {$tmp}");
+        }
+        if (!rename($tmp, $file)) {
+            @unlink($tmp);
+            throw new RuntimeException("Failed to rename cache file: {$tmp} to {$file}");
+        }
     }
 }

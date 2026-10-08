@@ -59,4 +59,23 @@ final class ConfigTest extends TestCase
             unlink($file);
         }
     }
+
+    public function testWriteCacheToUnwritableLocationThrows(): void
+    {
+        $blockingFile = tempnam(sys_get_temp_dir(), 'block');
+        $cacheFile = $blockingFile . '/sub/config.php';
+        $c = new Config(['test' => 'data']);
+
+        $this->expectException(\RuntimeException::class);
+        try {
+            $c->writeCache($cacheFile);
+        } finally {
+            unlink($blockingFile);
+            // Verify no temp file was left behind
+            $pattern = dirname($cacheFile) === $blockingFile ? dirname($cacheFile) . '.*' : $cacheFile . '.*';
+            foreach (glob($pattern) as $leftover) {
+                unlink($leftover);
+            }
+        }
+    }
 }
