@@ -74,6 +74,12 @@ final class SelectTest extends DbTestCase
         self::assertSame(2, $this->db->select('posts')->where('published', '=', '2026-10-02 00:00:00')->count());
     }
 
+    public function testFirstRespectsOffset(): void
+    {
+        $first = $this->db->select('posts')->orderBy('title')->limit(10, 2)->first();
+        self::assertSame('C', $first['title']);
+    }
+
     public function testRejectsBadOperatorAndIdentifier(): void
     {
         $this->expectException(InvalidArgumentException::class);

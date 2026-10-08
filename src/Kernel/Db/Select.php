@@ -125,7 +125,7 @@ final class Select
     /** @return array<string, mixed>|null */
     public function first(): ?array
     {
-        [$sql, $params] = (clone $this)->limit(1)->toSql();
+        [$sql, $params] = (clone $this)->limit(1, $this->offset)->toSql();
 
         return $this->db->fetchOne($sql, $params);
     }
