@@ -21,7 +21,12 @@ final class ConditionalGet implements MiddlewareInterface
             return $response;
         }
         if (!$response->hasHeader('ETag')) {
-            $response = $response->withHeader('ETag', 'W/"' . sha1((string) $response->getBody()) . '"');
+            $body = $response->getBody();
+            if (!$body->isSeekable()) {
+                return $response;
+            }
+            $response = $response->withHeader('ETag', 'W/"' . sha1((string) $body) . '"');
+            $body->rewind();
         }
         if (!$this->notModified($request, $response)) {
             return $response;

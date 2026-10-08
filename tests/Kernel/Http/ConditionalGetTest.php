@@ -29,6 +29,13 @@ final class ConditionalGetTest extends TestCase
         self::assertSame('{"items":[]}', (string) $r->getBody());
     }
 
+    public function testBodyIsRewindedAfterEtagGeneration(): void
+    {
+        $r = $this->send(new ServerRequest('GET', '/f'));
+        self::assertSame(0, $r->getBody()->tell());
+        self::assertSame('{"items":[]}', $r->getBody()->getContents());
+    }
+
     public function testIfNoneMatchGives304(): void
     {
         $etag = $this->send(new ServerRequest('GET', '/f'))->getHeaderLine('ETag');
