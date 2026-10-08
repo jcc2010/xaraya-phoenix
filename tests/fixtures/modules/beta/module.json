@@ -1,0 +1,5 @@
+{
+  "name": "beta",
+  "version": "0.1.0",
+  "requires": { "kernel": "^0.1", "modules": { "alpha": "*" } }
+}
