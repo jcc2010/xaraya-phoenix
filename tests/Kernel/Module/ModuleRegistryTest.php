@@ -13,6 +13,60 @@ final class ModuleRegistryTest extends DbTestCase
 {
     private const FIXTURES = __DIR__ . '/../../fixtures/modules';
 
+    /** @var list<string> */
+    private array $tempDirs = [];
+
+    protected function tearDown(): void
+    {
+        foreach ($this->tempDirs as $base) {
+            foreach (glob($base . '/*/module.json') ?: [] as $file) {
+                @unlink($file);
+                @rmdir(dirname($file));
+            }
+            @rmdir($base);
+        }
+        $this->tempDirs = [];
+        parent::tearDown();
+    }
+
+    /** @param array<string, list<string>> $modules name => required module names */
+    private function tempModules(array $modules): string
+    {
+        $base = sys_get_temp_dir() . '/xar-reg-' . bin2hex(random_bytes(4));
+        mkdir($base);
+        $this->tempDirs[] = $base;
+        foreach ($modules as $name => $requires) {
+            mkdir($base . '/' . $name);
+            $deps = array_fill_keys($requires, '*');
+            file_put_contents($base . '/' . $name . '/module.json', json_encode([
+                'name' => $name,
+                'version' => '1',
+                'requires' => ['modules' => (object) $deps],
+            ], JSON_THROW_ON_ERROR));
+        }
+        $migrator = new Migrator($this->db);
+        $migrator->migrate(['kernel' => dirname(__DIR__, 3) . '/src/Kernel/migrations']);
+        foreach (array_keys($modules) as $name) {
+            $this->db->insert('modules', ['name' => $name, 'version' => '1', 'enabled' => true, 'installed_at' => '2026-10-08 00:00:00']);
+        }
+
+        return $base;
+    }
+
+    public function testEnabledIsOrderedByDependenciesNotName(): void
+    {
+        $r = $this->registry([$this->tempModules(['alpha' => ['zeta'], 'zeta' => []])]);
+        self::assertSame(['zeta', 'alpha'], array_keys($r->enabled()));
+    }
+
+    public function testCircularDependencyThrows(): void
+    {
+        $r = $this->registry([$this->tempModules(['aa' => ['bb'], 'bb' => ['aa']])]);
+        $this->expectException(ModuleException::class);
+        $this->expectExceptionMessage('Circular module dependency');
+        $r->enabled();
+    }
+
     private function registry(array $paths = [self::FIXTURES]): ModuleRegistry
     {
         return new ModuleRegistry($this->db, new Migrator($this->db), $paths, dirname(__DIR__, 3) . '/src/Kernel/migrations');
