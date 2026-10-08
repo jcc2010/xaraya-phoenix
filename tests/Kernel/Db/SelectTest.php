@@ -91,4 +91,71 @@ final class SelectTest extends DbTestCase
         $this->expectException(InvalidArgumentException::class);
         $this->db->select('posts')->orderBy('title; DROP TABLE posts');
     }
+
+    /** @return list<array<string, mixed>> */
+    private function seedTies(): array
+    {
+        $this->db->schema()->create('entries', function (Blueprint $t): void {
+            $t->ulid('id')->primary();
+            $t->datetime('published');
+        });
+        $rows = [
+            ['01m3t19wn8reaww81zg1m47ta1', '2026-10-03 00:00:00'],
+            ['01m3t19wn8reaww81zg1m47ta2', '2026-10-02 00:00:00'],
+            ['01m3t19wn8reaww81zg1m47ta3', '2026-10-02 00:00:00'],
+            ['01m3t19wn8reaww81zg1m47ta4', '2026-10-02 00:00:00'],
+            ['01m3t19wn8reaww81zg1m47ta5', '2026-10-01 00:00:00'],
+        ];
+        foreach ($rows as [$id, $published]) {
+            $this->db->insert('entries', compact('id', 'published'));
+        }
+
+        return $this->db->select('entries')->orderBy('published')->orderBy('id')->all();
+    }
+
+    /** @return list<string> */
+    private function walk(string $direction, string $op): array
+    {
+        $seen = [];
+        $cursor = null;
+        for ($guard = 0; $guard < 10; $guard++) {
+            $query = $this->db->select('entries')->orderBy('published', $direction)->orderBy('id', $direction)->limit(2);
+            if ($cursor !== null) {
+                $query->cursor(['published' => $cursor['published'], 'id' => $cursor['id']], $op);
+            }
+            $page = $query->all();
+            if ($page === []) {
+                break;
+            }
+            self::assertLessThanOrEqual(2, count($page));
+            array_push($seen, ...array_map('strval', array_column($page, 'id')));
+            $cursor = $page[count($page) - 1];
+        }
+
+        return $seen;
+    }
+
+    public function testDescendingKeysetWalksEveryRowOnce(): void
+    {
+        $ascending = array_map('strval', array_column($this->seedTies(), 'id'));
+        self::assertSame(array_reverse($ascending), $this->walk('desc', '<'));
+    }
+
+    public function testAscendingKeysetWalksEveryRowOnce(): void
+    {
+        $ascending = array_map('strval', array_column($this->seedTies(), 'id'));
+        self::assertSame($ascending, $this->walk('asc', '>'));
+    }
+
+    public function testCursorRejectsNullValuesAndPositionalKeys(): void
+    {
+        foreach ([['published' => '2026-10-01 00:00:00', 'id' => null], ['2026-10-01 00:00:00']] as $cursor) {
+            try {
+                $this->db->select('posts')->cursor($cursor, '<');
+                self::fail('expected InvalidArgumentException');
+            } catch (InvalidArgumentException) {
+                $this->addToAssertionCount(1);
+            }
+        }
+    }
 }

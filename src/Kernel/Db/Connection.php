@@ -16,6 +16,8 @@ use Xaraya\Kernel\Db\Schema\Schema;
 
 final class Connection
 {
+    private int $depth = 0;
+
     public function __construct(
         private readonly PDO $pdo,
         private readonly Dialect $dialect,
@@ -106,11 +108,21 @@ final class Connection
     }
 
     /**
+     * Inserts a row, or updates its non-conflict columns when it collides on $conflict.
+     *
+     * On MySQL/MariaDB `ON DUPLICATE KEY UPDATE` fires on ANY unique key of the table, not only the
+     * $conflict columns, so a collision on another unique index also turns into an update. It uses
+     * `VALUES(col)`, which MySQL 8.0.20+ deprecates, because MariaDB 10.6 has no `AS new` row alias.
+     *
      * @param array<string, mixed> $row
      * @param list<string> $conflict
      */
     public function upsert(string $table, array $row, array $conflict): void
     {
+        if ($conflict === []) {
+            throw new InvalidArgumentException('upsert() needs at least one conflict column');
+        }
+        array_map($this->ident(...), $conflict);
         $columns = $this->columns($row);
         $this->query($this->dialect->upsertSql($this->prefixed($table), $columns, $conflict), array_values($row));
     }
@@ -139,13 +151,20 @@ final class Connection
     }
 
     /**
+     * Runs $fn in a transaction. Nested calls use savepoints: an exception inside a nested call rolls back
+     * only that call's work and is rethrown, so the caller may catch it and carry on.
+     *
      * @template T
      * @param callable(self): T $fn
      * @return T
      */
     public function transaction(callable $fn): mixed
     {
+        if ($this->depth > 0) {
+            return $this->savepoint($fn);
+        }
         $this->pdo->beginTransaction();
+        $this->depth = 1;
         try {
             $result = $fn($this);
             $this->pdo->commit();
@@ -156,6 +175,33 @@ final class Connection
                 $this->pdo->rollBack();
             }
             throw $e;
+        } finally {
+            $this->depth = 0;
+        }
+    }
+
+    /**
+     * @template T
+     * @param callable(self): T $fn
+     * @return T
+     */
+    private function savepoint(callable $fn): mixed
+    {
+        $name = 'xar_sp_' . $this->depth;
+        $this->pdo->exec('SAVEPOINT ' . $name);
+        $this->depth++;
+        try {
+            $result = $fn($this);
+            $this->pdo->exec('RELEASE SAVEPOINT ' . $name);
+
+            return $result;
+        } catch (Throwable $e) {
+            if ($this->pdo->inTransaction()) {
+                $this->pdo->exec('ROLLBACK TO SAVEPOINT ' . $name);
+            }
+            throw $e;
+        } finally {
+            $this->depth--;
         }
     }
 

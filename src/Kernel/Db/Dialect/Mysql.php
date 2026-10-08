@@ -56,9 +56,18 @@ final class Mysql extends AbstractDialect
         return in_array($column->type, ['text', 'json'], true) ? '(' . $literal . ')' : $literal;
     }
 
+    /** MySQL treats backslashes in string literals as escapes (unless NO_BACKSLASH_ESCAPES is set). */
+    protected function literal(mixed $value): string
+    {
+        return is_string($value)
+            ? "'" . str_replace(['\\', "'"], ['\\\\', "''"], $value) . "'"
+            : parent::literal($value);
+    }
+
+    /** Binary collation, so equality and unique keys compare bytes as SQLite and PostgreSQL do. */
     protected function tableSuffix(): string
     {
-        return ' ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci';
+        return ' ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin';
     }
 
     protected function incrementsSql(): string

@@ -69,21 +69,22 @@ final class Blueprint
 
     public function index(string ...$columns): void
     {
-        $this->indexes[] = ['columns' => array_values($columns), 'unique' => false];
+        $this->indexes[] = ['columns' => self::names($columns), 'unique' => false];
     }
 
     public function unique(string ...$columns): void
     {
-        $this->indexes[] = ['columns' => array_values($columns), 'unique' => true];
+        $this->indexes[] = ['columns' => self::names($columns), 'unique' => true];
     }
 
     public function primary(string ...$columns): void
     {
-        $this->primary = array_values($columns);
+        $this->primary = self::names($columns);
     }
 
     public function foreign(string $column, string $table, string $references = 'id', string $onDelete = 'cascade'): void
     {
+        self::names([$column, $table, $references]);
         $onDelete = strtolower($onDelete);
         if (!in_array($onDelete, ['cascade', 'restrict', 'set null', 'no action'], true)) {
             throw new InvalidArgumentException("Unsupported ON DELETE action '{$onDelete}'");
@@ -93,9 +94,18 @@ final class Blueprint
 
     private function add(string $name, string $type, ?int $length = null): Column
     {
-        $column = new Column($name, $type, $length);
+        $column = new Column(Schema::check($name), $type, $length);
         $this->columns[] = $column;
 
         return $column;
+    }
+
+    /**
+     * @param array<int|string, string> $columns
+     * @return list<string>
+     */
+    private static function names(array $columns): array
+    {
+        return array_values(array_map(Schema::check(...), $columns));
     }
 }

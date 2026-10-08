@@ -160,4 +160,94 @@ final class SchemaTest extends DbTestCase
         $this->expectException(PDOException::class);
         $this->db->insert('items', ['slug' => 'a', 'title' => 't']);
     }
+
+    public function testComparisonsAreBinaryOnEveryDatabase(): void
+    {
+        $this->db->schema()->create('slugs', function (Blueprint $t): void {
+            $t->increments();
+            $t->string('slug', 64)->unique();
+        });
+        $this->db->insert('slugs', ['slug' => 'resume']);
+        $this->db->insert('slugs', ['slug' => 'Resume']);
+        self::assertSame(0, $this->db->select('slugs')->where('slug', '=', 'RESUME')->count());
+        self::assertSame(1, $this->db->select('slugs')->where('slug', '=', 'Resume')->count());
+    }
+
+    public function testRejectsUnsafeTableName(): void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->db->schema()->create('bad-name', function (Blueprint $t): void {
+            $t->increments();
+        });
+    }
+
+    public function testRejectsUnsafeTableNameOnAlterDropAndRename(): void
+    {
+        $schema = $this->db->schema();
+        foreach ([
+            fn() => $schema->table('x;y', function (Blueprint $t): void {}),
+            fn() => $schema->drop('x y'),
+            fn() => $schema->rename('ok', "bad\n"),
+        ] as $call) {
+            try {
+                $call();
+                self::fail('expected InvalidArgumentException');
+            } catch (\InvalidArgumentException) {
+                $this->addToAssertionCount(1);
+            }
+        }
+    }
+
+    public function testRejectsUnsafeColumnAndIndexNames(): void
+    {
+        foreach ([
+            fn(Blueprint $t) => $t->string('title`, x'),
+            fn(Blueprint $t) => $t->index('ok', '1bad'),
+            fn(Blueprint $t) => $t->unique("name\n"),
+            fn(Blueprint $t) => $t->primary('a b'),
+            fn(Blueprint $t) => $t->foreign('owner', 'users; drop'),
+        ] as $define) {
+            try {
+                $define(new Blueprint('things'));
+                self::fail('expected InvalidArgumentException');
+            } catch (\InvalidArgumentException) {
+                $this->addToAssertionCount(1);
+            }
+        }
+    }
+
+    public function testPrimaryKeysOnlyInCreate(): void
+    {
+        $this->createAllTypes();
+        foreach ([
+            fn(Blueprint $t) => $t->primary('slug'),
+            fn(Blueprint $t) => $t->string('code', 8)->primary(),
+        ] as $define) {
+            try {
+                $this->db->schema()->table('things', $define);
+                self::fail('expected LogicException');
+            } catch (\LogicException) {
+                $this->addToAssertionCount(1);
+            }
+        }
+    }
+
+    public function testDefaultBackslashesRoundTrip(): void
+    {
+        $this->db->schema()->create('defaults', function (Blueprint $t): void {
+            $t->increments();
+            $t->string('s', 32)->default('a\\nb');
+            $t->text('t')->default("it's c:\\path");
+        });
+        $this->db->insert('defaults', ['id' => 1]);
+        $row = $this->db->fetchOne('SELECT s, t FROM {defaults}');
+        self::assertSame('a\\nb', $row['s'] ?? null);
+        self::assertSame(4, strlen((string) $row['s']));
+        self::assertSame("it's c:\\path", $row['t'] ?? null);
+    }
+
+    public function testSchemaExposesItsConnection(): void
+    {
+        self::assertSame($this->db, $this->db->schema()->connection());
+    }
 }

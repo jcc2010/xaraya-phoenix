@@ -110,4 +110,59 @@ final class ConnectionTest extends DbTestCase
         $this->expectException(InvalidArgumentException::class);
         ConnectionFactory::make(['dsn' => 'oracle:whatever']);
     }
+
+    public function testNestedTransactionsCommitTogether(): void
+    {
+        $this->db->transaction(function ($db): void {
+            $db->insert('kv', ['k' => 'outer']);
+            $db->transaction(fn($db) => $db->insert('kv', ['k' => 'inner']));
+        });
+        self::assertSame(['inner', 'outer'], array_column($this->db->fetchAll('SELECT k FROM {kv} ORDER BY k'), 'k'));
+    }
+
+    public function testInnerFailureRollsBackToItsSavepoint(): void
+    {
+        $this->db->transaction(function ($db): void {
+            $db->insert('kv', ['k' => 'outer']);
+            try {
+                $db->transaction(function ($db): void {
+                    $db->insert('kv', ['k' => 'inner']);
+                    throw new \RuntimeException('inner boom');
+                });
+            } catch (\RuntimeException $e) {
+                self::assertSame('inner boom', $e->getMessage());
+            }
+            $db->transaction(fn($db) => $db->insert('kv', ['k' => 'after']));
+        });
+        self::assertSame(['after', 'outer'], array_column($this->db->fetchAll('SELECT k FROM {kv} ORDER BY k'), 'k'));
+    }
+
+    public function testOuterFailureDiscardsEverything(): void
+    {
+        try {
+            $this->db->transaction(function ($db): void {
+                $db->insert('kv', ['k' => 'outer']);
+                $db->transaction(fn($db) => $db->insert('kv', ['k' => 'inner']));
+                throw new \RuntimeException('outer boom');
+            });
+            self::fail('expected exception');
+        } catch (\RuntimeException $e) {
+            self::assertSame('outer boom', $e->getMessage());
+        }
+        self::assertSame(0, (int) $this->db->fetchValue('SELECT COUNT(*) FROM {kv}'));
+        $this->db->transaction(fn($db) => $db->insert('kv', ['k' => 'again']));
+        self::assertSame(1, (int) $this->db->fetchValue('SELECT COUNT(*) FROM {kv}'));
+    }
+
+    public function testUpsertRejectsEmptyConflict(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->db->upsert('kv', ['k' => 'a', 'v' => 'x'], []);
+    }
+
+    public function testUpsertRejectsUnsafeConflictColumn(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->db->upsert('kv', ['k' => 'a', 'v' => 'x'], ['k) DO NOTHING; --']);
+    }
 }

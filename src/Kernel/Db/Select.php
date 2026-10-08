@@ -69,14 +69,33 @@ final class Select
         return $this;
     }
 
-    /** @param array<string, mixed> $cursor ordered column => value */
+    /**
+     * Keyset pagination: keeps rows strictly after the cursor row in a lexicographic order over its columns.
+     *
+     * The cursor columns must be the query's ORDER BY columns, in the same order, and the direction of
+     * EVERY one must match $op: `<` with all DESC, `>` with all ASC. Mixed directions are not supported.
+     * The last column should be unique (an id) so ties are broken. Cursor values must not be null, since
+     * comparisons with NULL never match; order only by NOT NULL columns.
+     *
+     * @param array<mixed> $cursor ordered column name => value of the last row already seen; other keys throw
+     */
     public function cursor(array $cursor, string $op = '<'): self
     {
         if (!in_array($op, ['<', '>'], true) || $cursor === []) {
             throw new InvalidArgumentException('cursor() needs columns and an operator of < or >');
         }
-        $columns = array_keys($cursor);
-        $values = array_values(array_map(Connection::normalize(...), $cursor));
+        $columns = [];
+        $values = [];
+        foreach ($cursor as $column => $value) {
+            if (!is_string($column)) {
+                throw new InvalidArgumentException('cursor() keys must be column names');
+            }
+            if ($value === null) {
+                throw new InvalidArgumentException("cursor() value for '{$column}' must not be null");
+            }
+            $columns[] = $column;
+            $values[] = Connection::normalize($value);
+        }
         $alternatives = [];
         foreach ($columns as $i => $column) {
             $terms = [];

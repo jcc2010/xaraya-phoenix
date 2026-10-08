@@ -102,4 +102,40 @@ final class MigratorTest extends DbTestCase
         $this->db->insert('modules', ['name' => 'blog', 'version' => '0.1.0', 'installed_at' => '2026-10-08 00:00:00']);
         self::assertTrue((bool) $this->db->fetchValue('SELECT enabled FROM {modules} WHERE name = ?', ['blog']));
     }
+
+    private function writeRaw(string $name, string $up): void
+    {
+        file_put_contents("{$this->dir}/{$name}.php", "<?php\ndeclare(strict_types=1);\n"
+            . "use Xaraya\\Kernel\\Db\\Migrations\\Migration;\nuse Xaraya\\Kernel\\Db\\Schema\\Blueprint;\nuse Xaraya\\Kernel\\Db\\Schema\\Schema;\n"
+            . "return new class extends Migration {\n    public function up(Schema \$schema): void\n    {\n{$up}\n    }\n};\n");
+    }
+
+    public function testMigrationMayOpenItsOwnTransaction(): void
+    {
+        $this->writeRaw('2026_01_03_000001_seed_alpha', <<<'PHP'
+                    $schema->create('seeded', function (Blueprint $t): void { $t->increments(); $t->string('name'); });
+                    $schema->connection()->transaction(function ($db): void {
+                        $db->insert('seeded', ['name' => 'one']);
+                        $db->insert('seeded', ['name' => 'two']);
+                    });
+            PHP);
+        $done = (new Migrator($this->db))->migrate(['demo' => $this->dir]);
+        self::assertContains('demo/2026_01_03_000001_seed_alpha', $done);
+        self::assertSame(2, (int) $this->db->fetchValue('SELECT COUNT(*) FROM {seeded}'));
+    }
+
+    public function testMigrationCanBackfillThroughTheSchemaConnection(): void
+    {
+        $this->writeRaw('2026_01_03_000001_create_people', <<<'PHP'
+                    $schema->create('people', function (Blueprint $t): void { $t->increments(); $t->string('name'); });
+                    $schema->connection()->insert('people', ['name' => 'Ada']);
+                    $schema->connection()->insert('people', ['name' => 'Bob']);
+            PHP);
+        $this->writeRaw('2026_01_03_000002_add_people_status', <<<'PHP'
+                    $schema->table('people', function (Blueprint $t): void { $t->string('status', 16)->nullable(); });
+                    $schema->connection()->update('people', ['status' => 'active'], ['status' => null]);
+            PHP);
+        (new Migrator($this->db))->migrate(['demo' => $this->dir]);
+        self::assertSame(['active', 'active'], array_column($this->db->fetchAll('SELECT status FROM {people} ORDER BY id'), 'status'));
+    }
 }
