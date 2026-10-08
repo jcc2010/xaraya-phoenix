@@ -33,7 +33,7 @@ final class ManifestTest extends TestCase
         self::assertSame(realpath(self::FIXTURES . '/alpha') . '/migrations', $m->migrationsPath());
         self::assertTrue($m->isContent());
         self::assertSame([['event' => 'Xaraya\\Kernel\\Events\\ItemCreated', 'listener' => 'Xaraya\\Module\\Alpha\\Thing', 'priority' => 5]], $m->subscribers());
-        self::assertSame(['Xaraya\\Module\\Alpha\\Thing'], $m->commands());
+        self::assertSame(['Xaraya\\Module\\Alpha\\AlphaPingCommand'], $m->commands());
         self::assertNull($m->routes());
         self::assertNull($m->provider());
         self::assertSame([], $m->requiredModules());

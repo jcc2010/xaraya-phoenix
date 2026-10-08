@@ -6,5 +6,5 @@
   "subscribers": [
     { "event": "Xaraya\\Kernel\\Events\\ItemCreated", "listener": "Xaraya\\Module\\Alpha\\Thing", "priority": 5 }
   ],
-  "commands": ["Xaraya\\Module\\Alpha\\Thing"]
+  "commands": ["Xaraya\\Module\\Alpha\\AlphaPingCommand"]
 }
