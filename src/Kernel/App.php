@@ -19,6 +19,7 @@ use Xaraya\Kernel\Db\Connection;
 use Xaraya\Kernel\Db\ConnectionFactory;
 use Xaraya\Kernel\Db\Migrations\Migrator;
 use Xaraya\Kernel\Events\EventDispatcher;
+use Xaraya\Kernel\Http\CallableHandler;
 use Xaraya\Kernel\Http\Emitter;
 use Xaraya\Kernel\Http\Middleware\ConditionalGet;
 use Xaraya\Kernel\Http\Middleware\Cors;
@@ -55,7 +56,7 @@ final class App
     private function __construct(private readonly string $root, array $overrides)
     {
         Env::load($root . '/.env');
-        $config = Config::load($root . '/config/app.php', $overrides === [] ? $root . '/var/cache/config.php' : null);
+        $config = Config::load($root . '/config/app.php', $overrides === [] ? $this->configCachePath() : null);
         foreach ($overrides as $key => $value) {
             $config->set($key, $value);
         }
@@ -148,21 +149,25 @@ final class App
 
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
-        $stack = [$this->container->get(ErrorHandler::class)];
-        foreach ($this->globalMiddleware as $class) {
-            $middleware = $this->container->get($class);
-            if (!$middleware instanceof MiddlewareInterface) {
-                throw new LogicException("{$class} is not a MiddlewareInterface");
+        $final = new CallableHandler(function (ServerRequestInterface $request): ResponseInterface {
+            $stack = [];
+            foreach ($this->globalMiddleware as $class) {
+                $middleware = $this->container->has($class) ? $this->container->get($class) : $this->container->make($class);
+                if (!$middleware instanceof MiddlewareInterface) {
+                    throw new LogicException("{$class} is not a MiddlewareInterface");
+                }
+                $stack[] = $middleware;
             }
-            $stack[] = $middleware;
-        }
-        $final = new RouteHandler(
-            $this->container->get(Router::class),
-            $this->container->get(MiddlewareRegistry::class),
-            $this->container,
-        );
+            $route = new RouteHandler(
+                $this->container->get(Router::class),
+                $this->container->get(MiddlewareRegistry::class),
+                $this->container,
+            );
 
-        return (new Pipeline($stack, $final))->handle($request);
+            return (new Pipeline($stack, $route))->handle($request);
+        });
+
+        return (new Pipeline([$this->container->get(ErrorHandler::class)], $final))->handle($request);
     }
 
     public function run(): void
@@ -175,13 +180,18 @@ final class App
     public function clearCache(): int
     {
         $removed = 0;
-        foreach ([...(glob($this->cacheDir() . '/*.php') ?: []), ...(glob($this->root . '/var/cache/config.php') ?: [])] as $file) {
+        foreach ([...(glob($this->cacheDir() . '/*.php') ?: []), ...(glob($this->configCachePath()) ?: [])] as $file) {
             if (is_file($file) && unlink($file)) {
                 $removed++;
             }
         }
 
         return $removed;
+    }
+
+    private function configCachePath(): string
+    {
+        return $this->root . '/var/cache/config.php';
     }
 
     private function cacheDir(): string

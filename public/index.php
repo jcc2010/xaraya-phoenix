@@ -11,4 +11,13 @@ if (PHP_SAPI === 'cli-server') {
 
 require dirname(__DIR__) . '/vendor/autoload.php';
 
-Xaraya\Kernel\App::boot(dirname(__DIR__))->run();
+try {
+    Xaraya\Kernel\App::boot(dirname(__DIR__))->run();
+} catch (Throwable $e) {
+    error_log((string) $e);
+    if (!headers_sent()) {
+        http_response_code(500);
+        header('Content-Type: text/plain; charset=utf-8');
+    }
+    echo "Server Error\n";
+}
