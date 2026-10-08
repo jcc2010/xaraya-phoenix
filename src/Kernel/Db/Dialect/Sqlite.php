@@ -24,6 +24,22 @@ final class Sqlite extends AbstractDialect
         return "SELECT name FROM sqlite_master WHERE type = 'table' AND name NOT LIKE 'sqlite_%' ORDER BY name";
     }
 
+    public function renameTable(PDO $pdo, string $from, string $to): void
+    {
+        parent::renameTable($pdo, $from, $to);
+        $statement = $pdo->prepare("SELECT name, sql FROM sqlite_master WHERE type = 'index' AND tbl_name = ? AND sql IS NOT NULL");
+        $statement->execute([$to]);
+        foreach ($statement->fetchAll(PDO::FETCH_ASSOC) as $index) {
+            $old = (string) $index['name'];
+            if (!str_starts_with($old, $from . '_')) {
+                continue;
+            }
+            $new = $this->renamedIndexName($from, $to, $old);
+            $pdo->exec('DROP INDEX ' . $this->quote($old));
+            $pdo->exec(preg_replace('/' . preg_quote($this->quote($old), '/') . '/', $this->quote($new), (string) $index['sql'], 1) ?? '');
+        }
+    }
+
     protected function incrementsSql(): string
     {
         return 'INTEGER PRIMARY KEY AUTOINCREMENT';

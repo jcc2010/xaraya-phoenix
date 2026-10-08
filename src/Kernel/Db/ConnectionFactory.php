@@ -39,6 +39,8 @@ final class ConnectionFactory
         ];
         if ($driver === 'mysql') {
             $options[PDO::ATTR_EMULATE_PREPARES] = false;
+            // Report matched rows, not changed rows, to match SQLite and PostgreSQL.
+            $options[class_exists(\Pdo\Mysql::class) ? \Pdo\Mysql::ATTR_FOUND_ROWS : PDO::MYSQL_ATTR_FOUND_ROWS] = true;
         }
         $user = $config['user'] ?? null;
         $password = $config['password'] ?? null;

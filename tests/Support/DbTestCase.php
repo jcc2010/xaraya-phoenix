@@ -48,7 +48,7 @@ abstract class DbTestCase extends TestCase
             $db->pdo()->exec('SET FOREIGN_KEY_CHECKS = 0');
         }
         foreach ($db->tables() as $table) {
-            $db->pdo()->exec($db->dialect()->dropTableSql($db->prefix() . $table));
+            $db->pdo()->exec($db->dialect()->dropTableSql($db->prefix() . $table) . ($db->dialect()->name() === 'pgsql' ? ' CASCADE' : ''));
         }
         if ($mysql) {
             $db->pdo()->exec('SET FOREIGN_KEY_CHECKS = 1');

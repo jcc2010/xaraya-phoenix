@@ -127,4 +127,37 @@ final class SchemaTest extends DbTestCase
         self::assertCount(2, $sql);
         self::assertMatchesRegularExpression('/INDEX "([^"]{1,60})" ON/', $sql[1]);
     }
+
+    public function testTextAndJsonDefaults(): void
+    {
+        $this->db->schema()->create('defaults', function (Blueprint $t): void {
+            $t->increments();
+            $t->int('x');
+            $t->text('note')->default('');
+            $t->json('meta')->default('{}');
+        });
+        $this->db->insert('defaults', ['x' => 1]);
+        $row = $this->db->fetchOne('SELECT note, meta FROM {defaults}');
+        self::assertNotNull($row);
+        self::assertSame('', $row['note']);
+        self::assertSame('{}', str_replace(' ', '', (string) $row['meta']));
+    }
+
+    public function testTableCanBeRecreatedAfterRename(): void
+    {
+        $define = function (Blueprint $t): void {
+            $t->increments();
+            $t->string('slug', 32)->unique();
+            $t->string('title', 32);
+            $t->index('title');
+        };
+        $s = $this->db->schema();
+        $s->create('things', $define);
+        $s->rename('things', 'items');
+        $s->create('things', $define);
+
+        $this->db->insert('items', ['slug' => 'a', 'title' => 't']);
+        $this->expectException(PDOException::class);
+        $this->db->insert('items', ['slug' => 'a', 'title' => 't']);
+    }
 }

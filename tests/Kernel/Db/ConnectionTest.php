@@ -44,6 +44,12 @@ final class ConnectionTest extends DbTestCase
         $this->db->update('kv', ['n' => 1], []);
     }
 
+    public function testUpdateCountsMatchedRowsEvenWhenUnchanged(): void
+    {
+        $this->db->insert('kv', ['k' => 'a', 'n' => 1]);
+        self::assertSame(1, $this->db->update('kv', ['n' => 1], ['k' => 'a']));
+    }
+
     public function testWhereNullMatchesIsNull(): void
     {
         $this->db->insert('kv', ['k' => 'a', 'v' => null]);

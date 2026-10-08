@@ -36,5 +36,9 @@ interface Dialect
 
     public function dropTableSql(string $table): string;
 
-    public function renameTableSql(string $from, string $to): string;
+    /**
+     * Renames a table together with its indexes (names starting with "<from>_"),
+     * so the old name can be reused. Arguments are full, prefixed, unquoted names.
+     */
+    public function renameTable(PDO $pdo, string $from, string $to): void;
 }

@@ -30,6 +30,10 @@ final class Schema
         $this->run($this->db->dialect()->alterTable($blueprint, $this->db->prefix()));
     }
 
+    /**
+     * Dropping a table that other tables reference errors on MySQL and PostgreSQL,
+     * while SQLite performs an implicit DELETE that fires ON DELETE actions.
+     */
     public function drop(string $table): void
     {
         $this->run([$this->db->dialect()->dropTableSql($this->db->prefix() . $table)]);
@@ -38,7 +42,7 @@ final class Schema
     public function rename(string $from, string $to): void
     {
         $prefix = $this->db->prefix();
-        $this->run([$this->db->dialect()->renameTableSql($prefix . $from, $prefix . $to)]);
+        $this->db->dialect()->renameTable($this->db->pdo(), $prefix . $from, $prefix . $to);
     }
 
     public function has(string $table): bool

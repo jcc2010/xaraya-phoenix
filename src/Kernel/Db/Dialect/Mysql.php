@@ -48,6 +48,14 @@ final class Mysql extends AbstractDialect
         ));
     }
 
+    protected function defaultSql(Column $column): string
+    {
+        $literal = parent::defaultSql($column);
+
+        // MySQL only allows defaults on TEXT/JSON columns in expression form (8.0.13+).
+        return in_array($column->type, ['text', 'json'], true) ? '(' . $literal . ')' : $literal;
+    }
+
     protected function tableSuffix(): string
     {
         return ' ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci';

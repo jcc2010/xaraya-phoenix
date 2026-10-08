@@ -24,9 +24,17 @@ final class Pgsql extends AbstractDialect
         return 'SELECT tablename FROM pg_tables WHERE schemaname = current_schema() ORDER BY tablename';
     }
 
-    public function dropTableSql(string $table): string
+    public function renameTable(PDO $pdo, string $from, string $to): void
     {
-        return parent::dropTableSql($table) . ' CASCADE';
+        parent::renameTable($pdo, $from, $to);
+        $statement = $pdo->prepare('SELECT indexname FROM pg_indexes WHERE schemaname = current_schema() AND tablename = ?');
+        $statement->execute([$to]);
+        foreach ($statement->fetchAll(PDO::FETCH_COLUMN) as $old) {
+            $old = (string) $old;
+            if (str_starts_with($old, $from . '_')) {
+                $pdo->exec('ALTER INDEX ' . $this->quote($old) . ' RENAME TO ' . $this->quote($this->renamedIndexName($from, $to, $old)));
+            }
+        }
     }
 
     protected function boolLiteral(bool $value): string

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Xaraya\Kernel\Db\Dialect;
 
+use PDO;
 use Xaraya\Kernel\Db\Schema\Blueprint;
 use Xaraya\Kernel\Db\Schema\Column;
 
@@ -97,9 +98,17 @@ abstract class AbstractDialect implements Dialect
         return 'DROP TABLE IF EXISTS ' . $this->quote($table);
     }
 
-    public function renameTableSql(string $from, string $to): string
+    public function renameTable(PDO $pdo, string $from, string $to): void
     {
-        return 'ALTER TABLE ' . $this->quote($from) . ' RENAME TO ' . $this->quote($to);
+        $pdo->exec('ALTER TABLE ' . $this->quote($from) . ' RENAME TO ' . $this->quote($to));
+    }
+
+    /** Derives the new name of an index when its table is renamed. */
+    protected function renamedIndexName(string $from, string $to, string $index): string
+    {
+        $name = $to . substr($index, strlen($from));
+
+        return strlen($name) <= 60 ? $name : substr($name, 0, 51) . '_' . substr(md5($name), 0, 8);
     }
 
     /** @param list<string> $columns */
@@ -115,10 +124,15 @@ abstract class AbstractDialect implements Dialect
         }
         $sql = $this->quote($column->name) . ' ' . $this->typeSql($column) . ($column->nullable ? ' NULL' : ' NOT NULL');
         if ($column->hasDefault) {
-            $sql .= ' DEFAULT ' . $this->literal($column->default);
+            $sql .= ' DEFAULT ' . $this->defaultSql($column);
         }
 
         return $sql;
+    }
+
+    protected function defaultSql(Column $column): string
+    {
+        return $this->literal($column->default);
     }
 
     protected function literal(mixed $value): string
