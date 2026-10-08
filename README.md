@@ -1,43 +1,30 @@
-# xaraya/core project
+# Xaraya Phoenix
 
-This provides the Xaraya core framework with the essential modules, blocks, properties and themes.
+A small, modern fork of [Xaraya](https://github.com/xaraya/core): a blogging engine that speaks
+Athena's JSON Feed format natively, and a content manager that can import other JSON sources.
 
-Optional [xaraya/modules](https://github.com/mikespub/xaraya-modules) and [xaraya/properties](https://github.com/mikespub/xaraya-properties) bundles will be installed in development mode.
+Status: early development on the `next` branch. Release codenames follow the X-Men
+(1.0 *Cyclops*). The original Xaraya tree is kept read-only in `legacy/` until 1.0.
 
 ## Requirements
 
-- PHP 8.2+ with mbstring, XML and XSL extensions
-- MariaDB 10.x or MySQL 8.x (or SQLite 3.x in tests)
-- composer 2.x for installation
+- PHP 8.3+ with pdo, mbstring, json
+- SQLite (default), MySQL 8 / MariaDB 10.6+, or Postgres 14+
 
-## Installation
-
-Create Xaraya core project using `composer` in current directory or "myproject" subdirectory ([composer create-project](https://getcomposer.org/doc/03-cli.md#create-project))
+## Quick start
 
 ```sh
-composer create-project xaraya/core [myproject]
+composer install
+bin/xar migrate
+bin/xar serve
 ```
 
-## Xaraya Modules
-
-Add other [Xaraya Modules](https://github.com/xaraya-modules) as `composer` packages to your project ([composer require](https://getcomposer.org/doc/03-cli.md#require-r))
+## Development
 
 ```sh
-composer require xaraya/library
+composer test   # PHPUnit (XAR_TEST_DSN selects the database)
+composer stan   # PHPStan level 8
+composer cs     # coding style check
 ```
 
-## Legacy Support
-
-Older 2.x modules can be supported under the following conditions:
-- **Removed**: no use of legacy 1.x core functions, e.g. `xarUserGetVar` to `xarUser::getVar` (2.4.5)
-- **Renamed**: replace static method calls for `DataObjectMaster::get*` with `DataObjectFactory::get*` (2.7.3)
-- **Autoload**: remove/rename conflicting classes, e.g. left-over copies of `class/hooksubjects/*` (2.8.0)
-
-After copying the module files to the `html/code/modules/[mymodule]/` directory, be sure to run dump-autoload again:
-```sh
-composer dump-autoload -o
-```
-
-You can use developer tools `bermuda_cleanup.php` to clean up 2.x module code and templates.
-Older 1.x modules can be converted using `aruba2jamaica-2.1.php` first.
-Some "minor" clean-up will be needed afterwards :-)
+License: GPL-2.0-or-later.

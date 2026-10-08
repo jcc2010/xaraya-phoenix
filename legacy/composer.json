@@ -1,0 +1,101 @@
+{
+    "name": "xaraya/core",
+    "description": "Xaraya Core web development framework",
+    "type": "project",
+    "require": {
+        "php": ">=8.2",
+        "ext-mbstring": "*",
+        "ext-xml": "*",
+        "ext-xsl": "*"
+    },
+    "require-dev": {
+        "middlewares/utils": "^4.0",
+        "nikic/fast-route": "2.0.0-beta1",
+        "nyholm/psr7": "^1.8",
+        "nyholm/psr7-server": "^1.1",
+        "phpdocumentor/reflection": "^6.4",
+        "symfony/config": "^7.4 || ^8.0",
+        "symfony/routing": "^7.4 || ^8.0",
+        "webonyx/graphql-php": "^15.26",
+        "xaraya/modules": "dev-master",
+        "xaraya/properties": "dev-master",
+        "xaraya/twig": "^2.8"
+    },
+    "suggest": {
+        "phpstan/phpstan": "PHP Static Analysis Tool - discover bugs in your code without running it",
+        "phpunit/phpunit": "The PHP Unit Testing framework",
+        "doctrine/cache": "Use supported Doctrine CacheProviders for caching",
+        "doctrine/dbal": "Experiment with external database (Doctrine DBAL)",
+        "mongodb/mongodb": "Experiment with external database (MongoDB)",
+        "phpdocumentor/reflection": "Required to use bermuda_cleanup.php in developer/tools",
+        "xaraya/modules": "Experiment with adding modules via composer cli",
+        "xaraya/properties": "Experiment with adding properties via composer cli",
+        "xaraya/twig": "Use Twig template engine with Xaraya",
+        "ext-mysqli": "Access database via Creole library (legacy)",
+        "ext-pdo_mysql": "Access database via PDO driver (modern)"
+    },
+    "license": "GPL-2.0-or-later",
+    "config": {
+        "optimize-autoloader": true,
+        "sort-packages": true,
+        "preferred-install": {
+            "xaraya/properties": "source"
+        },
+        "allow-plugins": {
+            "xaraya/*": true,
+            "symfony/flex": false,
+            "symfony/runtime": false
+        }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "autoload": {
+        "classmap": [
+            "html/bootstrap.php",
+            "html/lib/",
+            "html/code/"
+        ],
+        "files": [
+            "html/var/layout.system.php"
+        ],
+        "exclude-from-classmap": [
+            "html/lib/xaraya/legacy/",
+            "vendor/xaraya/properties/"
+        ]
+    },
+    "scripts": {
+        "xar-modules-install": "xarInstallComposer::createModuleSymLinks",
+        "xar-modules-list": "xarInstallComposer::showModules",
+        "xar-modules-uninstall": "xarInstallComposer::removeModuleSymLinks",
+        "xar-properties-install": "xarInstallComposer::createPropertySymLinks",
+        "xar-properties-list": "xarInstallComposer::showProperties",
+        "xar-properties-uninstall": "xarInstallComposer::removePropertySymLinks",
+        "xar-properties-update": "cd vendor/xaraya/properties; git submodule update --init; echo 'done'",
+        "xar-twig-install": "composer require xaraya/twig",
+        "xar-twig-uninstall": "composer remove xaraya/twig",
+        "xar-start-server": [
+            "Composer\\Config::disableProcessTimeout",
+            "php -S 0.0.0.0:8080 -t html"
+        ]
+    },
+    "scripts-descriptions": {
+        "xar-modules-install": "Create symlinks to Xaraya modules via composer",
+        "xar-modules-list": "List Xaraya modules available via composer",
+        "xar-modules-uninstall": "Remove symlinks to Xaraya modules via composer",
+        "xar-properties-install": "Create symlinks to Xaraya properties via composer",
+        "xar-properties-list": "List Xaraya properties available via composer",
+        "xar-properties-uninstall": "Remove symlinks to Xaraya properties via composer",
+        "xar-properties-update": "Update Xaraya properties from git submodules",
+        "xar-twig-install": "Use Twig templates with Xaraya",
+        "xar-twig-uninstall": "Remove Twig template engine",
+        "xar-start-server": "Start local PHP server to browse Xaraya site"
+    },
+    "extra": {
+        "installer-paths": {
+            "html/code/modules/{name}/": ["type:xaraya-module"],
+            "html/themes/{name}/": ["type:xaraya-theme"],
+            "html/code/blocks/{name}/": ["type:xaraya-block"],
+            "html/code/properties/{name}/": ["type:xaraya-property"]
+        }
+    }
+}

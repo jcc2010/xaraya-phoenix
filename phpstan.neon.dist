@@ -1,22 +1,4 @@
-includes:
-    - phpstan-baseline.neon
-
 parameters:
-    level: 0
-    # Dynamic properties emits warnings from PHP 8.2 onwards.
-    # checkDynamicProperties: true
+    level: 8
     paths:
-        - html
-        - developer
-    bootstrapFiles:
-        - phpstan-bootstrap.php
-    excludePaths:
-        - html/var/*
-        - html/lib/creole/*
-        - developer/tests/*
-    # ignoreErrors:
-    #     - identifiers:
-    #         - staticMethod.deprecatedClass
-    #         - classConstant.deprecatedClass
-    parallel:
-        processTimeout: 300.0
+        - src

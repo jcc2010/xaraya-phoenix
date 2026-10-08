@@ -1,9 +1,8 @@
-composer.lock
 /vendor/
-.php_cs.cache
-.php-cs-fixer.cache
-phpstan.neon
-.phpunit.result.cache
-.phpunit.cache
-.vscode/
-var/
+/var/*
+!/var/.gitkeep
+/.env
+/.phpunit.cache/
+/.php-cs-fixer.cache
+/phpstan.neon
+/.vscode/

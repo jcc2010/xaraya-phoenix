@@ -1,0 +1,68 @@
+name: CI
+on:
+  push:
+    branches: [next]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        php: ['8.3', '8.4']
+        db: [sqlite, mysql, pgsql]
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: xaraya_test
+        ports: ['3306:3306']
+        options: >-
+          --health-cmd="mysqladmin ping -h 127.0.0.1 -proot"
+          --health-interval=5s --health-timeout=5s --health-retries=20
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: xaraya_test
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd="pg_isready -U postgres"
+          --health-interval=5s --health-timeout=5s --health-retries=20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          extensions: pdo, pdo_sqlite, pdo_mysql, pdo_pgsql, mbstring
+          coverage: none
+      - run: composer install --no-interaction --no-progress
+      - name: Select database
+        run: |
+          case "${{ matrix.db }}" in
+            mysql)
+              echo "XAR_TEST_DSN=mysql:host=127.0.0.1;port=3306;dbname=xaraya_test;charset=utf8mb4" >> "$GITHUB_ENV"
+              echo "XAR_TEST_DB_USER=root" >> "$GITHUB_ENV"
+              echo "XAR_TEST_DB_PASSWORD=root" >> "$GITHUB_ENV" ;;
+            pgsql)
+              echo "XAR_TEST_DSN=pgsql:host=127.0.0.1;port=5432;dbname=xaraya_test" >> "$GITHUB_ENV"
+              echo "XAR_TEST_DB_USER=postgres" >> "$GITHUB_ENV"
+              echo "XAR_TEST_DB_PASSWORD=postgres" >> "$GITHUB_ENV" ;;
+            *)
+              echo "XAR_TEST_DSN=sqlite::memory:" >> "$GITHUB_ENV" ;;
+          esac
+      - run: vendor/bin/phpunit
+
+  static:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          coverage: none
+      - run: composer install --no-interaction --no-progress
+      - run: composer stan
+      - run: composer cs
