@@ -24,7 +24,8 @@
         "twig/twig": "Render .twig templates with the Twig engine"
     },
     "autoload": {
-        "psr-4": { "Xaraya\\": "src/" }
+        "psr-4": { "Xaraya\\": "src/" },
+        "files": ["src/functions.php"]
     },
     "autoload-dev": {
         "psr-4": { "Xaraya\\Tests\\": "tests/" }
