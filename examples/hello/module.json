@@ -1,0 +1,10 @@
+{
+  "name": "hello",
+  "version": "0.1.0",
+  "requires": { "kernel": "^0.1", "modules": {} },
+  "routes": "Xaraya\\Module\\Hello\\Routes",
+  "migrations": "migrations",
+  "subscribers": [
+    { "event": "Xaraya\\Kernel\\Events\\ItemCreated", "listener": "Xaraya\\Module\\Hello\\CountGreetings", "priority": 0 }
+  ]
+}
