@@ -10,6 +10,7 @@ use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Log\AbstractLogger;
 use Xaraya\Kernel\Http\CallableHandler;
+use Xaraya\Kernel\Http\Exception\HttpException;
 use Xaraya\Kernel\Http\Exception\MethodNotAllowed;
 use Xaraya\Kernel\Http\Exception\NotFound;
 use Xaraya\Kernel\Http\Middleware\ErrorHandler;
@@ -84,5 +85,48 @@ final class ErrorHandlerTest extends TestCase
         $eh = new ErrorHandler(new MemoryLogger(), false, fn(int $status, string $message) => "<h1>Custom {$status}</h1>");
         $response = $this->send($eh, new ServerRequest('GET', '/x'), new NotFound());
         self::assertSame('<h1>Custom 404</h1>', (string) $response->getBody());
+    }
+
+    public function testServerHttpExceptionIsMaskedAndLogged(): void
+    {
+        $logger = new MemoryLogger();
+        $e = new HttpException(503, 'DB host db1.internal down');
+        $response = $this->send(new ErrorHandler($logger), new ServerRequest('GET', '/x'), $e);
+        self::assertSame(503, $response->getStatusCode());
+        self::assertStringNotContainsString('db1.internal', (string) $response->getBody());
+        self::assertStringContainsString('Service Unavailable', (string) $response->getBody());
+        self::assertSame(['error: DB host db1.internal down'], $logger->lines);
+
+        $debug = $this->send(new ErrorHandler(new MemoryLogger(), debug: true), new ServerRequest('GET', '/x'), $e);
+        self::assertStringContainsString('db1.internal', (string) $debug->getBody());
+    }
+
+    public function testInvalidUtf8MessageInDebugStillYieldsJson(): void
+    {
+        $response = $this->send(new ErrorHandler(new MemoryLogger(), debug: true), new ServerRequest('GET', '/x.json'), new \RuntimeException("bad \xB1 bytes"));
+        self::assertSame(500, $response->getStatusCode());
+        self::assertIsArray(json_decode((string) $response->getBody(), true));
+    }
+
+    public function testThrowingRendererFallsBack(): void
+    {
+        $eh = new ErrorHandler(new MemoryLogger(), false, function (): never {
+            throw new \RuntimeException('boom');
+        });
+        $response = $this->send($eh, new ServerRequest('GET', '/x'), new NotFound());
+        self::assertSame(404, $response->getStatusCode());
+        self::assertStringContainsString('Not Found', (string) $response->getBody());
+    }
+
+    public function testThrowingLoggerStillReturns500(): void
+    {
+        $logger = new class extends AbstractLogger {
+            public function log($level, string|\Stringable $message, array $context = []): void
+            {
+                throw new \RuntimeException('logger down');
+            }
+        };
+        $response = $this->send(new ErrorHandler($logger), new ServerRequest('GET', '/x'), new \RuntimeException('x'));
+        self::assertSame(500, $response->getStatusCode());
     }
 }

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Xaraya\Kernel\Http\Middleware;
 
 use Closure;
+use Nyholm\Psr7\Response;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
@@ -28,11 +29,26 @@ final class ErrorHandler implements MiddlewareInterface
         try {
             return $handler->handle($request);
         } catch (HttpException $e) {
-            return $this->respond($request, $e->status(), $e->getMessage(), $e->headers(), $e);
+            $status = $e->status();
+            if ($status >= 500) {
+                $this->log($e);
+            }
+            $message = $status >= 500 && !$this->debug ? HttpException::reason($status) : $e->getMessage();
+
+            return $this->respond($request, $status, $message, $e->headers(), $e);
         } catch (Throwable $e) {
-            $this->logger->error($e->getMessage(), ['exception' => $e]);
+            $this->log($e);
 
             return $this->respond($request, 500, $this->debug ? $e->getMessage() : HttpException::reason(500), [], $e);
+        }
+    }
+
+    private function log(Throwable $e): void
+    {
+        try {
+            $this->logger->error($e->getMessage(), ['exception' => $e]);
+        } catch (Throwable) {
+            // A failing logger must never break error handling.
         }
     }
 
@@ -47,9 +63,17 @@ final class ErrorHandler implements MiddlewareInterface
             if ($trace !== null) {
                 $error['trace'] = $trace;
             }
-            $response = Controller::jsonResponse(['error' => $error], $status);
+            $body = json_encode(['error' => $error], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_INVALID_UTF8_SUBSTITUTE | JSON_PARTIAL_OUTPUT_ON_ERROR);
+            $response = new Response($status, ['Content-Type' => 'application/json'], $body === false ? '{"error":{"status":' . $status . '}}' : $body);
         } else {
-            $html = $this->renderHtml !== null ? ($this->renderHtml)($status, $message, $request) : null;
+            $html = null;
+            if ($this->renderHtml !== null) {
+                try {
+                    $html = ($this->renderHtml)($status, $message, $request);
+                } catch (Throwable) {
+                    $html = null;
+                }
+            }
             $response = Controller::htmlResponse($html ?? $this->fallback($status, $message, $trace), $status);
         }
         foreach ($headers as $name => $value) {
