@@ -9,6 +9,8 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
+use Throwable;
+use Xaraya\Kernel\Http\Exception\HttpException;
 
 final class Cors implements MiddlewareInterface
 {
@@ -24,6 +26,15 @@ final class Cors implements MiddlewareInterface
             return $requested === '' ? $response : $response->withHeader('Access-Control-Allow-Headers', $requested);
         }
 
-        return $handler->handle($request)->withHeader('Access-Control-Allow-Origin', '*');
+        try {
+            $response = $handler->handle($request);
+        } catch (HttpException $e) {
+            throw new HttpException($e->status(), $e->getMessage(), [...$e->headers(), 'Access-Control-Allow-Origin' => '*'], $e->getPrevious());
+        } catch (Throwable $e) {
+            // ErrorHandler masks the 5xx message and logs the wrapped exception.
+            throw new HttpException(500, '', ['Access-Control-Allow-Origin' => '*'], $e);
+        }
+
+        return $response->withHeader('Access-Control-Allow-Origin', '*');
     }
 }

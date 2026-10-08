@@ -46,6 +46,17 @@ final class TagMiddleware implements MiddlewareInterface
     }
 }
 
+final class NeedMiddleware implements MiddlewareInterface
+{
+    /** @param list<string> $args */
+    public function __construct(public readonly array $args = []) {}
+
+    public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
+    {
+        return $handler->handle($request)->withHeader('X-Need', implode(',', $this->args));
+    }
+}
+
 final class RouteHandlerTest extends TestCase
 {
     private function handler(): RouteHandler
@@ -92,5 +103,52 @@ final class RouteHandlerTest extends TestCase
     {
         $this->expectException(\LogicException::class);
         (new MiddlewareRegistry(new Container()))->resolve('nope');
+    }
+
+    public function testClassStringFactoryReceivesArgs(): void
+    {
+        $registry = new MiddlewareRegistry(new Container());
+        $registry->register('need', NeedMiddleware::class);
+        $middleware = $registry->resolve('need:admin');
+        self::assertInstanceOf(NeedMiddleware::class, $middleware);
+        self::assertSame(['admin'], $middleware->args);
+        self::assertSame([], $registry->resolve('need')->args);
+    }
+
+    public function testClassStringFactoryWithoutArgsParameterRejectsArgs(): void
+    {
+        $registry = new MiddlewareRegistry(new Container());
+        $registry->register('plain', TagMiddleware::class);
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage("Middleware 'plain' does not accept arguments");
+        $registry->resolve('plain:admin');
+    }
+
+    public function testMarkerAliasesAreSkippedInTheRouteStack(): void
+    {
+        $container = new Container();
+        $registry = new MiddlewareRegistry($container);
+        $registry->registerMarker('csrf');
+        $registry->register('tag', fn(Container $c, array $args) => new TagMiddleware($args[0] ?? 'none'));
+        $r = new RouteCollector();
+        $r->post('/hook', fn() => new Response(200))->middleware('csrf:off', 'tag:a');
+        $response = (new RouteHandler(new Router($r->routes()), $registry, $container))->handle(new ServerRequest('POST', '/hook'));
+        self::assertSame(200, $response->getStatusCode());
+        self::assertSame(['a'], $response->getHeader('X-Tags'));
+        self::assertTrue($registry->isMarker('csrf:off'));
+        self::assertFalse($registry->isMarker('tag:a'));
+    }
+
+    public function testReusesAnAttachedRouteMatch(): void
+    {
+        $container = new Container();
+        $r = new RouteCollector();
+        $r->get('/real', fn() => new Response(200, [], 'real'));
+        $other = new RouteCollector();
+        $other->get('/elsewhere', fn() => new Response(202, [], 'attached'));
+        $match = (new Router($other->routes()))->match('GET', '/elsewhere');
+        $request = (new ServerRequest('GET', '/not-routed'))->withAttribute(RouteMatch::class, $match);
+        $response = (new RouteHandler(new Router($r->routes()), new MiddlewareRegistry($container), $container))->handle($request);
+        self::assertSame(202, $response->getStatusCode());
     }
 }

@@ -129,4 +129,18 @@ final class ErrorHandlerTest extends TestCase
         $response = $this->send(new ErrorHandler($logger), new ServerRequest('GET', '/x'), new \RuntimeException('x'));
         self::assertSame(500, $response->getStatusCode());
     }
+
+    public function testWrappedServerErrorLogsThePreviousMessage(): void
+    {
+        $logger = new MemoryLogger();
+        $e = new HttpException(500, '', ['Access-Control-Allow-Origin' => '*'], new \RuntimeException('feed db exploded'));
+        $response = $this->send(new ErrorHandler($logger), new ServerRequest('GET', '/x.json'), $e);
+        self::assertSame(500, $response->getStatusCode());
+        self::assertSame('*', $response->getHeaderLine('Access-Control-Allow-Origin'));
+        self::assertStringNotContainsString('exploded', (string) $response->getBody());
+        self::assertSame(['error: feed db exploded'], $logger->lines);
+
+        $debug = $this->send(new ErrorHandler(new MemoryLogger(), debug: true), new ServerRequest('GET', '/x.json'), $e);
+        self::assertSame('feed db exploded', json_decode((string) $debug->getBody(), true)['error']['message']);
+    }
 }

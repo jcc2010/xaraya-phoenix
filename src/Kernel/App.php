@@ -82,6 +82,7 @@ final class App
             $registry = new MiddlewareRegistry($c);
             $registry->register('cors', Cors::class);
             $registry->register('conditional', ConditionalGet::class);
+            $registry->registerMarker('csrf');
 
             return $registry;
         });
@@ -163,6 +164,8 @@ final class App
                 $this->container->get(MiddlewareRegistry::class),
                 $this->container,
             );
+            // Match before running global middleware so it can see the RouteMatch; 404/405 go to ErrorHandler.
+            $request = RouteHandler::attach($request, $route->match($request));
 
             return (new Pipeline($stack, $route))->handle($request);
         });

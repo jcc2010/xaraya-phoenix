@@ -30,12 +30,16 @@ final class ErrorHandler implements MiddlewareInterface
             return $handler->handle($request);
         } catch (HttpException $e) {
             $status = $e->status();
+            // A 5xx HttpException with no message of its own that wraps another (as Cors does) reports the cause.
+            $cause = $status >= 500 && $e->getPrevious() !== null && $e->getMessage() === HttpException::reason($status)
+                ? $e->getPrevious()
+                : $e;
             if ($status >= 500) {
-                $this->log($e);
+                $this->log($cause);
             }
-            $message = $status >= 500 && !$this->debug ? HttpException::reason($status) : $e->getMessage();
+            $message = $status >= 500 && !$this->debug ? HttpException::reason($status) : $cause->getMessage();
 
-            return $this->respond($request, $status, $message, $e->headers(), $e);
+            return $this->respond($request, $status, $message, $e->headers(), $cause);
         } catch (Throwable $e) {
             $this->log($e);
 

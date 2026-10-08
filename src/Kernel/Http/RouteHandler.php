@@ -23,15 +23,30 @@ final class RouteHandler implements RequestHandlerInterface
 
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
-        $match = $this->router->match($request->getMethod(), rawurldecode($request->getUri()->getPath()));
-        foreach ($match->params as $key => $value) {
-            $request = $request->withAttribute($key, $value);
+        $match = $request->getAttribute(RouteMatch::class);
+        if (!$match instanceof RouteMatch) {
+            $request = self::attach($request, $match = $this->match($request));
         }
-        $request = $request->withAttribute(RouteMatch::class, $match);
-        $stack = array_map($this->middleware->resolve(...), $match->route->getMiddleware());
+        $stack = $this->middleware->stack($match->route->getMiddleware());
 
         return (new Pipeline($stack, new CallableHandler(fn(ServerRequestInterface $r): ResponseInterface => $this->invoke($match, $r))))
             ->handle($request);
+    }
+
+    /** Matches the request's method and decoded path; throws NotFound or MethodNotAllowed. */
+    public function match(ServerRequestInterface $request): RouteMatch
+    {
+        return $this->router->match($request->getMethod(), rawurldecode($request->getUri()->getPath()));
+    }
+
+    /** Attaches the match and its params as request attributes. */
+    public static function attach(ServerRequestInterface $request, RouteMatch $match): ServerRequestInterface
+    {
+        foreach ($match->params as $key => $value) {
+            $request = $request->withAttribute($key, $value);
+        }
+
+        return $request->withAttribute(RouteMatch::class, $match);
     }
 
     private function invoke(RouteMatch $match, ServerRequestInterface $request): ResponseInterface

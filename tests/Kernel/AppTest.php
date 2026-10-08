@@ -15,6 +15,7 @@ use Xaraya\Kernel\Config\Config;
 use Xaraya\Kernel\Db\Connection;
 use Xaraya\Kernel\Events\EventDispatcher;
 use Xaraya\Kernel\Module\ModuleRegistry;
+use Xaraya\Kernel\Routing\RouteMatch;
 use Xaraya\Kernel\Routing\UrlGenerator;
 use Xaraya\Tests\Support\AppTestCase;
 
@@ -83,7 +84,7 @@ final class AppTest extends AppTestCase
         self::assertCount(1, glob($this->tmp . '/cache/routes-*.php') ?: []);
     }
 
-    public function testPushedMiddlewareIsApplied(): void
+    private function gammaModule(): App
     {
         $dir = $this->tmp . '/modules/gamma';
         mkdir($dir . '/src', 0775, true);
@@ -94,6 +95,7 @@ final class AppTest extends AppTestCase
             namespace Xaraya\Module\Gamma;
 
             use Nyholm\Psr7\Response;
+            use Xaraya\Kernel\Http\Exception\NotFound;
             use Xaraya\Kernel\Routing\RouteCollector;
             use Xaraya\Kernel\Routing\RouteProvider;
 
@@ -101,17 +103,95 @@ final class AppTest extends AppTestCase
             {
                 public function routes(RouteCollector $routes): void
                 {
-                    $routes->get('/', fn () => new Response(200, [], 'ok'));
+                    $routes->get('/', fn () => new Response(200, [], 'ok'), 'gamma.home');
+                    $routes->post('/hook', fn () => new Response(200, [], 'hooked'), 'gamma.hook')->middleware('csrf:off');
+                    $routes->get('/feed/missing', fn () => throw new NotFound('no such feed'))->middleware('cors');
+                    $routes->get('/feed/broken', fn () => throw new \RuntimeException('feed db exploded'))->middleware('cors');
                 }
             }
             PHP);
         $this->boot([$this->tmp . '/modules'])->container()->get(ModuleRegistry::class)->enable('gamma');
 
-        $app = $this->boot([$this->tmp . '/modules']);
+        return $this->boot([$this->tmp . '/modules']);
+    }
+
+    public function testPushedMiddlewareIsApplied(): void
+    {
+        $app = $this->gammaModule();
         $app->pushMiddleware(HeaderMiddleware::class);
         $response = $app->handle(new ServerRequest('GET', '/'));
         self::assertSame(200, $response->getStatusCode());
         self::assertSame('yes', $response->getHeaderLine('X-Test'));
+    }
+
+    public function testGlobalMiddlewareSeesTheRouteMatch(): void
+    {
+        RouteSpyMiddleware::$seen = [];
+        $app = $this->gammaModule();
+        $app->pushMiddleware(RouteSpyMiddleware::class);
+        self::assertSame(200, $app->handle(new ServerRequest('GET', '/'))->getStatusCode());
+        self::assertSame(['gamma.home'], RouteSpyMiddleware::$seen);
+    }
+
+    public function testCsrfOffMarkerIsAccepted(): void
+    {
+        RouteSpyMiddleware::$seen = [];
+        $app = $this->gammaModule();
+        $app->pushMiddleware(RouteSpyMiddleware::class);
+        $response = $app->handle(new ServerRequest('POST', '/hook'));
+        self::assertSame(200, $response->getStatusCode());
+        self::assertSame('hooked', (string) $response->getBody());
+        self::assertSame(['gamma.hook:csrf'], RouteSpyMiddleware::$seen);
+    }
+
+    public function testUnknownRouteIs404WithoutRunningGlobalMiddleware(): void
+    {
+        RouteSpyMiddleware::$seen = [];
+        $app = $this->gammaModule();
+        $app->pushMiddleware(RouteSpyMiddleware::class);
+        $response = $app->handle(new ServerRequest('GET', '/nope.json'));
+        self::assertSame(404, $response->getStatusCode());
+        self::assertSame(404, json_decode((string) $response->getBody(), true)['error']['status']);
+        self::assertSame([], RouteSpyMiddleware::$seen);
+        self::assertSame(405, $app->handle(new ServerRequest('DELETE', '/'))->getStatusCode());
+        self::assertSame([], RouteSpyMiddleware::$seen);
+    }
+
+    public function testCorsRouteErrorsCarryAllowOrigin(): void
+    {
+        $app = $this->gammaModule();
+        $missing = $app->handle(new ServerRequest('GET', '/feed/missing'));
+        self::assertSame(404, $missing->getStatusCode());
+        self::assertSame('*', $missing->getHeaderLine('Access-Control-Allow-Origin'));
+        self::assertStringContainsString('no such feed', (string) $missing->getBody());
+    }
+
+    public function testCorsRouteFailureIsMaskedLoggedAndCarriesAllowOrigin(): void
+    {
+        $this->gammaModule();
+        $app = $this->boot([$this->tmp . '/modules'], ['app.debug' => false]);
+        $broken = $app->handle(new ServerRequest('GET', '/feed/broken'));
+        self::assertSame(500, $broken->getStatusCode());
+        self::assertSame('*', $broken->getHeaderLine('Access-Control-Allow-Origin'));
+        self::assertStringNotContainsString('exploded', (string) $broken->getBody());
+        $log = implode('', array_map('file_get_contents', glob($this->tmp . '/logs/*') ?: []));
+        self::assertStringContainsString('feed db exploded', $log);
+    }
+}
+
+final class RouteSpyMiddleware implements MiddlewareInterface
+{
+    /** @var list<string> */
+    public static array $seen = [];
+
+    public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
+    {
+        $match = $request->getAttribute(RouteMatch::class);
+        self::$seen[] = $match instanceof RouteMatch
+            ? ($match->route->name ?? '?') . ($match->route->hasMiddleware('csrf') ? ':csrf' : '')
+            : 'none';
+
+        return $handler->handle($request);
     }
 }
 
