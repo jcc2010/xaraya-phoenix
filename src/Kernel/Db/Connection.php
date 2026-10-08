@@ -182,6 +182,11 @@ final class Connection
         return new Schema($this);
     }
 
+    public function select(string $table): Select
+    {
+        return new Select($this, $table);
+    }
+
     public static function normalize(mixed $value): mixed
     {
         return match (true) {
