@@ -177,6 +177,49 @@ final class AppTest extends AppTestCase
         $log = implode('', array_map('file_get_contents', glob($this->tmp . '/logs/*') ?: []));
         self::assertStringContainsString('feed db exploded', $log);
     }
+
+    public function testCliBootNeitherReadsNorWritesConfigCache(): void
+    {
+        $root = $this->projectCopy();
+        $cache = $root . '/var/cache/config.php';
+
+        App::boot($root, [], false, false);
+        self::assertFileDoesNotExist($cache, 'CLI boot must not write the config cache');
+
+        mkdir(dirname($cache), 0775, true);
+        file_put_contents($cache, '<?php return ' . var_export(['app' => ['name' => 'from-cache'], 'modules' => ['paths' => ['modules']]], true) . ';');
+        $before = file_get_contents($cache);
+        $config = App::boot($root, [], false, false)->container()->get(Config::class);
+        self::assertNotSame('from-cache', $config->get('app.name'), 'CLI boot must not read the config cache');
+        self::assertSame($before, file_get_contents($cache));
+    }
+
+    public function testCliBootSeesEnvOverrideDespiteStaleCache(): void
+    {
+        $root = $this->projectCopy();
+        $cache = $root . '/var/cache/config.php';
+        mkdir(dirname($cache), 0775, true);
+        file_put_contents($cache, '<?php return ' . var_export(['app' => ['debug' => false], 'db' => ['dsn' => 'sqlite:' . $this->tmp . '/cached.sqlite'], 'modules' => ['paths' => ['modules']]], true) . ';');
+        $previous = getenv('MODULE_PATHS');
+        putenv('MODULE_PATHS=modules,examples');
+        try {
+            $web = App::boot($root)->container()->get(Config::class);
+            self::assertSame(['modules'], $web->get('modules.paths'), 'web boots still use the cache');
+            $cli = App::boot($root, [], false, false)->container()->get(Config::class);
+            self::assertSame(['modules', 'examples'], $cli->get('modules.paths'));
+        } finally {
+            $previous === false ? putenv('MODULE_PATHS') : putenv('MODULE_PATHS=' . $previous);
+        }
+    }
+
+    private function projectCopy(): string
+    {
+        mkdir($this->tmp . '/proj/config', 0775, true);
+        copy(dirname(__DIR__, 2) . '/config/app.php', $this->tmp . '/proj/config/app.php');
+        touch($this->tmp . '/proj/config/app.php', time() - 100);
+
+        return $this->tmp . '/proj';
+    }
 }
 
 final class RouteSpyMiddleware implements MiddlewareInterface

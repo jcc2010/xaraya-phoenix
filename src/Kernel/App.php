@@ -50,19 +50,21 @@ final class App
      * @param array<string, mixed> $overrides
      * @param bool $safe skip module service providers and event subscribers, so a broken module cannot
      *                   stop the CLI from disabling it
+     * @param bool $useConfigCache read and write var/cache/config.php (web requests only; the CLI passes
+     *                             false so env-var overrides are never shadowed by a stale cache)
      */
-    public static function boot(string $root, array $overrides = [], bool $safe = false): self
+    public static function boot(string $root, array $overrides = [], bool $safe = false, bool $useConfigCache = true): self
     {
-        return new self(rtrim($root, '/'), $overrides, $safe);
+        return new self(rtrim($root, '/'), $overrides, $safe, $useConfigCache);
     }
 
     /** @param array<string, mixed> $overrides */
-    private function __construct(private readonly string $root, array $overrides, private readonly bool $safe)
+    private function __construct(private readonly string $root, array $overrides, private readonly bool $safe, bool $useConfigCache)
     {
         Env::load($root . '/.env');
         $config = Config::load(
             $root . '/config/app.php',
-            $overrides === [] ? $this->configCachePath() : null,
+            $useConfigCache && $overrides === [] ? $this->configCachePath() : null,
             [$root . '/.env'],
         );
         foreach ($overrides as $key => $value) {

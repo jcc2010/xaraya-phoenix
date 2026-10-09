@@ -47,12 +47,12 @@ final class Application
     {
         $output ??= new Output();
         try {
-            $app = App::boot($root, $overrides);
+            $app = App::boot($root, $overrides, false, false);
         } catch (Throwable $e) {
             $output->error('Boot failed: ' . $e->getMessage());
             $output->error('Retrying in safe mode (module providers, subscribers and commands are skipped).');
             try {
-                $app = App::boot($root, $overrides, true);
+                $app = App::boot($root, $overrides, true, false);
             } catch (Throwable $e) {
                 $output->error('Safe-mode boot failed: ' . $e->getMessage());
 
