@@ -4,6 +4,7 @@
   "content": true,
   "requires": { "kernel": "^0.1", "modules": {} },
   "provider": "Xaraya\\Module\\Blog\\BlogServiceProvider",
+  "routes": "Xaraya\\Module\\Blog\\Routes",
   "migrations": "migrations",
   "commands": [
     "Xaraya\\Module\\Blog\\Cli\\BlogCreateCommand",
