@@ -1,0 +1,2274 @@
+{
+    "version": "https://jsonfeed.org/version/1.1",
+    "title": "John Cox",
+    "description": "Notes, photos and the things worth saying something about.",
+    "home_page_url": "https://www.wyome.com/blog/",
+    "feed_url": "https://athenana.com/blog/wyome/feed.json",
+    "next_url": "https://athenana.com/blog/wyome/feed.json?before=MjAyNi0xMC0wNyAxNjo0OToxN3wwMW0yZGdqMnptcHRxZWRhYTBjYjdobXRkdg",
+    "language": "en",
+    "icon": "https://athenana.com/img/apple-touch-icon.png",
+    "favicon": "https://athenana.com/favicon.ico",
+    "authors": [
+        {
+            "name": "John Cox",
+            "url": "https://www.wyome.com/blog/"
+        }
+    ],
+    "_athenana": {
+        "subscribe_url": "https://athenana.com/blog/wyome/subscribe"
+    },
+    "items": [
+        {
+            "id": "https://athenana.com/s/01kzk4vvvse6wjrafxt3s8whsn",
+            "url": "https://www.wyome.com/blog/post.html?id=01kzk4vvvse6wjrafxt3s8whsn",
+            "external_url": "https://www.gamintraveler.com/2025/12/07/best-countries-free-visa-1-year-for-americans/?utm_source=flipboard&utm_content=travelers/magazine/The%20Travel%20Exchange",
+            "title": "15 Countries Where Americans Can Live Visa-Free For A Full Year",
+            "content_html": "<p>The article identifies 15 countries where Americans can stay visa-free or on extended tourist visas for up to a year, ranging from Albania and Georgia to more structured options like Spain&#039;s Non-Lucrative Visa and Argentina&#039;s Digital Nomad Visa, each with varying cost-of-living and income requirements. Beyond the practical visa details, it critiques the romanticized notion of long-term tourism by noting that visa-free policies often serve countries&#039; economic interests rather than facilitate genuine integration, that American passport privilege contrasts sharply with travel restrictions faced by citizens of other nations, and that extended tourism can still strain local resources and communities. The guide emphasizes that visa-free access alone doesn&#039;t guarantee a successful relocation—proper planning around healthcare, finances, cultural adjustment, and work restrictions is essential for a genuinely transformative year abroad.</p>",
+            "date_published": "2026-10-08T15:07:16+00:00",
+            "date_modified": "2026-10-08T15:50:08+00:00",
+            "image": "https://athenana.com/p/01m4e0vq5nxw9jw2vj0cvnfcs8?v=29834ec6",
+            "tags": [
+                "travel",
+                "united states",
+                "georgia",
+                "digital"
+            ],
+            "_source": {
+                "name": "www.gamintraveler.com",
+                "url": "https://www.gamintraveler.com/2025/12/07/best-countries-free-visa-1-year-for-americans/?utm_source=flipboard&utm_content=travelers/magazine/The%20Travel%20Exchange"
+            },
+            "_athenana": {
+                "kind": "link",
+                "tags": [
+                    {
+                        "name": "travel",
+                        "slug": "travel"
+                    },
+                    {
+                        "name": "united states",
+                        "slug": "united-states"
+                    },
+                    {
+                        "name": "georgia",
+                        "slug": "georgia"
+                    },
+                    {
+                        "name": "digital",
+                        "slug": "digital"
+                    }
+                ]
+            }
+        },
+        {
+            "id": "https://athenana.com/s/01kzk594wg0h36ckpn87v44hm2",
+            "url": "https://www.wyome.com/blog/post.html?id=01kzk594wg0h36ckpn87v44hm2",
+            "external_url": "https://summitborn.com/the-15-most-beautiful-places-to-visit-on-the-american-west-coast/",
+            "title": "The 15 Most Beautiful Destinations to Visit on the American West Coast",
+            "content_html": "<p>This is a travel guide listing 15 major attractions along the USA West Coast, from Washington to California, including national parks, coastal towns, and cities. Each destination is briefly described with its key features—such as Olympic National Park&#039;s rainforests, Yosemite&#039;s granite cliffs, Big Sur&#039;s dramatic coastline, and Napa Valley&#039;s wineries—along with recommended activities like hiking, kayaking, and sightseeing. The guide is organized to appeal to various traveler types: nature lovers, adventure seekers, foodies, and culture enthusiasts seeking diverse West Coast experiences.</p>",
+            "date_published": "2026-10-08T15:06:53+00:00",
+            "date_modified": "2026-10-08T15:50:08+00:00",
+            "image": "https://athenana.com/p/01m4e0v0r6b255dtvg8dnfca3g?v=cffefea0",
+            "tags": [
+                "hiking",
+                "travel",
+                "national parks",
+                "united states",
+                "road trips",
+                "california",
+                "beaches",
+                "outdoor",
+                "west coast",
+                "washington"
+            ],
+            "_source": {
+                "name": "summitborn.com",
+                "url": "https://summitborn.com/the-15-most-beautiful-places-to-visit-on-the-american-west-coast/"
+            },
+            "_athenana": {
+                "kind": "link",
+                "tags": [
+                    {
+                        "name": "hiking",
+                        "slug": "hiking"
+                    },
+                    {
+                        "name": "travel",
+                        "slug": "travel"
+                    },
+                    {
+                        "name": "national parks",
+                        "slug": "national-parks"
+                    },
+                    {
+                        "name": "united states",
+                        "slug": "united-states"
+                    },
+                    {
+                        "name": "road trips",
+                        "slug": "road-trips"
+                    },
+                    {
+                        "name": "california",
+                        "slug": "california"
+                    },
+                    {
+                        "name": "beaches",
+                        "slug": "beaches"
+                    },
+                    {
+                        "name": "outdoor",
+                        "slug": "outdoor"
+                    },
+                    {
+                        "name": "west coast",
+                        "slug": "west-coast"
+                    },
+                    {
+                        "name": "washington",
+                        "slug": "washington"
+                    }
+                ]
+            }
+        },
+        {
+            "id": "https://athenana.com/s/01kzk5091s41c54n14y61ftk67",
+            "url": "https://www.wyome.com/blog/post.html?id=01kzk5091s41c54n14y61ftk67",
+            "external_url": "https://www.insidehook.com/gear/100-best-american-made-products",
+            "title": "The 100 Best American-Made Products",
+            "content_html": "<p>InsideHook curates a list of 100 American-made products across gear, style, home, kitchen, and grooming categories, taking a generous approach to what qualifies as &quot;made in America&quot; by including items where substantial American manufacturing and ingenuity are involved, even if some international components are necessary. Rather than focusing on strict FTC compliance, the editors emphasize celebrating the specific craftspeople and small manufacturers behind these goods—from cast iron skillets hand-signed by blacksmiths to vertically integrated woolen mills—arguing that what makes these products worth buying is not patriotic labeling but their genuine quality and the dedication of American makers.</p>",
+            "date_published": "2026-10-08T15:06:35+00:00",
+            "date_modified": "2026-10-08T15:50:08+00:00",
+            "image": "https://athenana.com/p/01m4e0tef393t44s9t6g51z580?v=7ff94310",
+            "tags": [
+                "gear",
+                "recommendations",
+                "united states",
+                "kitchen",
+                "grooming",
+                "style",
+                "business",
+                "shopping",
+                "home"
+            ],
+            "_source": {
+                "name": "www.insidehook.com",
+                "url": "https://www.insidehook.com/gear/100-best-american-made-products"
+            },
+            "_athenana": {
+                "kind": "link",
+                "tags": [
+                    {
+                        "name": "gear",
+                        "slug": "gear"
+                    },
+                    {
+                        "name": "recommendations",
+                        "slug": "recommendations"
+                    },
+                    {
+                        "name": "united states",
+                        "slug": "united-states"
+                    },
+                    {
+                        "name": "kitchen",
+                        "slug": "kitchen"
+                    },
+                    {
+                        "name": "grooming",
+                        "slug": "grooming"
+                    },
+                    {
+                        "name": "style",
+                        "slug": "style"
+                    },
+                    {
+                        "name": "business",
+                        "slug": "business"
+                    },
+                    {
+                        "name": "shopping",
+                        "slug": "shopping"
+                    },
+                    {
+                        "name": "home",
+                        "slug": "home"
+                    }
+                ]
+            }
+        },
+        {
+            "id": "https://athenana.com/s/01kzk50cj6mtd5sqz6hqssf59m",
+            "url": "https://www.wyome.com/blog/post.html?id=01kzk50cj6mtd5sqz6hqssf59m",
+            "external_url": "https://www.businessinsider.com/national-geographic-photographer-phone-photography-tips-2023-3?utm_source=pocket_discover#in-my-opinion-including-foreground-subjects-in-my-nature-shots-has-made-them-feel-more-immersive-8",
+            "title": "National Geographic photographer tips for phone photography, examples",
+            "content_html": "<p>National Geographic photographer Kiliii Yüyan shares practical techniques for improving smartphone photography, including spending extended time in one location to capture optimal lighting, experimenting with uncommon angles to add depth, using foreground subjects to frame landscapes, and shooting close-ups to create intimacy rather than relying on zoom. A Business Insider travel reporter demonstrates these principles through her own phone photos from Arizona hikes, Italian landmarks, and other travels, showing how each technique transformed initially underwhelming shots into more dynamic, layered images that better conveyed her actual experience of each place.</p>",
+            "date_published": "2026-10-08T15:06:22+00:00",
+            "date_modified": "2026-10-08T15:06:22+00:00",
+            "image": "https://athenana.com/p/01m4e0sxpsdkg1gk9a58wbpe1x?v=54b1f514",
+            "tags": [
+                "photography",
+                "travel",
+                "advice"
+            ],
+            "_source": {
+                "name": "www.businessinsider.com",
+                "url": "https://www.businessinsider.com/national-geographic-photographer-phone-photography-tips-2023-3?utm_source=pocket_discover#in-my-opinion-including-foreground-subjects-in-my-nature-shots-has-made-them-feel-more-immersive-8"
+            },
+            "_athenana": {
+                "kind": "link",
+                "tags": [
+                    {
+                        "name": "photography",
+                        "slug": "photography"
+                    },
+                    {
+                        "name": "travel",
+                        "slug": "travel"
+                    },
+                    {
+                        "name": "advice",
+                        "slug": "advice"
+                    }
+                ]
+            }
+        },
+        {
+            "id": "https://athenana.com/s/01kzk50gpvm9s13bavss0h6n76",
+            "url": "https://www.wyome.com/blog/post.html?id=01kzk50gpvm9s13bavss0h6n76",
+            "external_url": "https://www.inverse.com/entertainment/wolverine-oral-history-x-men?utm_source=digg",
+            "title": "The oral history of Wolverine, the unlikely superhero who saved the X-Men",
+            "content_html": "<p># Summary\n\nWolverine&#039;s journey from a minor Canadian character created in 1972 to become Marvel&#039;s most iconic mutant was shaped by editorial decisions, creative writing, and perfect casting. Roy Thomas introduced him to boost Canadian comic sales, Chris Claremont developed his complexity and aging him up, and subsequent writers like Larry Hama explored his emotional depth beneath the gruff exterior, making him compelling enough to sustain multiple comic series, an animated show, and Hugh Jackman&#039;s transformative film performances from 2000 to 2017. His enduring appeal lies in the paradox of a powerful, dangerous fighter whose constant pain and deep loyalty to his team reveal an underlying vulnerability and humanity.</p>",
+            "date_published": "2026-10-08T15:05:57+00:00",
+            "date_modified": "2026-10-08T15:05:57+00:00",
+            "image": "https://athenana.com/p/01m4e0s92603mtrccbcbyqr5xs?v=383ada1e",
+            "tags": [
+                "history",
+                "comics",
+                "film"
+            ],
+            "_source": {
+                "name": "www.inverse.com",
+                "url": "https://www.inverse.com/entertainment/wolverine-oral-history-x-men?utm_source=digg"
+            },
+            "_athenana": {
+                "kind": "link",
+                "tags": [
+                    {
+                        "name": "history",
+                        "slug": "history"
+                    },
+                    {
+                        "name": "comics",
+                        "slug": "comics"
+                    },
+                    {
+                        "name": "film",
+                        "slug": "film"
+                    }
+                ]
+            }
+        },
+        {
+            "id": "https://athenana.com/s/01m2dgj0gj90pfj46das9qhxnz",
+            "url": "https://www.wyome.com/blog/post.html?id=01m2dgj0gj90pfj46das9qhxnz",
+            "external_url": "https://seattletimes.com/entertainment/books/moira-macdonald-recommends-some-atmospheric-thrillers",
+            "title": "Moira Macdonald recommends some atmospheric thrillers",
+            "content_html": "<p>Film critic Moira Macdonald curates a selection of atmospheric thriller movies worth watching.</p>",
+            "date_published": "2026-10-08T14:18:14+00:00",
+            "date_modified": "2026-10-08T14:18:14+00:00",
+            "image": "https://athenana.com/p/01m4dy1rcng7m9drkv4qas24x7?v=c5e80b14",
+            "tags": [
+                "thriller",
+                "recommendations",
+                "cinema"
+            ],
+            "_source": {
+                "name": "seattletimes.com",
+                "url": "https://seattletimes.com/entertainment/books/moira-macdonald-recommends-some-atmospheric-thrillers"
+            },
+            "_athenana": {
+                "kind": "link",
+                "tags": [
+                    {
+                        "name": "thriller",
+                        "slug": "thriller"
+                    },
+                    {
+                        "name": "recommendations",
+                        "slug": "recommendations"
+                    },
+                    {
+                        "name": "cinema",
+                        "slug": "cinema"
+                    }
+                ]
+            }
+        },
+        {
+            "id": "https://athenana.com/s/01kzk4qe6frsqxkdqzrp7r3727",
+            "url": "https://www.wyome.com/blog/post.html?id=01kzk4qe6frsqxkdqzrp7r3727",
+            "external_url": "https://www.cnbc.com/2023/09/28/chattanooga-tennessee-best-city-south-retire-southern-living-investopedia-study.html",
+            "title": "Chattanooga is the 'all-around best city' to retire in the South",
+            "content_html": "<p>Southern Living and Investopedia ranked the best Southern towns and cities for retirees based on cost of living, home values, hospital access, and continuing education opportunities. Chattanooga, Tennessee emerged as the top overall choice, offering no state income tax, affordable homes averaging $295,930, and proximity to major cities and natural attractions, while the list also includes specialized recommendations like Beaufort, North Carolina for healthy living and Ocean Springs, Mississippi for home affordability with tax-friendly retirement income policies.</p>",
+            "date_published": "2026-10-08T14:15:20+00:00",
+            "date_modified": "2026-10-08T14:15:20+00:00",
+            "image": "https://athenana.com/p/01m4dxwkr6xkatphe0vb3hfmb6?v=5b9928ac",
+            "tags": [
+                "retirement",
+                "real estate",
+                "travel",
+                "tennessee",
+                "southern living",
+                "chattanooga",
+                "cost of living"
+            ],
+            "_source": {
+                "name": "www.cnbc.com",
+                "url": "https://www.cnbc.com/2023/09/28/chattanooga-tennessee-best-city-south-retire-southern-living-investopedia-study.html"
+            },
+            "_athenana": {
+                "kind": "link",
+                "tags": [
+                    {
+                        "name": "retirement",
+                        "slug": "retirement"
+                    },
+                    {
+                        "name": "real estate",
+                        "slug": "real-estate"
+                    },
+                    {
+                        "name": "travel",
+                        "slug": "travel"
+                    },
+                    {
+                        "name": "tennessee",
+                        "slug": "tennessee"
+                    },
+                    {
+                        "name": "southern living",
+                        "slug": "southern-living"
+                    },
+                    {
+                        "name": "chattanooga",
+                        "slug": "chattanooga"
+                    },
+                    {
+                        "name": "cost of living",
+                        "slug": "cost-of-living"
+                    }
+                ]
+            }
+        },
+        {
+            "id": "https://athenana.com/s/01kzk51qabq38dxdx033stwshh",
+            "url": "https://www.wyome.com/blog/post.html?id=01kzk51qabq38dxdx033stwshh",
+            "external_url": "https://www.mensjournal.com/drink/7-bourbons-you-can-pretty-much-only-buy-in-kentucky-w480695#gid=ci02b8d0ec80092491&pid=6-bulleit-barrel-strength",
+            "title": "14 Bourbons You Can Pretty Much Only Buy in Kentucky",
+            "content_html": "<p>Kentucky distilleries and retailers hold exclusive or limited-distribution bourbons that enthusiasts cannot easily find elsewhere, making a visit to the state essential for serious whiskey lovers. The piece recommends fourteen specific Kentucky-only or Kentucky-first expressions—ranging from the budget-friendly Very Old Barton to premium releases like Maker&#039;s Mark Private Selection and Peerless Single Barrel—that showcase the state&#039;s dominance in the bourbon market and explain why distilleries prioritize local sales over nationwide distribution. Each recommendation includes tasting notes and details about where to purchase, whether at distillery gift shops or select retailers, to help visitors know which bottles warrant seeking out during a Kentucky trip.</p>",
+            "date_published": "2026-10-08T13:33:28+00:00",
+            "date_modified": "2026-10-08T13:33:28+00:00",
+            "image": "https://athenana.com/p/01m4dvfzkbad81b1ekr39wzpfv?v=d2d56778",
+            "tags": [
+                "travel",
+                "kentucky",
+                "bourbon",
+                "spirits"
+            ],
+            "_source": {
+                "name": "www.mensjournal.com",
+                "url": "https://www.mensjournal.com/drink/7-bourbons-you-can-pretty-much-only-buy-in-kentucky-w480695#gid=ci02b8d0ec80092491&pid=6-bulleit-barrel-strength"
+            },
+            "_athenana": {
+                "kind": "link",
+                "tags": [
+                    {
+                        "name": "travel",
+                        "slug": "travel"
+                    },
+                    {
+                        "name": "kentucky",
+                        "slug": "kentucky"
+                    },
+                    {
+                        "name": "bourbon",
+                        "slug": "bourbon"
+                    },
+                    {
+                        "name": "spirits",
+                        "slug": "spirits"
+                    }
+                ]
+            }
+        },
+        {
+            "id": "https://athenana.com/s/01kzk5wwwx1b10zj8p82dh930b",
+            "url": "https://www.wyome.com/blog/post.html?id=01kzk5wwwx1b10zj8p82dh930b",
+            "external_url": "https://www.howtogeek.com/smart-home-sensors-put-in-basement-crawl-space-attic/",
+            "title": "4 smart home sensors you should put in your basement, crawl space, and attic",
+            "content_html": "<p>How-To Geek runs down four sensor types worth tucking into a home&#039;s neglected corners: water leak detectors near pipes and in basements/attics (paired ideally with an auto shut-off valve), humidity sensors to catch mold-prone dampness before it spreads, temperature sensors to expose poorly insulated areas prone to frozen pipes, and combined infrared/mmWave presence sensors for automating lights and catching unwelcome critters in attics or crawlspaces. It&#039;s a practical shopping-and-placement guide, naming specific products like the IKEA Klippbok, Aqara hygrometer, IKEA TIMMERFLOTTE, and Everything Presence One, with a closing reminder to keep batteries fresh since these devices are only useful when powered.</p>",
+            "date_published": "2026-10-08T12:59:09+00:00",
+            "date_modified": "2026-10-08T12:59:09+00:00",
+            "image": "https://athenana.com/p/01m4dsh4dve37xgvs0tygp8r8m?v=e26f881b",
+            "tags": [
+                "smart home",
+                "home",
+                "gadgets"
+            ],
+            "_source": {
+                "name": "www.howtogeek.com",
+                "url": "https://www.howtogeek.com/smart-home-sensors-put-in-basement-crawl-space-attic/"
+            },
+            "_athenana": {
+                "kind": "link",
+                "tags": [
+                    {
+                        "name": "smart home",
+                        "slug": "smart-home"
+                    },
+                    {
+                        "name": "home",
+                        "slug": "home"
+                    },
+                    {
+                        "name": "gadgets",
+                        "slug": "gadgets"
+                    }
+                ]
+            }
+        },
+        {
+            "id": "https://athenana.com/s/01m4dq2fmedbb6bzz1jkj1w290",
+            "url": "https://www.wyome.com/blog/post.html?id=01m4dq2fmedbb6bzz1jkj1w290",
+            "external_url": "https://www.yankodesign.com/2026/10/07/25-foot-motorhome-with-flexible-interior-has-private-shower-murphy-bed-and-home-office-on-the-road/?utm_source=rss&utm_medium=rss&utm_campaign=25-foot-motorhome-with-flexible-interior-has-private-shower-murphy-bed-and-home-office-on-the-road",
+            "title": "25-foot motorhome with flexible interior has private shower, murphy bed, and home office on the road - Yanko Design",
+            "content_html": "<p>This piece is a promotional walkthrough of the 2027 Wonder FX, a sub-25-foot Class C motorhome from Leisure Travel Vans, and it argues that the vehicle packs a surprising amount of livable space into a compact body. Its distinguishing features are a convertible living area that can become a home office, a bathroom with a stand-up shower behind a bendable door, and a Murphy bed that folds down from the wall to create a 65-inch-wide sleeping area. It also lists the technical specs (Ford Transit chassis, 270-Ah lithium battery, 3,000-W inverter, 4-kW generator) and a starting price of about $200,000, with Starlink and solar as extra-cost options.</p>",
+            "date_published": "2026-10-08T12:16:08+00:00",
+            "date_modified": "2026-10-08T12:58:36+00:00",
+            "image": "https://athenana.com/p/01m4dsg0ygnrka83zhf8vv6kze?v=1a26148a",
+            "tags": [
+                "road trips",
+                "rv"
+            ],
+            "_source": {
+                "name": "Yanko Design - Modern Industrial Design News",
+                "url": "https://www.yankodesign.com/2026/10/07/25-foot-motorhome-with-flexible-interior-has-private-shower-murphy-bed-and-home-office-on-the-road/?utm_source=rss&utm_medium=rss&utm_campaign=25-foot-motorhome-with-flexible-interior-has-private-shower-murphy-bed-and-home-office-on-the-road"
+            },
+            "_athenana": {
+                "kind": "link",
+                "tags": [
+                    {
+                        "name": "road trips",
+                        "slug": "road-trips"
+                    },
+                    {
+                        "name": "rv",
+                        "slug": "rv"
+                    }
+                ]
+            }
+        },
+        {
+            "id": "https://athenana.com/s/01m4dn167ypha85z9bhpbtk4m2",
+            "url": "https://www.wyome.com/blog/post.html?id=01m4dn167ypha85z9bhpbtk4m2",
+            "external_url": "https://www.theverge.com/ai-artificial-intelligence/1003794/ai-education-computational-model-thought?utm_medium=email&utm_source=ten_tabs&utm_campaign=&position=3&category=fascinating_stories&scheduled_corpus_item_id=31c43e7d-8c76-4429-88b1-94cae1551db4&url=https%3A%2F%2Fwww.theverge.com%2Fai-artificial-intelligence%2F1003794%2Fai-education-computational-model-thought",
+            "title": "Our minds aren’t equipped to handle AI | The Verge",
+            "content_html": "<p>Benjamin Riley argues that the dominant computational model of the mind, which treats thinking as input, computation, and output, is a warped mirror that helps explain why AI tools are so damaging. Drawing on Paul Cisek&#039;s feedback-control view of the brain and the cultural history of imitation, language, and schooling, he contends that AI is a &quot;cognitive hot dog&quot;: tempting in the moment, but harmful when it becomes a regular part of how people learn. The piece is distinctive for grounding its critique of AI in evolutionary neuroscience and for calling for cognitive immunization, including school bans and protected spaces for unaided thinking.</p>",
+            "date_published": "2026-10-08T11:40:29+00:00",
+            "date_modified": "2026-10-08T11:51:34+00:00",
+            "image": "https://athenana.com/p/01m4dnng6mmd7bk7pgt0aj04gq?v=f443f1e1",
+            "tags": [
+                "technology",
+                "artificial intelligence"
+            ],
+            "_source": {
+                "name": "The Verge",
+                "url": "https://www.theverge.com/ai-artificial-intelligence/1003794/ai-education-computational-model-thought?utm_medium=email&utm_source=ten_tabs&utm_campaign=&position=3&category=fascinating_stories&scheduled_corpus_item_id=31c43e7d-8c76-4429-88b1-94cae1551db4&url=https%3A%2F%2Fwww.theverge.com%2Fai-artificial-intelligence%2F1003794%2Fai-education-computational-model-thought"
+            },
+            "_athenana": {
+                "kind": "link",
+                "tags": [
+                    {
+                        "name": "technology",
+                        "slug": "technology"
+                    },
+                    {
+                        "name": "artificial intelligence",
+                        "slug": "artificial-intelligence"
+                    }
+                ]
+            }
+        },
+        {
+            "id": "https://athenana.com/s/01m4dn0hyz8eb38bd541qhnx76",
+            "url": "https://www.wyome.com/blog/post.html?id=01m4dn0hyz8eb38bd541qhnx76",
+            "external_url": "https://thehustle.co/originals/why-barcodes-are-about-to-go-extinct?utm_medium=email&utm_source=ten_tabs&utm_campaign=&position=5&category=fascinating_stories&scheduled_corpus_item_id=25488e5f-e28d-44e9-a31e-d6ef5a92181d&url=https%3A%2F%2Fthehustle.co%2Foriginals%2Fwhy-barcodes-are-about-to-go-extinct",
+            "title": "Why barcodes are about to go extinct",
+            "content_html": "<p>This piece traces how the QR code, invented at Denso in the early 1990s and released royalty-free, is poised to replace the 50-year-old UPC barcode on retail products, driven by GS1&#039;s &quot;Sunrise 2027&quot; transition and by food-traceability rules that barcodes cannot meet. It makes the case that brands which wait for retailers to demand the switch risk expensive data and packaging problems, while noting that consumers want targeted information rather than more of it.</p>",
+            "date_published": "2026-10-08T11:40:08+00:00",
+            "date_modified": "2026-10-08T11:51:40+00:00",
+            "image": "https://athenana.com/p/01m4dnnnjkjpghf9462cep1ady?v=daa9f2eb",
+            "tags": [
+                "technology"
+            ],
+            "_source": {
+                "name": "thehustle.co",
+                "url": "https://thehustle.co/originals/why-barcodes-are-about-to-go-extinct?utm_medium=email&utm_source=ten_tabs&utm_campaign=&position=5&category=fascinating_stories&scheduled_corpus_item_id=25488e5f-e28d-44e9-a31e-d6ef5a92181d&url=https%3A%2F%2Fthehustle.co%2Foriginals%2Fwhy-barcodes-are-about-to-go-extinct"
+            },
+            "_athenana": {
+                "kind": "link",
+                "tags": [
+                    {
+                        "name": "technology",
+                        "slug": "technology"
+                    }
+                ]
+            }
+        },
+        {
+            "id": "https://athenana.com/s/01kzk4xvbrqhs2aynr43cv88m5",
+            "url": "https://www.wyome.com/blog/post.html?id=01kzk4xvbrqhs2aynr43cv88m5",
+            "external_url": "https://www.giantfreakinrobot.com/ent/netflix-dark-sci-fi-dystopia.html",
+            "title": "Netflix Dark Sci-Fi Dystopia Series Is An Intense Battle For Survival",
+            "content_html": "<p>A Netflix science fiction series depicting a dark, dystopian world where characters struggle to survive against intense odds.</p>",
+            "date_published": "2026-10-08T11:04:32+00:00",
+            "date_modified": "2026-10-08T11:04:32+00:00",
+            "image": "https://athenana.com/p/01m4djz81vjsq0q0yeq2v5x7f2?v=6da76b1a",
+            "tags": [
+                "television",
+                "drama",
+                "sci-fi",
+                "dystopia",
+                "netflix"
+            ],
+            "_source": {
+                "name": "www.giantfreakinrobot.com",
+                "url": "https://www.giantfreakinrobot.com/ent/netflix-dark-sci-fi-dystopia.html"
+            },
+            "_athenana": {
+                "kind": "link",
+                "tags": [
+                    {
+                        "name": "television",
+                        "slug": "television"
+                    },
+                    {
+                        "name": "drama",
+                        "slug": "drama"
+                    },
+                    {
+                        "name": "sci-fi",
+                        "slug": "sci-fi"
+                    },
+                    {
+                        "name": "dystopia",
+                        "slug": "dystopia"
+                    },
+                    {
+                        "name": "netflix",
+                        "slug": "netflix"
+                    }
+                ]
+            }
+        },
+        {
+            "id": "https://athenana.com/s/01kzk591v45p1x3ce72dt3xtrj",
+            "url": "https://www.wyome.com/blog/post.html?id=01kzk591v45p1x3ce72dt3xtrj",
+            "external_url": "https://www.seriouseats.com/fermented-hot-sauce-how-to",
+            "title": "How to Make Fermented Hot Sauce",
+            "content_html": "<p>Tim Chin explains how to make nuanced, shelf-stable [[fermented hot sauce]] at home by walking through ingredient selection, preparation, fermentation methods, and food-safety considerations. He contrasts vinegar-based sauces with fermented approaches like [[Sriracha]] and [[Tabasco]], emphasizing fermentation’s ability to transform heat into layered sour, funky, and fruity esters through lactic acid bacteria activity. The guide details choosing and prepping [[chile peppers]] (fresh vs dried, skin and wall thickness, seeds and membranes), balancing heat with fruits or vegetables, and whether to use a salt [[brine]], a chopped mash, or a hybrid. Practical techniques include packing vessels, using an [[airlock]] to exclude oxygen, recommended salt concentrations and temperatures, monitoring pH or taste, aging options, and final processing and storage for consistent, flavorful sauces. He also explains capsaicin behavior in fat, acid, and alcohol and recommends tasting peppers before fermenting.</p>",
+            "date_published": "2026-10-08T00:34:24+00:00",
+            "date_modified": "2026-10-08T00:34:24+00:00",
+            "image": "https://athenana.com/p/01m4cexaczsp5051cj4wgy9bk9?v=b65919c0",
+            "tags": [
+                "food",
+                "recipes",
+                "cooking",
+                "fermentation",
+                "serious eats"
+            ],
+            "_source": {
+                "name": "www.seriouseats.com",
+                "url": "https://www.seriouseats.com/fermented-hot-sauce-how-to"
+            },
+            "_athenana": {
+                "kind": "link",
+                "tags": [
+                    {
+                        "name": "food",
+                        "slug": "food"
+                    },
+                    {
+                        "name": "recipes",
+                        "slug": "recipes"
+                    },
+                    {
+                        "name": "cooking",
+                        "slug": "cooking"
+                    },
+                    {
+                        "name": "fermentation",
+                        "slug": "fermentation"
+                    },
+                    {
+                        "name": "serious eats",
+                        "slug": "serious-eats"
+                    }
+                ]
+            }
+        },
+        {
+            "id": "https://athenana.com/s/01kzk4y0h3y0a6fjjfy279tftj",
+            "url": "https://www.wyome.com/blog/post.html?id=01kzk4y0h3y0a6fjjfy279tftj",
+            "external_url": "https://www.goodhousekeeping.com/health/g35999541/best-snacks-for-diabetics/",
+            "title": "20 Best Snacks for People with Diabetes, According to Registered Dietitians",
+            "content_html": "<p>This article presents a comprehensive list of 20 snack options recommended by registered dietitians for people with diabetes or prediabetes, emphasizing foods high in protein, fiber, and healthy fats that help stabilize blood sugar levels. Each snack includes expert commentary explaining its nutritional benefits and practical tips for preparation or pairing—such as roasted chickpeas with spices, Greek yogurt, nuts, eggs, and plant-based options like hummus and edamame. The dietitians also emphasize that blood sugar-friendly eating doesn&#039;t require sacrificing cultural or traditional foods, encouraging people to enjoy flavorful snacks while maintaining stable glucose levels.</p>",
+            "date_published": "2026-10-07T23:29:43+00:00",
+            "date_modified": "2026-10-07T23:29:43+00:00",
+            "image": "https://athenana.com/p/01m4cb6xpq305bnx11yec9gzmt?v=eccb798b",
+            "tags": [
+                "food",
+                "nutrition",
+                "recipes",
+                "health",
+                "snacks",
+                "healthy eating"
+            ],
+            "_source": {
+                "name": "www.goodhousekeeping.com",
+                "url": "https://www.goodhousekeeping.com/health/g35999541/best-snacks-for-diabetics/"
+            },
+            "_athenana": {
+                "kind": "link",
+                "tags": [
+                    {
+                        "name": "food",
+                        "slug": "food"
+                    },
+                    {
+                        "name": "nutrition",
+                        "slug": "nutrition"
+                    },
+                    {
+                        "name": "recipes",
+                        "slug": "recipes"
+                    },
+                    {
+                        "name": "health",
+                        "slug": "health"
+                    },
+                    {
+                        "name": "snacks",
+                        "slug": "snacks"
+                    },
+                    {
+                        "name": "healthy eating",
+                        "slug": "healthy-eating"
+                    }
+                ]
+            }
+        },
+        {
+            "id": "https://athenana.com/s/01kzk4y97qa2nm1nstah3pca42",
+            "url": "https://www.wyome.com/blog/post.html?id=01kzk4y97qa2nm1nstah3pca42",
+            "external_url": "https://www.gq.com/story/how-to-get-shredded-the-right-way-3?utm_source=pocket_discover",
+            "title": "How to Get Shredded the Right Way",
+            "content_html": "<p>Getting visible abs requires reducing body fat to around 12% through a balanced approach combining strength training, moderate calorie deficit (around 500 calories), adequate protein intake (1.6g per kilogram of body weight), cardio, and consistent sleep—not through extreme methods like crash diets or starvation. Results typically appear within four to nine weeks, with noticeable changes visible after four to six weeks, though the timeline depends on individual factors like genetics and starting body composition. The safest method prioritizes progressive strength training, whole foods, and patience rather than the drastic weight-loss tactics used by elite athletes preparing for competition.</p>",
+            "date_published": "2026-10-07T23:28:11+00:00",
+            "date_modified": "2026-10-07T23:28:11+00:00",
+            "image": "https://athenana.com/p/01m4cb45qdv6fh2mfdkjm5ezx4?v=b841d2b8",
+            "tags": [
+                "nutrition",
+                "fitness",
+                "weight loss",
+                "tags",
+                "strength training"
+            ],
+            "_source": {
+                "name": "www.gq.com",
+                "url": "https://www.gq.com/story/how-to-get-shredded-the-right-way-3?utm_source=pocket_discover"
+            },
+            "_athenana": {
+                "kind": "link",
+                "tags": [
+                    {
+                        "name": "nutrition",
+                        "slug": "nutrition"
+                    },
+                    {
+                        "name": "fitness",
+                        "slug": "fitness"
+                    },
+                    {
+                        "name": "weight loss",
+                        "slug": "weight-loss"
+                    },
+                    {
+                        "name": "tags",
+                        "slug": "tags"
+                    },
+                    {
+                        "name": "strength training",
+                        "slug": "strength-training"
+                    }
+                ]
+            }
+        },
+        {
+            "id": "https://athenana.com/s/01kzk52yf0251cq162wvkjmgrz",
+            "url": "https://www.wyome.com/blog/post.html?id=01kzk52yf0251cq162wvkjmgrz",
+            "external_url": "https://www.muscleandfitness.com/workout-plan/workouts/workout-routines/complete-mf-beginners-training-guide-plan/?utm_source=GetShift-dot-net",
+            "title": "4-Week Beginner Workout Plan For Strength & Fat Loss",
+            "content_html": "<p>This four-week beginner bodybuilding program progressively intensifies by shifting from full-body workouts in week one to increasingly specialized splits (upper/lower, push/pull/legs, then four-way) while adding exercises and volume each week. The program prioritizes learning fundamental free-weight movements early, maintaining the 8-15 rep range for muscle growth, and using reverse pyramid sets (decreasing weight as reps increase) to maximize results without risking injury or burnout. The author argues that completing even one month of consistent training establishes the foundation and visible results needed to sustain long-term fitness commitment, making it suitable for complete beginners or those returning after extended breaks.</p>",
+            "date_published": "2026-10-07T23:27:14+00:00",
+            "date_modified": "2026-10-07T23:27:17+00:00",
+            "image": "https://athenana.com/p/01m4cb2a8v8yp4by4w7xd71pry?v=0d7b84ce",
+            "tags": [
+                "nutrition",
+                "fitness",
+                "training",
+                "strength training",
+                "exercise"
+            ],
+            "_source": {
+                "name": "www.muscleandfitness.com",
+                "url": "https://www.muscleandfitness.com/workout-plan/workouts/workout-routines/complete-mf-beginners-training-guide-plan/?utm_source=GetShift-dot-net"
+            },
+            "_athenana": {
+                "kind": "link",
+                "tags": [
+                    {
+                        "name": "nutrition",
+                        "slug": "nutrition"
+                    },
+                    {
+                        "name": "fitness",
+                        "slug": "fitness"
+                    },
+                    {
+                        "name": "training",
+                        "slug": "training"
+                    },
+                    {
+                        "name": "strength training",
+                        "slug": "strength-training"
+                    },
+                    {
+                        "name": "exercise",
+                        "slug": "exercise"
+                    }
+                ]
+            }
+        },
+        {
+            "id": "https://athenana.com/s/01kzk534e2pexppvn3n5gw4c02",
+            "url": "https://www.wyome.com/blog/post.html?id=01kzk534e2pexppvn3n5gw4c02",
+            "external_url": "https://www.news-medical.net/news/20240629/Natural-compound-found-in-olives-can-lower-blood-sugar-levels-and-promote-weight-loss.aspx",
+            "title": "Natural compound found in olives can lower blood sugar levels and promote weight loss",
+            "content_html": "<p>A Virginia Tech study found that elenolic acid, a compound derived from olives, significantly reduced weight and improved blood sugar control in obese diabetic mice—with effects comparable to the injectable drug liraglutide and superior to metformin. The researchers identified that elenolic acid works by stimulating the release of metabolic hormones (GLP-1 and PYY) in the gut, which promote satiety and regulate blood sugar, rather than targeting metabolic tissues directly. While the natural concentration in olive products is too low to produce these benefits, the findings suggest elenolic acid could be developed into a safer and cheaper alternative to existing obesity and diabetes medications.</p>",
+            "date_published": "2026-10-07T23:26:55+00:00",
+            "date_modified": "2026-10-07T23:26:55+00:00",
+            "image": "https://athenana.com/p/01m4cb1wpetrfgzxcb5fcx1sjz?v=929b0023",
+            "tags": [
+                "nutrition",
+                "health",
+                "weight loss",
+                "science",
+                "diet",
+                "obesity"
+            ],
+            "_source": {
+                "name": "www.news-medical.net",
+                "url": "https://www.news-medical.net/news/20240629/Natural-compound-found-in-olives-can-lower-blood-sugar-levels-and-promote-weight-loss.aspx"
+            },
+            "_athenana": {
+                "kind": "link",
+                "tags": [
+                    {
+                        "name": "nutrition",
+                        "slug": "nutrition"
+                    },
+                    {
+                        "name": "health",
+                        "slug": "health"
+                    },
+                    {
+                        "name": "weight loss",
+                        "slug": "weight-loss"
+                    },
+                    {
+                        "name": "science",
+                        "slug": "science"
+                    },
+                    {
+                        "name": "diet",
+                        "slug": "diet"
+                    },
+                    {
+                        "name": "obesity",
+                        "slug": "obesity"
+                    }
+                ]
+            }
+        },
+        {
+            "id": "https://athenana.com/s/01kzk58xtbn5jfs6ra5nx846n0",
+            "url": "https://www.wyome.com/blog/post.html?id=01kzk58xtbn5jfs6ra5nx846n0",
+            "external_url": "https://www.self.com/story/how-to-improve-gut-health",
+            "title": "7 Legit Ways to Improve Your Gut Health, According to GI Doctors",
+            "content_html": "<p>While gut health has become a wellness obsession fueled by social media and a booming supplement industry, there&#039;s actually no single formula for a healthy gut—it varies significantly from person to person. Rather than relying on pills and potions, gastroenterologists recommend proven lifestyle habits: eating plenty of fiber and diverse plants, staying hydrated, exercising regularly, managing stress, getting adequate sleep, and using antibiotics only when necessary. These everyday practices support the growth of beneficial bacteria and the gut-brain connection that influences everything from digestion to mental health and immune function.</p>",
+            "date_published": "2026-10-07T23:26:10+00:00",
+            "date_modified": "2026-10-07T23:26:10+00:00",
+            "image": "https://athenana.com/p/01m4cb09gh7sjy98mwx8r9znr6?v=7395a54d",
+            "tags": [
+                "nutrition",
+                "health",
+                "wellness",
+                "sleep",
+                "advice",
+                "tags",
+                "hydration",
+                "exercise",
+                "probiotics",
+                "fiber"
+            ],
+            "_source": {
+                "name": "www.self.com",
+                "url": "https://www.self.com/story/how-to-improve-gut-health"
+            },
+            "_athenana": {
+                "kind": "link",
+                "tags": [
+                    {
+                        "name": "nutrition",
+                        "slug": "nutrition"
+                    },
+                    {
+                        "name": "health",
+                        "slug": "health"
+                    },
+                    {
+                        "name": "wellness",
+                        "slug": "wellness"
+                    },
+                    {
+                        "name": "sleep",
+                        "slug": "sleep"
+                    },
+                    {
+                        "name": "advice",
+                        "slug": "advice"
+                    },
+                    {
+                        "name": "tags",
+                        "slug": "tags"
+                    },
+                    {
+                        "name": "hydration",
+                        "slug": "hydration"
+                    },
+                    {
+                        "name": "exercise",
+                        "slug": "exercise"
+                    },
+                    {
+                        "name": "probiotics",
+                        "slug": "probiotics"
+                    },
+                    {
+                        "name": "fiber",
+                        "slug": "fiber"
+                    }
+                ]
+            }
+        },
+        {
+            "id": "https://athenana.com/s/01kzk5wh8wad9jhp0q9egg0w5n",
+            "url": "https://www.wyome.com/blog/post.html?id=01kzk5wh8wad9jhp0q9egg0w5n",
+            "external_url": "https://www.foodandwine.com/what-is-the-sauerkraut-diet-12016323",
+            "title": "Trump Officials Swear by the ‘Sauerkraut Diet’ — but Does It Actually Work?",
+            "content_html": "<p>The so-called [[sauerkraut]] diet, created by [[Sean O’Mara]], is a lifestyle plan popular with several members of President Trump’s Cabinet and highlighted in the [[Wall Street Journal]], centered on fermented foods, [[grass-fed meat]], extended fasting, brief high‑intensity workouts, and other hormetic practices. Advocates claim the regimen restores the gut microbiome, boosts immunity, and can trigger GLP‑1–related weight effects; doctors report common weight loss but emphasize the evidence is limited. Nutrition experts place value on fermented foods for microbiome diversity and reduced inflammation, yet warn the meat‑heavy approach can raise LDL cholesterol in susceptible people and fermented products can be high in sodium. The article summarizes existing small studies, offers fermented‑food shopping guidance, and underscores that the diet’s long‑term risks and benefits remain insufficiently studied. Readers should consult clinicians before making major dietary changes.</p>",
+            "date_published": "2026-10-07T23:19:17+00:00",
+            "date_modified": "2026-10-07T23:19:17+00:00",
+            "image": "https://athenana.com/p/01m4cakvw5b97cfkjrs6430rn4?v=884f04d4",
+            "tags": [
+                "food",
+                "nutrition",
+                "health",
+                "weight loss",
+                "diet",
+                "donald trump"
+            ],
+            "_source": {
+                "name": "www.foodandwine.com",
+                "url": "https://www.foodandwine.com/what-is-the-sauerkraut-diet-12016323"
+            },
+            "_athenana": {
+                "kind": "link",
+                "tags": [
+                    {
+                        "name": "food",
+                        "slug": "food"
+                    },
+                    {
+                        "name": "nutrition",
+                        "slug": "nutrition"
+                    },
+                    {
+                        "name": "health",
+                        "slug": "health"
+                    },
+                    {
+                        "name": "weight loss",
+                        "slug": "weight-loss"
+                    },
+                    {
+                        "name": "diet",
+                        "slug": "diet"
+                    },
+                    {
+                        "name": "donald trump",
+                        "slug": "donald-trump"
+                    }
+                ]
+            }
+        },
+        {
+            "id": "https://athenana.com/s/01m2dgj1yctxq57ad9dywj6jbv",
+            "url": "https://www.wyome.com/blog/post.html?id=01m2dgj1yctxq57ad9dywj6jbv",
+            "external_url": "http://npr.org/2022/12/16/1139780043/what-is-time-physics-atomic-clocks-society",
+            "title": "Researchers say time is an illusion. So why are we all obsessed with it?",
+            "content_html": "<p>An article exploring the paradox of physicists claiming time is illusory while humans remain deeply preoccupied with measuring and managing it.</p>",
+            "date_published": "2026-10-07T23:08:15+00:00",
+            "date_modified": "2026-10-07T23:08:15+00:00",
+            "image": "https://athenana.com/p/01m4c9znmkzwxsmf7nszpptp6b?v=7639c992",
+            "tags": [
+                "philosophy",
+                "science"
+            ],
+            "_athenana": {
+                "kind": "link",
+                "tags": [
+                    {
+                        "name": "philosophy",
+                        "slug": "philosophy"
+                    },
+                    {
+                        "name": "science",
+                        "slug": "science"
+                    }
+                ]
+            }
+        },
+        {
+            "id": "https://athenana.com/s/01m2dgj0ht308kh7cshwg8kf7z",
+            "url": "https://www.wyome.com/blog/post.html?id=01m2dgj0ht308kh7cshwg8kf7z",
+            "external_url": "https://nytimes.com/2023/03/14/special-series/protopia-movement.html",
+            "title": "Forget Utopia. Ignore Dystopia. Embrace Protopia!",
+            "content_html": "<p>An argument for embracing protopia—a realistic, constantly improving vision of the future—rather than utopian or dystopian thinking.</p>",
+            "date_published": "2026-10-07T23:07:40+00:00",
+            "date_modified": "2026-10-08T03:07:07+00:00",
+            "image": "https://athenana.com/p/01m4c9ymccaq1kfd34yxvqzmbe?v=cd2a62b8",
+            "tags": [
+                "philosophy",
+                "optimism"
+            ],
+            "_athenana": {
+                "kind": "link",
+                "tags": [
+                    {
+                        "name": "philosophy",
+                        "slug": "philosophy"
+                    },
+                    {
+                        "name": "optimism",
+                        "slug": "optimism"
+                    }
+                ]
+            }
+        },
+        {
+            "id": "https://athenana.com/s/01kzk48rzmcp4pwp3q2ww5c3qg",
+            "url": "https://www.wyome.com/blog/post.html?id=01kzk48rzmcp4pwp3q2ww5c3qg",
+            "external_url": "https://www.popsci.com/science/not-living-in-computer-simulation/?utm_source=flipboard&utm_content=flipboard%2Fmagazine%2F10+For+Today",
+            "title": "Why we (probably) aren’t living in a computer simulation",
+            "content_html": "<p>A team led by Mir Faizal claims to have mathematically ruled out the simulation hypothesis by invoking quantum gravity&#039;s Platonic mathematical foundations combined with Gödel&#039;s incompleteness theorem, arguing that reality requires &quot;non-algorithmic understanding&quot; that no computational system—however powerful—could ever replicate, since simulations are inherently algorithmic. The piece is worth keeping mainly for its counterpoint: physicist Melvin Vopson (a simulation-theory proponent himself) pushes back hard, accusing the study of a category error for assuming a simulating system must obey the same physical/mathematical rules as the simulated universe, leaving the debate genuinely unresolved despite the confident framing.</p>",
+            "date_published": "2026-10-07T23:06:44+00:00",
+            "date_modified": "2026-10-07T23:06:44+00:00",
+            "image": "https://athenana.com/p/01m4c9wyp8201jwehzx1gfp89a?v=89abfee1",
+            "tags": [
+                "philosophy"
+            ],
+            "_source": {
+                "name": "www.popsci.com",
+                "url": "https://www.popsci.com/science/not-living-in-computer-simulation/?utm_source=flipboard&utm_content=flipboard%2Fmagazine%2F10+For+Today"
+            },
+            "_athenana": {
+                "kind": "link",
+                "tags": [
+                    {
+                        "name": "philosophy",
+                        "slug": "philosophy"
+                    }
+                ]
+            }
+        },
+        {
+            "id": "https://athenana.com/s/01kzk4hrre4t23vvb4v0nth106",
+            "url": "https://www.wyome.com/blog/post.html?id=01kzk4hrre4t23vvb4v0nth106",
+            "external_url": "https://trivia.cracked.com/article_44138_10-calvin-and-hobbes-comics-that-will-leave-you-contemplating-the-meaning-of-life.html?utm_source=flipboard&utm_content=topic%252Fcomics",
+            "title": "10 ‘Calvin and Hobbes’ Comics That Will Leave You Contemplating the Meaning of Life",
+            "content_html": "<p>This roundup pulls ten &quot;Calvin and Hobbes&quot; strips where Bill Watterson ditched the whimsy for existential heft, spotlighting moments the boy and his tiger wrestled with absurdity, mortality, war and the passage of time. It&#039;s less a joke list than a reminder that Watterson slipped genuine philosophical weight into a syndicated kids&#039; comic, culminating with the strip&#039;s famously poignant finale. Worth keeping as a quick clickable anthology of the series&#039; most quietly profound panels.</p>",
+            "date_published": "2026-10-07T23:06:29+00:00",
+            "date_modified": "2026-10-07T23:06:29+00:00",
+            "image": "https://athenana.com/p/01m4c9we7z88vw3mzfvavnxf6k?v=a268fbfe",
+            "tags": [
+                "philosophy",
+                "comics",
+                "nostalgia",
+                "humor",
+                "pop culture"
+            ],
+            "_source": {
+                "name": "trivia.cracked.com",
+                "url": "https://trivia.cracked.com/article_44138_10-calvin-and-hobbes-comics-that-will-leave-you-contemplating-the-meaning-of-life.html?utm_source=flipboard&utm_content=topic%252Fcomics"
+            },
+            "_athenana": {
+                "kind": "link",
+                "tags": [
+                    {
+                        "name": "philosophy",
+                        "slug": "philosophy"
+                    },
+                    {
+                        "name": "comics",
+                        "slug": "comics"
+                    },
+                    {
+                        "name": "nostalgia",
+                        "slug": "nostalgia"
+                    },
+                    {
+                        "name": "humor",
+                        "slug": "humor"
+                    },
+                    {
+                        "name": "pop culture",
+                        "slug": "pop-culture"
+                    }
+                ]
+            }
+        },
+        {
+            "id": "https://athenana.com/s/01kzk4nqmk6ntvsxb0g3snczbk",
+            "url": "https://www.wyome.com/blog/post.html?id=01kzk4nqmk6ntvsxb0g3snczbk",
+            "external_url": "https://www.cbr.com/calvin-and-hobbes-christmas-comic-strips/",
+            "title": "Calvin and Hobbes Debate Exactly How Santa Claus Defines the Term 'Good'",
+            "content_html": "<p>This piece introduces the first day of an Advent Calendar feature spotlighting Christmas-themed strips from notable comic strips, beginning with Bill Watterson&#039;s Calvin and Hobbes. The entry examines how Calvin navigates the seasonal pressure to appear good enough for Santa by philosophically debating the nature of goodness with Hobbes, even attempting to get a reference letter, while also featuring strips where Santa and his elves deliberate Calvin&#039;s worthiness and Calvin dreams of a poem convincing Santa to reward naughty children instead. The piece highlights Watterson&#039;s skill at blending clever wordplay with strong visual storytelling to explore Calvin&#039;s characteristically twisted imagination.</p>",
+            "date_published": "2026-10-07T23:06:18+00:00",
+            "date_modified": "2026-10-07T23:06:18+00:00",
+            "image": "https://athenana.com/p/01m4c9w373a5p4e6s411mnye08?v=bd330c2d",
+            "tags": [
+                "philosophy",
+                "comics",
+                "holiday",
+                "christmas",
+                "humor"
+            ],
+            "_source": {
+                "name": "www.cbr.com",
+                "url": "https://www.cbr.com/calvin-and-hobbes-christmas-comic-strips/"
+            },
+            "_athenana": {
+                "kind": "link",
+                "tags": [
+                    {
+                        "name": "philosophy",
+                        "slug": "philosophy"
+                    },
+                    {
+                        "name": "comics",
+                        "slug": "comics"
+                    },
+                    {
+                        "name": "holiday",
+                        "slug": "holiday"
+                    },
+                    {
+                        "name": "christmas",
+                        "slug": "christmas"
+                    },
+                    {
+                        "name": "humor",
+                        "slug": "humor"
+                    }
+                ]
+            }
+        },
+        {
+            "id": "https://athenana.com/s/01kzk53710jbpjtnv09nhfhkrn",
+            "url": "https://www.wyome.com/blog/post.html?id=01kzk53710jbpjtnv09nhfhkrn",
+            "external_url": "https://www.newyorker.com/magazine/2023/07/03/how-to-flourish-an-ancient-guide-to-living-well-aristotle-susan-sauve-meyer-book-review?utm_source=pocket_discover",
+            "title": "An Ancient Guide to the Good Life",
+            "content_html": "<p># Summary\n\nThis essay explores why Aristotle&#039;s Nicomachean Ethics, repackaged as a modern self-help guide called &quot;How to Flourish,&quot; ultimately disappoints readers seeking actionable moral rules—and why that disappointment reflects a fundamental misunderstanding of Aristotelian ethics. Aristotle&#039;s central insight is that becoming a good person (developing phronesis or &quot;good judgment&quot;) requires lived experience, habit, and the wisdom of well-lived lives rather than algorithmic principles or formulaic advice. The essay argues that contrary to contemporary culture&#039;s hunger for rules and shortcuts, genuine ethical wisdom comes only through slow, repeated practice within a community of experienced people—a truth evident in everything from cooking to the internet&#039;s &quot;Am I the Asshole?&quot; forum, where strangers help one another see situations clearly.</p>",
+            "date_published": "2026-10-07T23:05:59+00:00",
+            "date_modified": "2026-10-07T23:05:59+00:00",
+            "image": "https://athenana.com/p/01m4c9vhrxswwb1zgsngmh90d2?v=b74da67e",
+            "tags": [
+                "philosophy",
+                "ethics",
+                "self-help",
+                "tags"
+            ],
+            "_source": {
+                "name": "www.newyorker.com",
+                "url": "https://www.newyorker.com/magazine/2023/07/03/how-to-flourish-an-ancient-guide-to-living-well-aristotle-susan-sauve-meyer-book-review?utm_source=pocket_discover"
+            },
+            "_athenana": {
+                "kind": "link",
+                "tags": [
+                    {
+                        "name": "philosophy",
+                        "slug": "philosophy"
+                    },
+                    {
+                        "name": "ethics",
+                        "slug": "ethics"
+                    },
+                    {
+                        "name": "self-help",
+                        "slug": "self-help"
+                    },
+                    {
+                        "name": "tags",
+                        "slug": "tags"
+                    }
+                ]
+            }
+        },
+        {
+            "id": "https://athenana.com/s/01kzk58tv7cgaj69jfssehbymd",
+            "url": "https://www.wyome.com/blog/post.html?id=01kzk58tv7cgaj69jfssehbymd",
+            "external_url": "https://www.scientificamerican.com/article/do-we-live-in-a-simulation-chances-are-about-50-50/",
+            "title": "Do We Live in a Simulation? Chances Are about 50–50",
+            "content_html": "<p>Astronomer David Kipping applied Bayesian reasoning to philosopher Nick Bostrom&#039;s 2003 simulation argument, which posits that at least one of three propositions must be true: humans go extinct before developing simulation technology, advanced civilizations don&#039;t simulate their past, or we&#039;re already living in a simulation. Kipping&#039;s analysis assigns equal initial probabilities to the &quot;physical hypothesis&quot; (no simulations exist) and the &quot;simulation hypothesis&quot; (simulations do exist), concluding that the odds we live in base reality are roughly even—contradicting Elon Musk&#039;s claim that the odds are one in billions. However, Kipping cautions that if humans ever create conscious simulations, the mathematics would flip dramatically to suggest we ourselves are almost certainly simulated, while acknowledging that the simulation hypothesis may be fundamentally untestable and thus fail the standard of science.</p>",
+            "date_published": "2026-10-07T23:04:59+00:00",
+            "date_modified": "2026-10-07T23:04:59+00:00",
+            "image": "https://athenana.com/p/01m4c9sq8ysbdwmba9v7sfb7p4?v=d27aa0dc",
+            "tags": [
+                "philosophy",
+                "science"
+            ],
+            "_source": {
+                "name": "www.scientificamerican.com",
+                "url": "https://www.scientificamerican.com/article/do-we-live-in-a-simulation-chances-are-about-50-50/"
+            },
+            "_athenana": {
+                "kind": "link",
+                "tags": [
+                    {
+                        "name": "philosophy",
+                        "slug": "philosophy"
+                    },
+                    {
+                        "name": "science",
+                        "slug": "science"
+                    }
+                ]
+            }
+        },
+        {
+            "id": "https://athenana.com/s/01kzk4zyw6jnfpr6t05s81jg30",
+            "url": "https://www.wyome.com/blog/post.html?id=01kzk4zyw6jnfpr6t05s81jg30",
+            "external_url": "https://www.indiewire.com/gallery/best-political-films/",
+            "title": "The 10 Best Films for Our Current Political Moment",
+            "content_html": "<p>Armando Ianucci, creator of &quot;Veep,&quot; drew parallels between Biden&#039;s delayed exit from the race and the final voting scene in his film &quot;The Death of Stalin,&quot; where characters fear being the first to act against the prevailing order. The piece uses this moment to argue that art inadvertently captures political dynamics we struggle to acknowledge in reality, then expands into a list of ten films—from &quot;Mr. Smith Goes to Washington&quot; to &quot;Lincoln&quot;—that offer deeper insights into contemporary political issues than simple sitcom comparisons can provide.</p>",
+            "date_published": "2026-10-07T21:19:08+00:00",
+            "date_modified": "2026-10-07T21:19:08+00:00",
+            "image": "https://athenana.com/p/01m4c3qw4d2as9kv4p3zq70yc5?v=a75ad8ce",
+            "tags": [
+                "film",
+                "recommendations",
+                "politics",
+                "cinema"
+            ],
+            "_source": {
+                "name": "www.indiewire.com",
+                "url": "https://www.indiewire.com/gallery/best-political-films/"
+            },
+            "_athenana": {
+                "kind": "link",
+                "tags": [
+                    {
+                        "name": "film",
+                        "slug": "film"
+                    },
+                    {
+                        "name": "recommendations",
+                        "slug": "recommendations"
+                    },
+                    {
+                        "name": "politics",
+                        "slug": "politics"
+                    },
+                    {
+                        "name": "cinema",
+                        "slug": "cinema"
+                    }
+                ]
+            }
+        },
+        {
+            "id": "https://athenana.com/s/01kzk50265fbx0sb1q8czsjj0w",
+            "url": "https://www.wyome.com/blog/post.html?id=01kzk50265fbx0sb1q8czsjj0w",
+            "external_url": "https://www.indiewire.com/gallery/quentin-tarantino-favorite-movies/",
+            "title": "Quentin Tarantino’s Favorite Movies: 65 Films the Director Wants You to See",
+            "content_html": "<p>Quentin Tarantino&#039;s cinematic tastes span from canonical classics to overlooked gems and mainstream blockbusters, reflecting his encyclopedic knowledge of film history developed during his video store years. His preferences reveal consistent interests in stylistic audacity, practical action sequences, complex character development, and genre-bending narratives—from spaghetti Westerns and exploitation films to screwball comedies and martial arts movies. The article catalogs 64 of Tarantino&#039;s favorite films across decades and countries, demonstrating how his admiration for directors like Brian De Palma, Pedro Almodóvar, and Bong Joon-ho has directly influenced his own directorial approach and filmmaking philosophy.</p>",
+            "date_published": "2026-10-07T21:18:54+00:00",
+            "date_modified": "2026-10-07T21:18:54+00:00",
+            "image": "https://athenana.com/p/01m4c3qb01zwdsrn39n5hm8t65?v=f4c307c7",
+            "tags": [
+                "film",
+                "recommendations",
+                "cinema"
+            ],
+            "_source": {
+                "name": "www.indiewire.com",
+                "url": "https://www.indiewire.com/gallery/quentin-tarantino-favorite-movies/"
+            },
+            "_athenana": {
+                "kind": "link",
+                "tags": [
+                    {
+                        "name": "film",
+                        "slug": "film"
+                    },
+                    {
+                        "name": "recommendations",
+                        "slug": "recommendations"
+                    },
+                    {
+                        "name": "cinema",
+                        "slug": "cinema"
+                    }
+                ]
+            }
+        },
+        {
+            "id": "https://athenana.com/s/01kzk5tzjytt77aj026twe5t8p",
+            "url": "https://www.wyome.com/blog/post.html?id=01kzk5tzjytt77aj026twe5t8p",
+            "external_url": "https://collider.com/best-movies-2021/",
+            "title": "5 Years Later, These Are the 10 Best Movies of 2021",
+            "content_html": "<p>A retrospective ranking of 2021&#039;s best films five years on, arguing that despite the pandemic&#039;s disruption of release patterns and awards attention, that year quietly produced an unusually deep field of enduring work. It runs from Joel Coen&#039;s The Tragedy of Macbeth and Villeneuve&#039;s Dune down through overlooked gems like Mass and Judas and the Black Messiah, landing on The Worst Person in the World at number one as proof of cinema&#039;s growing embrace of international, formally adventurous storytelling. Worth keeping as a corrective list-style piece that pushes back against films (like Licorice Pizza or West Side Story) getting overshadowed by their directors&#039; bigger later hits or box-office flops.</p>",
+            "date_published": "2026-10-07T21:18:13+00:00",
+            "date_modified": "2026-10-07T21:18:13+00:00",
+            "image": "https://athenana.com/p/01m4c3p6z2m6n1f9haaqysft5t?v=5b8323ca",
+            "tags": [
+                "film",
+                "dune",
+                "movies",
+                "cinema"
+            ],
+            "_source": {
+                "name": "collider.com",
+                "url": "https://collider.com/best-movies-2021/"
+            },
+            "_athenana": {
+                "kind": "link",
+                "tags": [
+                    {
+                        "name": "film",
+                        "slug": "film"
+                    },
+                    {
+                        "name": "dune",
+                        "slug": "dune"
+                    },
+                    {
+                        "name": "movies",
+                        "slug": "movies"
+                    },
+                    {
+                        "name": "cinema",
+                        "slug": "cinema"
+                    }
+                ]
+            }
+        },
+        {
+            "id": "https://athenana.com/s/01m2dgj572b98c34aymm6ngq1g",
+            "url": "https://www.wyome.com/blog/post.html?id=01m2dgj572b98c34aymm6ngq1g",
+            "external_url": "https://consequence.net/2022/09/best-albums-all-time-list/3",
+            "title": "The 100 Greatest Albums of All Time",
+            "content_html": "<p>Consequence magazine released an updated version of its &quot;100 Greatest Albums of All Time&quot; list, 12 years after the original 2010 edition, reflecting significant shifts in musical culture, taste, and available recordings. The new list was compiled through extensive debate among staff members (only two of whom worked on the original), weighing factors like an album&#039;s impact at release, retrospective significance, influence on evolving musical trends, and the pure joy it brings to listeners. The publication acknowledges that readers will inevitably disagree with placements and omissions, but stands by the selections as a thoughtful assessment of musical greatness rather than a claim to objective truth.</p>",
+            "date_published": "2026-10-07T21:17:16+00:00",
+            "date_modified": "2026-10-07T21:17:16+00:00",
+            "image": "https://athenana.com/p/01m4c3mfqg53ndnc4vvcpwqrec?v=b3686fdc",
+            "tags": [
+                "music",
+                "rankings",
+                "recommendations",
+                "rock",
+                "classics"
+            ],
+            "_source": {
+                "name": "Consequence",
+                "url": "https://consequence.net/2022/09/best-albums-all-time-list/3"
+            },
+            "_athenana": {
+                "kind": "link",
+                "tags": [
+                    {
+                        "name": "music",
+                        "slug": "music"
+                    },
+                    {
+                        "name": "rankings",
+                        "slug": "rankings"
+                    },
+                    {
+                        "name": "recommendations",
+                        "slug": "recommendations"
+                    },
+                    {
+                        "name": "rock",
+                        "slug": "rock"
+                    },
+                    {
+                        "name": "classics",
+                        "slug": "classics"
+                    }
+                ]
+            }
+        },
+        {
+            "id": "https://athenana.com/s/01m2dghwxxdhzsra6rn5tmy2hq",
+            "url": "https://www.wyome.com/blog/post.html?id=01m2dghwxxdhzsra6rn5tmy2hq",
+            "external_url": "https://collider.com/most-underrated-sci-fi-mystery-movies-21st-century-ranked",
+            "title": "The 10 Most Underrated Sci-Fi Mysteries of the 21st Century, Ranked",
+            "content_html": "<p>This article ranks ten underrated science fiction mystery films from the 21st century, from Gareth Edwards&#039; *Monsters* at number ten to James Gray&#039;s *Ad Astra* at number one. Each entry includes a brief description of the film&#039;s plot, thematic concerns, and performances, explaining why these commercially overlooked or critically underseen films deserve recognition from sci-fi fans. The list spans from 2002 to 2019 and includes notable titles like *Equilibrium*, *The Butterfly Effect*, *Southland Tales*, and *Code 46*, positioning them as worthy alternatives to mainstream franchises that have dominated the genre.</p>",
+            "date_published": "2026-10-07T21:16:24+00:00",
+            "date_modified": "2026-10-07T21:16:24+00:00",
+            "image": "https://athenana.com/p/01m4c3jvpphb7fhc5zvta7q1bz?v=065100f7",
+            "tags": [
+                "underrated",
+                "film",
+                "rankings",
+                "sci-fi"
+            ],
+            "_source": {
+                "name": "Collider",
+                "url": "https://collider.com/most-underrated-sci-fi-mystery-movies-21st-century-ranked"
+            },
+            "_athenana": {
+                "kind": "link",
+                "tags": [
+                    {
+                        "name": "underrated",
+                        "slug": "underrated"
+                    },
+                    {
+                        "name": "film",
+                        "slug": "film"
+                    },
+                    {
+                        "name": "rankings",
+                        "slug": "rankings"
+                    },
+                    {
+                        "name": "sci-fi",
+                        "slug": "sci-fi"
+                    }
+                ]
+            }
+        },
+        {
+            "id": "https://athenana.com/s/01m2e3cacxdhq5e99xmckh6vx1",
+            "url": "https://www.wyome.com/blog/post.html?id=01m2e3cacxdhq5e99xmckh6vx1",
+            "external_url": "https://collider.com/most-timeless-classic-film-noir-movies-ranked/",
+            "title": "The 10 Most Timeless Classic Film Noir Movies, Ranked",
+            "content_html": "<p>I don&#039;t have an article to summarize. The content you&#039;ve provided appears to be a webpage from Collider featuring a ranked list of classic film noir movies, with detailed descriptions of ten films from *The Killing* (ranked 10th) down to *Sunset Boulevard* (ranked 1st). If you&#039;d like me to summarize a specific article or piece of writing, please share the actual text or content you&#039;d like me to condense.</p>",
+            "date_published": "2026-10-07T21:15:43+00:00",
+            "date_modified": "2026-10-07T21:15:43+00:00",
+            "image": "https://athenana.com/p/01m4c3hkjyanrv7k4m77h0yp4h?v=7b576572",
+            "tags": [
+                "rankings",
+                "recommendations",
+                "classics",
+                "movies",
+                "cinema"
+            ],
+            "_source": {
+                "name": "Collider",
+                "url": "https://collider.com/most-timeless-classic-film-noir-movies-ranked/"
+            },
+            "_athenana": {
+                "kind": "link",
+                "tags": [
+                    {
+                        "name": "rankings",
+                        "slug": "rankings"
+                    },
+                    {
+                        "name": "recommendations",
+                        "slug": "recommendations"
+                    },
+                    {
+                        "name": "classics",
+                        "slug": "classics"
+                    },
+                    {
+                        "name": "movies",
+                        "slug": "movies"
+                    },
+                    {
+                        "name": "cinema",
+                        "slug": "cinema"
+                    }
+                ]
+            }
+        },
+        {
+            "id": "https://athenana.com/s/01kzk47q7gx6wgjcqw6ga3sabp",
+            "url": "https://www.wyome.com/blog/post.html?id=01kzk47q7gx6wgjcqw6ga3sabp",
+            "external_url": "https://collider.com/sci-fi-movies-moving-ranked/",
+            "title": "10 Most Moving Sci-Fi Movies, Ranked",
+            "content_html": "<p>A Collider countdown ranks the ten most emotionally affecting sci-fi films ever made, arguing that the genre&#039;s real power lies not in spectacle but in intimate human stakes—grief, memory, love, and mortality. It moves from animated tearjerkers like WALL-E and quiet meditations like After Yang and Solaris through romance-tech hybrids like Her and Eternal Sunshine, landing on Arrival and Interstellar as the pinnacle examples of cerebral, heart-wrenching storytelling. The throughline is that the best sci-fi uses cosmic scale to sharpen, not dilute, deeply personal emotional truths.</p>",
+            "date_published": "2026-10-07T21:15:19+00:00",
+            "date_modified": "2026-10-07T21:15:19+00:00",
+            "image": "https://athenana.com/p/01m4c3fmhhm1wt508w89kaz9yd?v=85599251",
+            "tags": [
+                "romance",
+                "film",
+                "rankings",
+                "sci-fi",
+                "dystopia",
+                "movies"
+            ],
+            "_source": {
+                "name": "collider.com",
+                "url": "https://collider.com/sci-fi-movies-moving-ranked/"
+            },
+            "_athenana": {
+                "kind": "link",
+                "tags": [
+                    {
+                        "name": "romance",
+                        "slug": "romance"
+                    },
+                    {
+                        "name": "film",
+                        "slug": "film"
+                    },
+                    {
+                        "name": "rankings",
+                        "slug": "rankings"
+                    },
+                    {
+                        "name": "sci-fi",
+                        "slug": "sci-fi"
+                    },
+                    {
+                        "name": "dystopia",
+                        "slug": "dystopia"
+                    },
+                    {
+                        "name": "movies",
+                        "slug": "movies"
+                    }
+                ]
+            }
+        },
+        {
+            "id": "https://athenana.com/s/01kzk4n1djtr8rhhw6g3z5vfb9",
+            "url": "https://www.wyome.com/blog/post.html?id=01kzk4n1djtr8rhhw6g3z5vfb9",
+            "external_url": "https://www.businessinsider.com/50-best-movies-all-time-critics-2016-10?utm_source=GetTheElevatordotcom",
+            "title": "The 50 best movies of all time list, according to critic reviews: Metacritic",
+            "content_html": "<p>This is Metacritic&#039;s ranked list of the 50 most critically acclaimed films of all time, based on composite critical reception scores. The ranking spans from classic Hollywood and silent films through contemporary Oscar winners, with *The Godfather* topping the list at a perfect 100/100 critical score, followed by *Citizen Kane* and *Rear Window*. The piece demonstrates how critical consensus values both timeless masterpieces and recent achievements, with notable directors like Hitchcock heavily represented across the rankings.</p>",
+            "date_published": "2026-10-07T21:12:17+00:00",
+            "date_modified": "2026-10-07T21:12:17+00:00",
+            "image": "https://athenana.com/p/01m4c3b9k68pe508mk9ta9a8a6?v=65f414f9",
+            "tags": [
+                "film",
+                "rankings",
+                "recommendations",
+                "classics",
+                "movies",
+                "cinema"
+            ],
+            "_source": {
+                "name": "www.businessinsider.com",
+                "url": "https://www.businessinsider.com/50-best-movies-all-time-critics-2016-10?utm_source=GetTheElevatordotcom"
+            },
+            "_athenana": {
+                "kind": "link",
+                "tags": [
+                    {
+                        "name": "film",
+                        "slug": "film"
+                    },
+                    {
+                        "name": "rankings",
+                        "slug": "rankings"
+                    },
+                    {
+                        "name": "recommendations",
+                        "slug": "recommendations"
+                    },
+                    {
+                        "name": "classics",
+                        "slug": "classics"
+                    },
+                    {
+                        "name": "movies",
+                        "slug": "movies"
+                    },
+                    {
+                        "name": "cinema",
+                        "slug": "cinema"
+                    }
+                ]
+            }
+        },
+        {
+            "id": "https://athenana.com/s/01kzk4pp29zbcb2ha5ttfwagac",
+            "url": "https://www.wyome.com/blog/post.html?id=01kzk4pp29zbcb2ha5ttfwagac",
+            "external_url": "https://www.theringer.com/project/best-tv-episodes?utm_source=flipboard&utm_content=flipboard%2Fmagazine%2F10+For+Today",
+            "title": "The 100 Best TV Episodes of the Century - The Ringer",
+            "content_html": "<p>The Ringer updated its 2018 ranking of the 100 best TV episodes of the century to reflect seven years of new television, a period during which streaming services fundamentally changed how shows are made and consumed. The revision added 27 new episodes while maintaining the original list&#039;s commitment to representing television&#039;s full range of genres rather than limiting itself to prestige dramas. The methodology remained consistent: staff submitted favorites, with one episode per show allowed and only episodes released after July 2018 eligible for inclusion or replacement.</p>",
+            "date_published": "2026-10-07T21:11:57+00:00",
+            "date_modified": "2026-10-07T21:11:57+00:00",
+            "image": "https://athenana.com/p/01m4c3aqx8aaae775mbbdfm2rs?v=54570e20",
+            "tags": [
+                "television",
+                "film",
+                "rankings",
+                "drama",
+                "comedy",
+                "recommendations",
+                "entertainment",
+                "tv"
+            ],
+            "_source": {
+                "name": "www.theringer.com",
+                "url": "https://www.theringer.com/project/best-tv-episodes?utm_source=flipboard&utm_content=flipboard%2Fmagazine%2F10+For+Today"
+            },
+            "_athenana": {
+                "kind": "link",
+                "tags": [
+                    {
+                        "name": "television",
+                        "slug": "television"
+                    },
+                    {
+                        "name": "film",
+                        "slug": "film"
+                    },
+                    {
+                        "name": "rankings",
+                        "slug": "rankings"
+                    },
+                    {
+                        "name": "drama",
+                        "slug": "drama"
+                    },
+                    {
+                        "name": "comedy",
+                        "slug": "comedy"
+                    },
+                    {
+                        "name": "recommendations",
+                        "slug": "recommendations"
+                    },
+                    {
+                        "name": "entertainment",
+                        "slug": "entertainment"
+                    },
+                    {
+                        "name": "tv",
+                        "slug": "tv"
+                    }
+                ]
+            }
+        },
+        {
+            "id": "https://athenana.com/s/01kzk4xyzesxhs2jmja6sgq31a",
+            "url": "https://www.wyome.com/blog/post.html?id=01kzk4xyzesxhs2jmja6sgq31a",
+            "external_url": "https://www.goldderby.com/gallery/james-bond-movies-ranked/",
+            "title": "James Bond Movies Ranked From Worst To Best",
+            "content_html": "<p>This ranking aggregates critical and audience scores from Rotten Tomatoes, Metacritic, and IMDb (combined out of 300) to determine the best and worst Bond films. Goldfinger emerges at the top with 261 points, while The Man With the Golden Gun ranks lowest at 149, with classic Connery films and recent Daniel Craig entries generally scoring higher than Roger Moore&#039;s 1980s outings. The list reveals that critical consensus tends to favor Bond films from the 1960s and recent reboots over the middling reviews given to many films from the franchise&#039;s middle decades.</p>",
+            "date_published": "2026-10-07T21:11:41+00:00",
+            "date_modified": "2026-10-07T21:11:41+00:00",
+            "image": "https://athenana.com/p/01m4c3a88hsq94k9eq5nc74eka?v=e4a74597",
+            "tags": [
+                "film",
+                "rankings",
+                "reviews",
+                "james bond",
+                "cinema"
+            ],
+            "_source": {
+                "name": "www.goldderby.com",
+                "url": "https://www.goldderby.com/gallery/james-bond-movies-ranked/"
+            },
+            "_athenana": {
+                "kind": "link",
+                "tags": [
+                    {
+                        "name": "film",
+                        "slug": "film"
+                    },
+                    {
+                        "name": "rankings",
+                        "slug": "rankings"
+                    },
+                    {
+                        "name": "reviews",
+                        "slug": "reviews"
+                    },
+                    {
+                        "name": "james bond",
+                        "slug": "james-bond"
+                    },
+                    {
+                        "name": "cinema",
+                        "slug": "cinema"
+                    }
+                ]
+            }
+        },
+        {
+            "id": "https://athenana.com/s/01kzk51ncnh32nfdetcmntr627",
+            "url": "https://www.wyome.com/blog/post.html?id=01kzk51ncnh32nfdetcmntr627",
+            "external_url": "https://www.mensjournal.com/entertainment/best-james-bond-movies-ranked",
+            "title": "Best James Bond Movies of All Time, Ranked | Men's Journal",
+            "content_html": "<p>This article ranks all 25 James Bond films from worst to best, beginning with Timothy Dalton&#039;s *The Living Daylights* and culminating in Sean Connery&#039;s *Thunderball*. Each entry includes a brief assessment of the film&#039;s strengths and weaknesses, behind-the-scenes trivia, and memorable quotes, spanning from the franchise&#039;s 1962 debut through Daniel Craig&#039;s 2015 *Spectre*. The rankings reflect both critical perspective and the evolution of Bond&#039;s character across different actors and eras, acknowledging shifts in tone from campy to gritty to the influence of competing spy franchises like the Bourne series.</p>",
+            "date_published": "2026-10-07T21:10:47+00:00",
+            "date_modified": "2026-10-07T21:10:53+00:00",
+            "image": "https://athenana.com/p/01m4c38ghc1mbd1asmzhnv7gkw?v=75843bf1",
+            "tags": [
+                "film",
+                "rankings",
+                "entertainment",
+                "james bond",
+                "movies"
+            ],
+            "_source": {
+                "name": "www.mensjournal.com",
+                "url": "https://www.mensjournal.com/entertainment/best-james-bond-movies-ranked"
+            },
+            "_athenana": {
+                "kind": "link",
+                "tags": [
+                    {
+                        "name": "film",
+                        "slug": "film"
+                    },
+                    {
+                        "name": "rankings",
+                        "slug": "rankings"
+                    },
+                    {
+                        "name": "entertainment",
+                        "slug": "entertainment"
+                    },
+                    {
+                        "name": "james bond",
+                        "slug": "james-bond"
+                    },
+                    {
+                        "name": "movies",
+                        "slug": "movies"
+                    }
+                ]
+            }
+        },
+        {
+            "id": "https://athenana.com/s/01m2e3caw5afh7ah6b8b58jwbn",
+            "url": "https://www.wyome.com/blog/post.html?id=01m2e3caw5afh7ah6b8b58jwbn",
+            "external_url": "https://thepointsguy.com/airline/sweet-spots-american-airlines-aadvantage/",
+            "title": "Redeem American Airlines AAdvantage miles for maximum value - The Points Guy",
+            "content_html": "<p>American Airlines&#039; AAdvantage program offers several high-value redemption opportunities, particularly with Oneworld partner airlines where fixed award charts still apply—such as European business class seats for 57,500 miles on carriers like Iberia or Finnair, and first-class flights to Japan on Japan Airlines for 80,000 miles. The program uses dynamic pricing for American-operated flights, making off-peak travel and short-haul economy redemptions (starting at 5,000 miles) better values, while partner redemptions like Royal Air Maroc business class to Morocco at 57,500 miles provide consistent availability and pricing.</p>",
+            "date_published": "2026-10-07T20:53:55+00:00",
+            "date_modified": "2026-10-07T20:53:55+00:00",
+            "image": "https://athenana.com/p/01m4c29repxgwd2yn3cxp2jsjv?v=da58a404",
+            "tags": [
+                "travel",
+                "business",
+                "credit cards",
+                "tips"
+            ],
+            "_source": {
+                "name": "The Points Guy",
+                "url": "https://thepointsguy.com/airline/sweet-spots-american-airlines-aadvantage/"
+            },
+            "_athenana": {
+                "kind": "link",
+                "tags": [
+                    {
+                        "name": "travel",
+                        "slug": "travel"
+                    },
+                    {
+                        "name": "business",
+                        "slug": "business"
+                    },
+                    {
+                        "name": "credit cards",
+                        "slug": "credit-cards"
+                    },
+                    {
+                        "name": "tips",
+                        "slug": "tips"
+                    }
+                ]
+            }
+        },
+        {
+            "id": "https://athenana.com/s/01m2e3caghjen4wb93k2v9f71m",
+            "url": "https://www.wyome.com/blog/post.html?id=01m2e3caghjen4wb93k2v9f71m",
+            "external_url": "https://thepointsguy.com/loyalty-programs/ultimate-guide-amex-membership-rewards/",
+            "title": "Amex Membership Rewards: How to earn, redeem and transfer - The Points Guy",
+            "content_html": "<p>Amex Membership Rewards points are valued at approximately 2 cents each and offer flexibility through multiple redemption options, with the highest value typically achieved by transferring points to airline and hotel partners rather than redeeming through Amex Travel or statement credits. The article compares six major Amex cards that earn these points, detailing their welcome bonuses, earning rates across spending categories, and annual fees to help cardholders choose the best option for their spending patterns. It also explains the mechanics of earning and redeeming points, including transfer partner options, tax implications, and redemption strategies that maximize value while warning against poor-value redemptions like gift cards or statement credits.</p>",
+            "date_published": "2026-10-07T20:53:45+00:00",
+            "date_modified": "2026-10-07T20:53:45+00:00",
+            "image": "https://athenana.com/p/01m4c29dvvr03fhqxzj9ws3cmq?v=11ca35e0",
+            "tags": [
+                "travel",
+                "credit cards",
+                "personal finance",
+                "rewards"
+            ],
+            "_source": {
+                "name": "The Points Guy",
+                "url": "https://thepointsguy.com/loyalty-programs/ultimate-guide-amex-membership-rewards/"
+            },
+            "_athenana": {
+                "kind": "link",
+                "tags": [
+                    {
+                        "name": "travel",
+                        "slug": "travel"
+                    },
+                    {
+                        "name": "credit cards",
+                        "slug": "credit-cards"
+                    },
+                    {
+                        "name": "personal finance",
+                        "slug": "personal-finance"
+                    },
+                    {
+                        "name": "rewards",
+                        "slug": "rewards"
+                    }
+                ]
+            }
+        },
+        {
+            "id": "https://athenana.com/s/01m2e3cafyq0a9r3njn7k4k5hd",
+            "url": "https://www.wyome.com/blog/post.html?id=01m2e3cafyq0a9r3njn7k4k5hd",
+            "external_url": "https://thepointsguy.com/credit-cards/reviews/amex-platinum-review/",
+            "title": "American Express Platinum review: Luxury perks worth the fee - The Points Guy",
+            "content_html": "<p>The Amex Platinum charges $895 annually but targets frequent travelers with extensive perks including broad airport lounge access, up to $2,039 in potential annual statement credits across travel and lifestyle categories, and 5x points earning on airfare and prepaid hotels. The card&#039;s value depends heavily on maximizing its scattered credits and elite hotel/airline status benefits, making it less suitable for those who want simplicity or primarily earn everyday rewards on dining and groceries.</p>",
+            "date_published": "2026-10-07T20:53:34+00:00",
+            "date_modified": "2026-10-07T20:53:34+00:00",
+            "image": "https://athenana.com/p/01m4c293rn81thhvz2k1wk0f8a?v=71ff9ba0",
+            "tags": [
+                "travel",
+                "credit cards",
+                "personal finance",
+                "luxury",
+                "reviews"
+            ],
+            "_source": {
+                "name": "The Points Guy",
+                "url": "https://thepointsguy.com/credit-cards/reviews/amex-platinum-review/"
+            },
+            "_athenana": {
+                "kind": "link",
+                "tags": [
+                    {
+                        "name": "travel",
+                        "slug": "travel"
+                    },
+                    {
+                        "name": "credit cards",
+                        "slug": "credit-cards"
+                    },
+                    {
+                        "name": "personal finance",
+                        "slug": "personal-finance"
+                    },
+                    {
+                        "name": "luxury",
+                        "slug": "luxury"
+                    },
+                    {
+                        "name": "reviews",
+                        "slug": "reviews"
+                    }
+                ]
+            }
+        },
+        {
+            "id": "https://athenana.com/s/01kzk47yk0tf9htmeb7dzm00e1",
+            "url": "https://www.wyome.com/blog/post.html?id=01kzk47yk0tf9htmeb7dzm00e1",
+            "external_url": "https://www.nytimes.com/2025/10/11/business/credit-cards-churners.html?nl=From+The+Times",
+            "title": "How Churners Earn Money By Regularly Signing Up for Credit Cards",
+            "content_html": "<p>David Wignall profiles [[Matthew Palm]], a 57-year-old freelance television producer in [[Illinois]] whose side hustle is opening and managing an array of [[credit cards]]—about 50 at last count—to harvest signup bonuses and rewards. The article explains the mechanics of card-churning strategies, the allure of sign-up points and travel perks, and how disciplined spending, calendar vigilance and an understanding of issuer rules can make the practice lucrative for some while posing risks to others: potential credit-score impacts, fees, and complex record-keeping. Wignall situates churning within broader consumer-finance choices, interviews experts and participants, and notes industry responses and policy considerations, concluding that while churning can pay off for experienced, organized individuals it is rarely advisable as a casual side income. Appeared in [[The New York Times]].</p>",
+            "date_published": "2026-10-07T20:53:23+00:00",
+            "date_modified": "2026-10-07T20:53:23+00:00",
+            "image": "https://athenana.com/p/01m4c28rppcf46vgrv2wtgfx93?v=d988e8a2",
+            "tags": [
+                "travel",
+                "strategy",
+                "business",
+                "credit cards",
+                "personal finance",
+                "rewards",
+                "side hustle"
+            ],
+            "_source": {
+                "name": "www.nytimes.com",
+                "url": "https://www.nytimes.com/2025/10/11/business/credit-cards-churners.html?nl=From+The+Times"
+            },
+            "_athenana": {
+                "kind": "link",
+                "tags": [
+                    {
+                        "name": "travel",
+                        "slug": "travel"
+                    },
+                    {
+                        "name": "strategy",
+                        "slug": "strategy"
+                    },
+                    {
+                        "name": "business",
+                        "slug": "business"
+                    },
+                    {
+                        "name": "credit cards",
+                        "slug": "credit-cards"
+                    },
+                    {
+                        "name": "personal finance",
+                        "slug": "personal-finance"
+                    },
+                    {
+                        "name": "rewards",
+                        "slug": "rewards"
+                    },
+                    {
+                        "name": "side hustle",
+                        "slug": "side-hustle"
+                    }
+                ]
+            }
+        },
+        {
+            "id": "https://athenana.com/s/01kzk58egc9mrxr7t6y8e141fg",
+            "url": "https://www.wyome.com/blog/post.html?id=01kzk58egc9mrxr7t6y8e141fg",
+            "external_url": "https://www.nike.com/running/marathon-training-plan",
+            "title": "Marathon Training Plan",
+            "content_html": "<p>Nike&#039;s 18-week marathon training plan combines guided runs, strength workouts, and recovery guidance through their app ecosystem to support both physical preparation and mental readiness for 26.2 miles. The program adapts to individual schedules and fitness levels, offering flexibility in training frequency and duration while incorporating coaching expertise on speed work, long runs, and recovery strategies. Rather than focusing solely on mileage, the plan treats marathon training as a holistic development process touching nutrition, mindset, and overall progress.</p>",
+            "date_published": "2026-10-07T18:12:33+00:00",
+            "date_modified": "2026-10-07T18:12:33+00:00",
+            "image": "https://athenana.com/p/01m4bs2a6kvc0h6dd894399pm7?v=17d95484",
+            "tags": [
+                "running",
+                "fitness",
+                "training",
+                "endurance",
+                "recovery",
+                "marathon"
+            ],
+            "_source": {
+                "name": "www.nike.com",
+                "url": "https://www.nike.com/running/marathon-training-plan"
+            },
+            "_athenana": {
+                "kind": "link",
+                "tags": [
+                    {
+                        "name": "running",
+                        "slug": "running"
+                    },
+                    {
+                        "name": "fitness",
+                        "slug": "fitness"
+                    },
+                    {
+                        "name": "training",
+                        "slug": "training"
+                    },
+                    {
+                        "name": "endurance",
+                        "slug": "endurance"
+                    },
+                    {
+                        "name": "recovery",
+                        "slug": "recovery"
+                    },
+                    {
+                        "name": "marathon",
+                        "slug": "marathon"
+                    }
+                ]
+            }
+        },
+        {
+            "id": "https://athenana.com/s/01kzk5tsqfsrsr8d6bb9eybvm8",
+            "url": "https://www.wyome.com/blog/post.html?id=01kzk5tsqfsrsr8d6bb9eybvm8",
+            "external_url": "https://tyr.com/",
+            "title": "TYR Sport",
+            "content_html": "<p>This is a promotional storefront page, not an article — a seasonal sale listing footwear like the CXT-3 Trainers, L-2 Lifter, and TECKNIT 2 Trainers with discounts up to 70% off. There&#039;s no real argument or reporting here, just product marketing copy, so it was likely saved as a shopping reminder rather than for its content.</p>",
+            "date_published": "2026-10-07T18:12:21+00:00",
+            "date_modified": "2026-10-07T18:12:21+00:00",
+            "image": "https://athenana.com/p/01m4bs1xn2wvk3ybsr1v04wnsb?v=929b968a",
+            "tags": [
+                "gear",
+                "footwear",
+                "running",
+                "fitness",
+                "training",
+                "accessories",
+                "recovery"
+            ],
+            "_source": {
+                "name": "tyr.com",
+                "url": "https://tyr.com/"
+            },
+            "_athenana": {
+                "kind": "link",
+                "tags": [
+                    {
+                        "name": "gear",
+                        "slug": "gear"
+                    },
+                    {
+                        "name": "footwear",
+                        "slug": "footwear"
+                    },
+                    {
+                        "name": "running",
+                        "slug": "running"
+                    },
+                    {
+                        "name": "fitness",
+                        "slug": "fitness"
+                    },
+                    {
+                        "name": "training",
+                        "slug": "training"
+                    },
+                    {
+                        "name": "accessories",
+                        "slug": "accessories"
+                    },
+                    {
+                        "name": "recovery",
+                        "slug": "recovery"
+                    }
+                ]
+            }
+        },
+        {
+            "id": "https://athenana.com/s/01kzk5gaqf38bnsvgq66tnhy4w",
+            "url": "https://www.wyome.com/blog/post.html?id=01kzk5gaqf38bnsvgq66tnhy4w",
+            "external_url": "https://www.homedit.com/i-left-baking-soda-on-tile-grout-overnight-and-didnt-expect-this/",
+            "title": "I Left Baking Soda on Tile Grout Overnight and Didn’t Expect This",
+            "content_html": "<p>Baking soda works on grout not through scrubbing force but through overnight chemical action that neutralizes trapped oils, soaps, and acids causing discoloration and odor. Applied as a paste and left untouched until morning, it draws residue from pores so it releases with a single wipe, and the grout then resists moisture absorption and dirt accumulation in ways that previous scrubbing methods never achieved. The key insight is that time, not friction, allows baking soda to alter the grout&#039;s surface environment permanently rather than just masking stains temporarily.</p>",
+            "date_published": "2026-10-07T18:11:23+00:00",
+            "date_modified": "2026-10-07T18:11:23+00:00",
+            "image": "https://athenana.com/p/01m4bs04azbfzwkrxm5akzydes?v=2dd2a30d",
+            "tags": [
+                "diy",
+                "bathroom",
+                "baking",
+                "cleaning",
+                "tips",
+                "home",
+                "vinegar"
+            ],
+            "_source": {
+                "name": "www.homedit.com",
+                "url": "https://www.homedit.com/i-left-baking-soda-on-tile-grout-overnight-and-didnt-expect-this/"
+            },
+            "_athenana": {
+                "kind": "link",
+                "tags": [
+                    {
+                        "name": "diy",
+                        "slug": "diy"
+                    },
+                    {
+                        "name": "bathroom",
+                        "slug": "bathroom"
+                    },
+                    {
+                        "name": "baking",
+                        "slug": "baking"
+                    },
+                    {
+                        "name": "cleaning",
+                        "slug": "cleaning"
+                    },
+                    {
+                        "name": "tips",
+                        "slug": "tips"
+                    },
+                    {
+                        "name": "home",
+                        "slug": "home"
+                    },
+                    {
+                        "name": "vinegar",
+                        "slug": "vinegar"
+                    }
+                ]
+            }
+        },
+        {
+            "id": "https://athenana.com/s/01kzk5m6djw2sjfjy8kdvretct",
+            "url": "https://www.wyome.com/blog/post.html?id=01kzk5m6djw2sjfjy8kdvretct",
+            "external_url": "https://www.homedit.com/i-tried-cleaning-my-kitchen-with-lemon-and-didnt-expect-it-to-work-this-well/",
+            "title": "I Tried Cleaning My Kitchen With Lemon and Didn’t Expect It To Work This Well",
+            "content_html": "<p>A hands-on test of lemon juice as a vinegar alternative across four kitchen tasks: it dissolved hard-water rings on granite, freshened wooden boards without deep-sanitizing them, and completely neutralized microwave odors via a boiled lemon-water steam trick, but left glasses streaky compared to standard cleaner. The takeaway is that lemon earns a permanent spot as a light, low-odor touch-up tool rather than a full cleaner replacement—worth keeping for the microwave trick alone.</p>",
+            "date_published": "2026-10-07T18:11:07+00:00",
+            "date_modified": "2026-10-07T18:11:07+00:00",
+            "image": "https://athenana.com/p/01m4brzmb3ktjkhzxzjp1k5df3?v=3e22ac8e",
+            "tags": [
+                "diy",
+                "cleaning",
+                "kitchen",
+                "home",
+                "vinegar"
+            ],
+            "_source": {
+                "name": "www.homedit.com",
+                "url": "https://www.homedit.com/i-tried-cleaning-my-kitchen-with-lemon-and-didnt-expect-it-to-work-this-well/"
+            },
+            "_athenana": {
+                "kind": "link",
+                "tags": [
+                    {
+                        "name": "diy",
+                        "slug": "diy"
+                    },
+                    {
+                        "name": "cleaning",
+                        "slug": "cleaning"
+                    },
+                    {
+                        "name": "kitchen",
+                        "slug": "kitchen"
+                    },
+                    {
+                        "name": "home",
+                        "slug": "home"
+                    },
+                    {
+                        "name": "vinegar",
+                        "slug": "vinegar"
+                    }
+                ]
+            }
+        },
+        {
+            "id": "https://athenana.com/s/01kzk5m54n5acxjyw9y6hygp1b",
+            "url": "https://www.wyome.com/blog/post.html?id=01kzk5m54n5acxjyw9y6hygp1b",
+            "external_url": "https://www.homedit.com/i-left-vinegar-to-work-on-these-11-cleaning-tasks-around-my-home/",
+            "title": "I Left Vinegar to Work on These 11 Cleaning Tasks Around My Home",
+            "content_html": "<p>A hands-on test log of white vinegar as an all-purpose cleaner, going through a dozen specific household applications—coffee makers, windows, dishwashers, drains, shower heads, washing machines—and reporting which ones actually produced visible results rather than just repeating the usual folk claims. The one caveat worth remembering is to skip natural stone surfaces since the acidity degrades sealant, and the citrus-infused vinegar variant is a nice fix for the smell issue. Worth keeping as a practical checklist rather than a general endorsement piece.</p>",
+            "date_published": "2026-10-07T18:10:43+00:00",
+            "date_modified": "2026-10-07T18:10:48+00:00",
+            "image": "https://athenana.com/p/01m4bryxqzc0jm9ee3ba2wb8z5?v=739d7e6d",
+            "tags": [
+                "diy",
+                "bathroom",
+                "cleaning",
+                "kitchen",
+                "tips",
+                "home",
+                "vinegar",
+                "household"
+            ],
+            "_source": {
+                "name": "www.homedit.com",
+                "url": "https://www.homedit.com/i-left-vinegar-to-work-on-these-11-cleaning-tasks-around-my-home/"
+            },
+            "_athenana": {
+                "kind": "link",
+                "tags": [
+                    {
+                        "name": "diy",
+                        "slug": "diy"
+                    },
+                    {
+                        "name": "bathroom",
+                        "slug": "bathroom"
+                    },
+                    {
+                        "name": "cleaning",
+                        "slug": "cleaning"
+                    },
+                    {
+                        "name": "kitchen",
+                        "slug": "kitchen"
+                    },
+                    {
+                        "name": "tips",
+                        "slug": "tips"
+                    },
+                    {
+                        "name": "home",
+                        "slug": "home"
+                    },
+                    {
+                        "name": "vinegar",
+                        "slug": "vinegar"
+                    },
+                    {
+                        "name": "household",
+                        "slug": "household"
+                    }
+                ]
+            }
+        },
+        {
+            "id": "https://athenana.com/s/01m2dgjf25hg9dm2n3nevyrwqw",
+            "url": "https://www.wyome.com/blog/post.html?id=01m2dgjf25hg9dm2n3nevyrwqw",
+            "external_url": "https://fastcompany.com/90645863/companies-fire-employees-for-these-personality-traits-but-maybe-they-should-be-getting-bonuses?partner=rss",
+            "title": "Companies fire employees for these personality traits, but maybe they should be getting bonuses",
+            "content_html": "<p>Rather than treating nonconformity as a liability, companies desperate to innovate should actively recruit and strategically integrate &quot;Rare Breeds&quot;—rebellious, obsessed, audacious individuals whose refusal to accept conventional wisdom drives breakthrough thinking. These misfits, whose traits parents and bosses once derided as character flaws, need careful organizational management to channel their disruptive energy without destabilizing the broader team, but their presence fundamentally shifts how an organization thinks about problems and risk. The article argues that innovation isn&#039;t a mystery but rather the direct result of prioritizing unconventional talent over cultural fit.</p>",
+            "date_published": "2026-10-07T16:50:25+00:00",
+            "date_modified": "2026-10-07T16:50:25+00:00",
+            "image": "https://athenana.com/p/01m4bmbvbrdzh8bh8nw83jqx1y?v=de14e4cb",
+            "tags": [
+                "culture",
+                "leadership",
+                "creativity",
+                "business"
+            ],
+            "_source": {
+                "name": "Fast Company",
+                "url": "https://fastcompany.com/90645863/companies-fire-employees-for-these-personality-traits-but-maybe-they-should-be-getting-bonuses?partner=rss"
+            },
+            "_athenana": {
+                "kind": "link",
+                "tags": [
+                    {
+                        "name": "culture",
+                        "slug": "culture"
+                    },
+                    {
+                        "name": "leadership",
+                        "slug": "leadership"
+                    },
+                    {
+                        "name": "creativity",
+                        "slug": "creativity"
+                    },
+                    {
+                        "name": "business",
+                        "slug": "business"
+                    }
+                ]
+            }
+        },
+        {
+            "id": "https://athenana.com/s/01m2dgja61krnwk5qrfn4za34b",
+            "url": "https://www.wyome.com/blog/post.html?id=01m2dgja61krnwk5qrfn4za34b",
+            "external_url": "https://getpocket.com/explore/item/the-weird-strategy-dr-seuss-used-to-create-his-greatest-work",
+            "title": "The Weird Strategy Dr. Seuss Used to Create His Greatest Work",
+            "content_html": "<p>In 1960, Dr. Seuss won a $50 bet by writing an entertaining children&#039;s book using only 50 words, resulting in *Green Eggs and Ham*, which became one of the best-selling children&#039;s books of all time. The piece argues that constraints—whether limits on words, time, money, or resources—actually enhance creativity and productivity by forcing you to find innovative solutions and preventing procrastination, rather than hindering your work. By reframing constraints as the &quot;size of your canvas&quot; rather than obstacles, you can focus on executing excellent work within whatever limitations you face.</p>",
+            "date_published": "2026-10-07T16:50:16+00:00",
+            "date_modified": "2026-10-07T16:50:16+00:00",
+            "image": "https://athenana.com/p/01m4bmbkf71yqda5555bcb25fd?v=8e90e707",
+            "tags": [
+                "productivity",
+                "writing",
+                "creativity",
+                "advice",
+                "habits"
+            ],
+            "_source": {
+                "name": "James Clear",
+                "url": "https://getpocket.com/explore/item/the-weird-strategy-dr-seuss-used-to-create-his-greatest-work"
+            },
+            "_athenana": {
+                "kind": "link",
+                "tags": [
+                    {
+                        "name": "productivity",
+                        "slug": "productivity"
+                    },
+                    {
+                        "name": "writing",
+                        "slug": "writing"
+                    },
+                    {
+                        "name": "creativity",
+                        "slug": "creativity"
+                    },
+                    {
+                        "name": "advice",
+                        "slug": "advice"
+                    },
+                    {
+                        "name": "habits",
+                        "slug": "habits"
+                    }
+                ]
+            }
+        },
+        {
+            "id": "https://athenana.com/s/01m2dgj2zmptqedaa0cb7hmtdv",
+            "url": "https://www.wyome.com/blog/post.html?id=01m2dgj2zmptqedaa0cb7hmtdv",
+            "external_url": "https://boingboing.net/2022/12/17/mark-robers-final-glitterbomb-goes-after-smash-and-grab-car-thieves.html",
+            "title": "Mark Rober's final GlitterBomb goes after smash-and-grab car thieves",
+            "content_html": "<p>Mark Rober&#039;s fifth and final GlitterBomb video targets a organized theft ring operating in San Francisco, with the device hidden in vehicles rather than on porches. Beyond the satisfying spectacle of catching thieves, the video notably explains how smash-and-grab operations actually function, offering insight into the mechanics of the crime itself.</p>",
+            "date_published": "2026-10-07T16:49:17+00:00",
+            "date_modified": "2026-10-07T16:49:17+00:00",
+            "image": "https://athenana.com/p/01m4bm9sx2re55kdgp1ykb02qn?v=7f79e1d4",
+            "tags": [
+                "diy",
+                "entertainment",
+                "security",
+                "creativity",
+                "gadgets"
+            ],
+            "_source": {
+                "name": "Boing Boing",
+                "url": "https://boingboing.net/2022/12/17/mark-robers-final-glitterbomb-goes-after-smash-and-grab-car-thieves.html"
+            },
+            "_athenana": {
+                "kind": "link",
+                "tags": [
+                    {
+                        "name": "diy",
+                        "slug": "diy"
+                    },
+                    {
+                        "name": "entertainment",
+                        "slug": "entertainment"
+                    },
+                    {
+                        "name": "security",
+                        "slug": "security"
+                    },
+                    {
+                        "name": "creativity",
+                        "slug": "creativity"
+                    },
+                    {
+                        "name": "gadgets",
+                        "slug": "gadgets"
+                    }
+                ]
+            }
+        }
+    ]
+}

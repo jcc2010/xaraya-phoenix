@@ -34,3 +34,33 @@ composer cs     # coding style check
 ```
 
 License: GPL-2.0-or-later.
+
+## Blog (Athena-compatible)
+
+Enable the module and mirror an existing JSON Feed blog (Athena or any JSON Feed 1.1 source):
+
+```sh
+bin/xar module:enable blog
+bin/xar blog:create wyome --mode=mirror --format=athena \
+  --source=https://athenana.com/blog/wyome/feed.json \
+  --post-url='https://www.wyome.com/blog/post.html?id={id}'
+bin/xar blog:sync wyome --full
+```
+
+Phoenix then serves the same feed shape as Athena, so a consumer only changes the host:
+
+- `GET /blog/{handle}/feed.json`: JSON Feed 1.1, 50 items a page, with `?before=` cursors
+- `GET /blog/{handle}/feed.xml`: RSS 2.0
+- `GET /s/{id}.json`: a single item
+
+Keep a mirror fresh with cron:
+
+```
+*/10 * * * * cd /path/to/phoenix && bin/xar blog:sync --all
+15 3 * * *   cd /path/to/phoenix && bin/xar blog:sync --all --full
+```
+
+A quick sync stops at the first unchanged page. A full sync also catches edits to old posts and
+deletions, and refuses to delete anything if the source suddenly shows under half of the posts.
+Add `--media=local` at creation to download images and serve them from `/media/…`.
+`bin/xar blog:mode <handle> native` stops mirroring; post ids never change.

@@ -1,0 +1,2151 @@
+{
+    "version": "https://jsonfeed.org/version/1.1",
+    "title": "John Cox",
+    "description": "Notes, photos and the things worth saying something about.",
+    "home_page_url": "https://www.wyome.com/blog/",
+    "feed_url": "https://athenana.com/blog/wyome/feed.json",
+    "next_url": "https://athenana.com/blog/wyome/feed.json?before=MjAyNi0xMC0wMSAxOTo1NDozMXwwMW0zd2dncnNhemQ2NjQ3a3F4YjhwZXdhdw",
+    "language": "en",
+    "icon": "https://athenana.com/img/apple-touch-icon.png",
+    "favicon": "https://athenana.com/favicon.ico",
+    "authors": [
+        {
+            "name": "John Cox",
+            "url": "https://www.wyome.com/blog/"
+        }
+    ],
+    "_athenana": {
+        "subscribe_url": "https://athenana.com/blog/wyome/subscribe"
+    },
+    "items": [
+        {
+            "id": "https://athenana.com/s/01m2dgj078nmfth1eprt4pffz6",
+            "url": "https://www.wyome.com/blog/post.html?id=01m2dgj078nmfth1eprt4pffz6",
+            "external_url": "https://alexmurrell.co.uk/articles/the-age-of-average",
+            "title": "The age of average",
+            "content_html": "<p># Summary\n\nThe article argues that across virtually every creative field—from architecture and interior design to fashion, film, branding, and personal appearance—a homogenizing aesthetic has taken over, with everything converging toward safe, indistinguishable mediocrity. Drawing examples from the &quot;AirSpace&quot; style dominating coffee shops worldwide to the rise of &quot;Instagram Face&quot; among influencers, from five-over-one apartment blocks to flattened corporate logos, the author demonstrates how optimization, globalized inspiration sources, testing-driven decision-making, and consolidation in creative industries have eliminated distinctiveness. The piece concludes that this &quot;age of average&quot; paradoxically presents an opportunity for bold companies to stand out through originality, since breaking from convention now offers genuine competitive advantage.</p>",
+            "date_published": "2026-10-07T16:49:08+00:00",
+            "date_modified": "2026-10-07T16:49:08+00:00",
+            "image": "https://athenana.com/p/01m4bm9hqaaxya9z5w87bphyqy?v=6372c776",
+            "tags": [
+                "design",
+                "minimalism",
+                "culture",
+                "creativity"
+            ],
+            "_source": {
+                "name": "Alex Murrell",
+                "url": "https://alexmurrell.co.uk/articles/the-age-of-average"
+            },
+            "_athenana": {
+                "kind": "link",
+                "tags": [
+                    {
+                        "name": "design",
+                        "slug": "design"
+                    },
+                    {
+                        "name": "minimalism",
+                        "slug": "minimalism"
+                    },
+                    {
+                        "name": "culture",
+                        "slug": "culture"
+                    },
+                    {
+                        "name": "creativity",
+                        "slug": "creativity"
+                    }
+                ]
+            }
+        },
+        {
+            "id": "https://athenana.com/s/01m2e3can8f3y8gz9rt2q0e4dh",
+            "url": "https://www.wyome.com/blog/post.html?id=01m2e3can8f3y8gz9rt2q0e4dh",
+            "external_url": "https://www.fastcompany.com/91399087/4-ways-ai-can-improve-your-thinking",
+            "title": "4 ways AI can improve your thinking",
+            "content_html": "<p>Rather than using AI merely to automate routine tasks, this piece argues for leveraging it as a tool for deeper thinking and creation—such as using it as a devil&#039;s advocate to stress-test decisions, building personalized learning curriculums, generating visual concepts iteratively, and creating custom tracking dashboards without coding. The author provides specific prompts, recommended tools (ChatGPT, Claude, Gemini, Ideogram), and practical examples of how each approach can slow down work to challenge assumptions and build new capabilities rather than just work faster.</p>",
+            "date_published": "2026-10-07T16:48:53+00:00",
+            "date_modified": "2026-10-07T16:48:53+00:00",
+            "image": "https://athenana.com/p/01m4bm8za1r6exmz2pd6dmjh47?v=9edb60d7",
+            "tags": [
+                "productivity",
+                "ai",
+                "creativity",
+                "learning"
+            ],
+            "_source": {
+                "name": "Fast Company",
+                "url": "https://www.fastcompany.com/91399087/4-ways-ai-can-improve-your-thinking"
+            },
+            "_athenana": {
+                "kind": "link",
+                "tags": [
+                    {
+                        "name": "productivity",
+                        "slug": "productivity"
+                    },
+                    {
+                        "name": "ai",
+                        "slug": "ai"
+                    },
+                    {
+                        "name": "creativity",
+                        "slug": "creativity"
+                    },
+                    {
+                        "name": "learning",
+                        "slug": "learning"
+                    }
+                ]
+            }
+        },
+        {
+            "id": "https://athenana.com/s/01kzk458xacn0sq3qmvd0v2n2f",
+            "url": "https://www.wyome.com/blog/post.html?id=01kzk458xacn0sq3qmvd0v2n2f",
+            "external_url": "https://www.ian-leslie.com/p/the-banality-of-genius-notes-on-peter",
+            "title": "The Banality of Genius: Notes on Peter Jackson's Get Back",
+            "content_html": "<p>Ian Leslie argues that [[Peter Jackson]]’s decision to present [[Get Back]] as an eight‑hour chronicle transforms what could have been a tidy highlights reel into an anthropological study of creative life. By lingering on the drab [[Twickenham]] studio, the messy, windowless basement and the quotidian rituals of [[The Beatles]] — flaccid toast, mugs of tea, cigarettes, hangovers, lunchtime routines and offhand jokes — the film compels us to attend to microscopic social signals: looks, smiles, a sigh. That patient, sometimes boring attention produces intimacy; as viewers we start to inhabit the band’s rhythm and feel their small joys and tensions with unusual intensity. Leslie suggests that this banality is the mechanism through which genius is revealed, and that prolonged reportage can reawaken creative urges in audiences and collaborators alike.</p>",
+            "date_published": "2026-10-07T16:48:37+00:00",
+            "date_modified": "2026-10-08T03:40:11+00:00",
+            "image": "https://athenana.com/p/01m4bm8jbhjd5xc1sbq3ht4ybg?v=e082e728",
+            "tags": [
+                "music",
+                "collaboration",
+                "documentary",
+                "creativity",
+                "the beatles"
+            ],
+            "_source": {
+                "name": "www.ian-leslie.com",
+                "url": "https://www.ian-leslie.com/p/the-banality-of-genius-notes-on-peter"
+            },
+            "_athenana": {
+                "kind": "link",
+                "tags": [
+                    {
+                        "name": "music",
+                        "slug": "music"
+                    },
+                    {
+                        "name": "collaboration",
+                        "slug": "collaboration"
+                    },
+                    {
+                        "name": "documentary",
+                        "slug": "documentary"
+                    },
+                    {
+                        "name": "creativity",
+                        "slug": "creativity"
+                    },
+                    {
+                        "name": "the beatles",
+                        "slug": "the-beatles"
+                    }
+                ]
+            }
+        },
+        {
+            "id": "https://athenana.com/s/01kzk565k5jgtw1c9wax3bt40a",
+            "url": "https://www.wyome.com/blog/post.html?id=01kzk565k5jgtw1c9wax3bt40a",
+            "external_url": "https://perell.com/essay/50-ideas-that-changed-my-life/?utm_source=GetShift-dot-net",
+            "title": "50 Ideas That Changed My Life",
+            "content_html": "<p>This is a collection of fifty conceptual frameworks and decision-making principles spanning economics, psychology, physics, and strategy—designed as mental models to improve thinking and life decisions. The ideas range from logical concepts like Occam&#039;s Razor and opportunity cost to behavioral insights like preference falsification and mimetic desire, arranged to illustrate how understanding systems, human nature, and hidden patterns can reveal overlooked opportunities and avoid common pitfalls. The author presents these as guiding principles that sharpen critical thinking by revealing what&#039;s counterintuitive, hidden in plain sight, or systematically ignored by conventional wisdom.</p>",
+            "date_published": "2026-10-07T16:48:06+00:00",
+            "date_modified": "2026-10-07T16:48:07+00:00",
+            "image": "https://athenana.com/p/01m4bm7r3822b55pespaq71461?v=de666120",
+            "tags": [
+                "productivity",
+                "philosophy",
+                "creativity",
+                "advice",
+                "economics",
+                "media"
+            ],
+            "_source": {
+                "name": "perell.com",
+                "url": "https://perell.com/essay/50-ideas-that-changed-my-life/?utm_source=GetShift-dot-net"
+            },
+            "_athenana": {
+                "kind": "link",
+                "tags": [
+                    {
+                        "name": "productivity",
+                        "slug": "productivity"
+                    },
+                    {
+                        "name": "philosophy",
+                        "slug": "philosophy"
+                    },
+                    {
+                        "name": "creativity",
+                        "slug": "creativity"
+                    },
+                    {
+                        "name": "advice",
+                        "slug": "advice"
+                    },
+                    {
+                        "name": "economics",
+                        "slug": "economics"
+                    },
+                    {
+                        "name": "media",
+                        "slug": "media"
+                    }
+                ]
+            }
+        },
+        {
+            "id": "https://athenana.com/s/01kzk5cst9x0qtb6bgmdeancs0",
+            "url": "https://www.wyome.com/blog/post.html?id=01kzk5cst9x0qtb6bgmdeancs0",
+            "external_url": "https://www.vox.com/even-better/24071171/how-to-look-at-art",
+            "title": "How to look at art — and really see it",
+            "content_html": "<p>Most people feel disconnected from art because they approach it passively, spending mere seconds with each piece and treating it as something to decipher rather than experience. The piece argues that &quot;getting&quot; art requires building a regular habit of museum visits and engaging actively with works by connecting them to your own memories and experiences—recognizing that meaning emerges from the triangle of the artwork itself, the artist&#039;s intent, and the viewer&#039;s response. Rather than seeking one correct interpretation, viewers should embrace discomfort, sit with unfamiliar emotions, and look for personal reflections in art, understanding it as an interactive process of imagination that transforms how we see our everyday lives.</p>",
+            "date_published": "2026-10-07T16:47:58+00:00",
+            "date_modified": "2026-10-07T16:47:58+00:00",
+            "image": "https://athenana.com/p/01m4bm7bykgrkj5c8qy1nwx4sj?v=1327a5c6",
+            "tags": [
+                "art",
+                "culture",
+                "creativity",
+                "museums"
+            ],
+            "_source": {
+                "name": "www.vox.com",
+                "url": "https://www.vox.com/even-better/24071171/how-to-look-at-art"
+            },
+            "_athenana": {
+                "kind": "link",
+                "tags": [
+                    {
+                        "name": "art",
+                        "slug": "art"
+                    },
+                    {
+                        "name": "culture",
+                        "slug": "culture"
+                    },
+                    {
+                        "name": "creativity",
+                        "slug": "creativity"
+                    },
+                    {
+                        "name": "museums",
+                        "slug": "museums"
+                    }
+                ]
+            }
+        },
+        {
+            "id": "https://athenana.com/s/01kzk4jkeg26syvhvk9fj1rweg",
+            "url": "https://www.wyome.com/blog/post.html?id=01kzk4jkeg26syvhvk9fj1rweg",
+            "external_url": "https://wipebook.com/",
+            "title": "Wipebook Reusable Whiteboard Notebooks & Dry Erase Flip Charts",
+            "content_html": "<p>This is a Wipebook product/marketing page arguing that covering classroom or office walls with reusable dry-erase flipcharts (rather than relying on a single fixed whiteboard) boosts collaborative problem-solving, giving every student or team member &quot;20 times&quot; the writing surface to sketch, revise, and think visibly. It bundles the pitch with a product lineup (Flipcharts, Workbooks, Notebooks, Scan app) and links out to teacher testimonials and blog posts showing real classroom uses—vertical non-permanent surfaces, small-group ELA strategies, inclusive participation for quiet students, and PD success stories—making it a useful reference for concrete implementation ideas rather than just the sales pitch itself.</p>",
+            "date_published": "2026-10-07T16:47:21+00:00",
+            "date_modified": "2026-10-07T16:47:21+00:00",
+            "image": "https://athenana.com/p/01m4bm52ybrrd8bxy9rn8bcczy?v=f9c90810",
+            "tags": [
+                "collaboration",
+                "education",
+                "notebooks",
+                "white"
+            ],
+            "_source": {
+                "name": "wipebook.com",
+                "url": "https://wipebook.com/"
+            },
+            "_athenana": {
+                "kind": "link",
+                "tags": [
+                    {
+                        "name": "collaboration",
+                        "slug": "collaboration"
+                    },
+                    {
+                        "name": "education",
+                        "slug": "education"
+                    },
+                    {
+                        "name": "notebooks",
+                        "slug": "notebooks"
+                    },
+                    {
+                        "name": "white",
+                        "slug": "white"
+                    }
+                ]
+            }
+        },
+        {
+            "id": "https://athenana.com/s/01kzk4rq1w4d9c17w01ras7g3k",
+            "url": "https://www.wyome.com/blog/post.html?id=01kzk4rq1w4d9c17w01ras7g3k",
+            "external_url": "https://www.esquire.com/lifestyle/g69743061/best-notebooks-and-notepads/",
+            "title": "Every Real Adult Needs a Notebook. Here Are Our 11 Favorites.",
+            "content_html": "<p># Summary\n\nThis is a comprehensive notebook and planner buying guide that reviews various options across different price points and use cases, from affordable DesignWorks Ink journals ($15) to luxury Smythson leather notebooks and customizable planning systems like The Daily Grind. Each product review explains specific features like paper quality, binding type, and intended purpose—whether for daily journaling, bullet journaling, outdoor use, or professional organization—along with practical considerations like ink bleeding, durability, and portability. The guide concludes with a &quot;What To Look For&quot; section advising readers to consider notebook size, cover type, paper weight, and binding style based on their personal writing habits and needs.</p>",
+            "date_published": "2026-10-07T16:46:32+00:00",
+            "date_modified": "2026-10-07T16:46:32+00:00",
+            "image": "https://athenana.com/p/01m4bm4rcsjm8dfkv3qnvqb1zv?v=94508fa9",
+            "tags": [
+                "accessories",
+                "recommendations",
+                "lifestyle",
+                "shopping",
+                "stationery",
+                "notebooks",
+                "gift guide"
+            ],
+            "_source": {
+                "name": "www.esquire.com",
+                "url": "https://www.esquire.com/lifestyle/g69743061/best-notebooks-and-notepads/"
+            },
+            "_athenana": {
+                "kind": "link",
+                "tags": [
+                    {
+                        "name": "accessories",
+                        "slug": "accessories"
+                    },
+                    {
+                        "name": "recommendations",
+                        "slug": "recommendations"
+                    },
+                    {
+                        "name": "lifestyle",
+                        "slug": "lifestyle"
+                    },
+                    {
+                        "name": "shopping",
+                        "slug": "shopping"
+                    },
+                    {
+                        "name": "stationery",
+                        "slug": "stationery"
+                    },
+                    {
+                        "name": "notebooks",
+                        "slug": "notebooks"
+                    },
+                    {
+                        "name": "gift guide",
+                        "slug": "gift-guide"
+                    }
+                ]
+            }
+        },
+        {
+            "id": "https://athenana.com/s/01kzk5m0dq862fpzm6wn34x1fh",
+            "url": "https://www.wyome.com/blog/post.html?id=01kzk5m0dq862fpzm6wn34x1fh",
+            "external_url": "https://www.baum-kuchen.net/products/018-365-days-notebook-a6-size",
+            "title": "[Stalogy Notebook] 365 Days (A6)",
+            "content_html": "<p>The piece is a product rundown of the STALOGY Editor&#039;s Series 365 Days Notebook, praising its minimal date/grid layout as a flexible base for bullet journaling and its thin, smooth Tomoe River–like paper that keeps a 368-page book feeling slim and portable. It notes practical pairing tips (a pencil board underneath for smoother writing) and lists compatible A6 covers, making it as much a buying guide as a review, worth keeping for the cover-compatibility and paper-feel details.</p>",
+            "date_published": "2026-10-07T16:46:06+00:00",
+            "date_modified": "2026-10-07T16:46:06+00:00",
+            "image": "https://athenana.com/p/01m4bkzghfahs9nfxp27y8svhn?v=3e88e3dd",
+            "tags": [
+                "organization",
+                "black",
+                "portable",
+                "paper",
+                "stationery",
+                "notebooks"
+            ],
+            "_source": {
+                "name": "www.baum-kuchen.net",
+                "url": "https://www.baum-kuchen.net/products/018-365-days-notebook-a6-size"
+            },
+            "_athenana": {
+                "kind": "link",
+                "tags": [
+                    {
+                        "name": "organization",
+                        "slug": "organization"
+                    },
+                    {
+                        "name": "black",
+                        "slug": "black"
+                    },
+                    {
+                        "name": "portable",
+                        "slug": "portable"
+                    },
+                    {
+                        "name": "paper",
+                        "slug": "paper"
+                    },
+                    {
+                        "name": "stationery",
+                        "slug": "stationery"
+                    },
+                    {
+                        "name": "notebooks",
+                        "slug": "notebooks"
+                    }
+                ]
+            }
+        },
+        {
+            "id": "https://athenana.com/s/01kzk5nps3yrbp46fpgd7w7t5y",
+            "url": "https://www.wyome.com/blog/post.html?id=01kzk5nps3yrbp46fpgd7w7t5y",
+            "external_url": "https://camillestyles.com/style/closet-clean-out/",
+            "title": "From Cluttered to Curated—How to Actually Achieve That Closet Clean Out",
+            "content_html": "<p>Prompted by months of packing the same handful of versatile pieces for constant travel, the writer realized her closet is mostly dead weight and lays out a five-step decluttering method: ditch anything unworn in years, cut duplicates down to true favorites, get honest about &quot;someday&quot; items (alter or release them), route castoffs to resale/donation platforms like ThredUp or Dress for Success, and adopt an ongoing one-in-one-out rule to keep the wardrobe intentional going forward. The piece frames closet editing as incremental and low-pressure rather than an overwhelming purge, tying it to a broader case for owning fewer, better-loved things.</p>",
+            "date_published": "2026-10-07T16:43:15+00:00",
+            "date_modified": "2026-10-07T16:43:15+00:00",
+            "image": "https://athenana.com/p/01m4bkyrfvjbd8m9w637wq2mz4?v=64d32dc9",
+            "tags": [
+                "minimalism",
+                "organization",
+                "clothing",
+                "fashion",
+                "decluttering"
+            ],
+            "_source": {
+                "name": "camillestyles.com",
+                "url": "https://camillestyles.com/style/closet-clean-out/"
+            },
+            "_athenana": {
+                "kind": "link",
+                "tags": [
+                    {
+                        "name": "minimalism",
+                        "slug": "minimalism"
+                    },
+                    {
+                        "name": "organization",
+                        "slug": "organization"
+                    },
+                    {
+                        "name": "clothing",
+                        "slug": "clothing"
+                    },
+                    {
+                        "name": "fashion",
+                        "slug": "fashion"
+                    },
+                    {
+                        "name": "decluttering",
+                        "slug": "decluttering"
+                    }
+                ]
+            }
+        },
+        {
+            "id": "https://athenana.com/s/01kzk5tqgz42m7228p9xmbw8n5",
+            "url": "https://www.wyome.com/blog/post.html?id=01kzk5tqgz42m7228p9xmbw8n5",
+            "external_url": "https://www.homedit.com/ikea-shoppers-discovered-a-different-use-for-this-bamboo-drying-rack/",
+            "title": "IKEA Shoppers Discovered a Different Use for This Bamboo Drying Rack",
+            "content_html": "<p>A French home-organizing creator repurposed IKEA&#039;s OSTBIT bamboo dish-drying rack—normally a countertop tool for air-drying plates and glasses—as a vertical, wall-mounted holder for rolled hand towels. Using adhesive mounting strips instead of drilling, she stuck the rack beside her bathroom mirror, turning its pegs into slots for neatly rolled towels, giving a boutique-hotel look with a renter-friendly, no-tools installation. It&#039;s a handy example of buying a product for one IKEA-catalog purpose and finding a smarter, better one.</p>",
+            "date_published": "2026-10-07T16:42:45+00:00",
+            "date_modified": "2026-10-07T16:42:45+00:00",
+            "image": "https://athenana.com/p/01m4bkxvhrecq4b4wh82x3bky0?v=6ddb6083",
+            "tags": [
+                "diy",
+                "bathroom",
+                "organization",
+                "storage",
+                "home",
+                "ikea"
+            ],
+            "_source": {
+                "name": "www.homedit.com",
+                "url": "https://www.homedit.com/ikea-shoppers-discovered-a-different-use-for-this-bamboo-drying-rack/"
+            },
+            "_athenana": {
+                "kind": "link",
+                "tags": [
+                    {
+                        "name": "diy",
+                        "slug": "diy"
+                    },
+                    {
+                        "name": "bathroom",
+                        "slug": "bathroom"
+                    },
+                    {
+                        "name": "organization",
+                        "slug": "organization"
+                    },
+                    {
+                        "name": "storage",
+                        "slug": "storage"
+                    },
+                    {
+                        "name": "home",
+                        "slug": "home"
+                    },
+                    {
+                        "name": "ikea",
+                        "slug": "ikea"
+                    }
+                ]
+            }
+        },
+        {
+            "id": "https://athenana.com/s/01kzk50j89xz2q6ccaqqg07phg",
+            "url": "https://www.wyome.com/blog/post.html?id=01kzk50j89xz2q6ccaqqg07phg",
+            "external_url": "https://www.inverse.com/innovation/it-turns-out-these-genius-products-make-life-way-easier",
+            "title": "It turns out, these 34 genius products make life WAY easier",
+            "content_html": "<p>This is a curated list of 34 Amazon products designed to solve common household irritants and inconveniences, ranging from organization and storage solutions to wellness and comfort items. The products cover diverse categories including kitchen gadgets (vegetable chopper, collapsible colander), pain relief (lumbar brace, neck relaxer), sleep aids (weighted blanket, lavender spray), smart home devices, and personal grooming tools, with brief descriptions of how each addresses a specific problem. Each entry emphasizes practical benefits and includes user testimonials to demonstrate real-world effectiveness.</p>",
+            "date_published": "2026-10-07T14:08:54+00:00",
+            "date_modified": "2026-10-07T14:08:59+00:00",
+            "image": "https://athenana.com/p/01m4bb3yy65kvx9kn1fjd27ad9?v=00dc76d9",
+            "tags": [
+                "organization",
+                "home",
+                "gift guide"
+            ],
+            "_source": {
+                "name": "www.inverse.com",
+                "url": "https://www.inverse.com/innovation/it-turns-out-these-genius-products-make-life-way-easier"
+            },
+            "_athenana": {
+                "kind": "link",
+                "tags": [
+                    {
+                        "name": "organization",
+                        "slug": "organization"
+                    },
+                    {
+                        "name": "home",
+                        "slug": "home"
+                    },
+                    {
+                        "name": "gift guide",
+                        "slug": "gift-guide"
+                    }
+                ]
+            }
+        },
+        {
+            "id": "https://athenana.com/s/01kzk50kjv6ngpz2vej329pf2t",
+            "url": "https://www.wyome.com/blog/post.html?id=01kzk50kjv6ngpz2vej329pf2t",
+            "external_url": "https://www.inverse.com/mind-body/exercise-unlocks-human-longevity?utm_source=GetShift-dot-net",
+            "title": "Evolutionary biologists reveal how exercise unlocks human longevity",
+            "content_html": "<p>Harvard evolutionary biologists propose that humans&#039; exceptional longevity compared to other primates evolved because our ancestors needed to stay physically active and healthy into old age to provision and care for their grandchildren—a role requiring sustained energy expenditure that our bodies are biologically designed for. The research suggests that physical activity in later life evolved to regulate fat storage and reproductive hormones while simultaneously triggering cellular repair processes, and modern sedentary lifestyles create a dangerous mismatch between our activity-dependent biology and our desk-bound existence. The authors argue that maintaining lifelong physical activity, particularly in older age, is essential to preventing the chronic diseases of aging that plague industrialized societies where humans are uniquely inactive.</p>",
+            "date_published": "2026-10-07T14:07:55+00:00",
+            "date_modified": "2026-10-07T14:07:55+00:00",
+            "image": "https://athenana.com/p/01m4bb29j6f05t8n7wpc0cdk1c?v=98c673ed",
+            "tags": [
+                "health",
+                "aging",
+                "exercise",
+                "longevity"
+            ],
+            "_source": {
+                "name": "www.inverse.com",
+                "url": "https://www.inverse.com/mind-body/exercise-unlocks-human-longevity?utm_source=GetShift-dot-net"
+            },
+            "_athenana": {
+                "kind": "link",
+                "tags": [
+                    {
+                        "name": "health",
+                        "slug": "health"
+                    },
+                    {
+                        "name": "aging",
+                        "slug": "aging"
+                    },
+                    {
+                        "name": "exercise",
+                        "slug": "exercise"
+                    },
+                    {
+                        "name": "longevity",
+                        "slug": "longevity"
+                    }
+                ]
+            }
+        },
+        {
+            "id": "https://athenana.com/s/01kzk50mr3cqrsefpc34gnp3g0",
+            "url": "https://www.wyome.com/blog/post.html?id=01kzk50mr3cqrsefpc34gnp3g0",
+            "external_url": "https://www.investors.com/etfs-and-funds/sectors/sp500-warren-buffett-makes-all-his-money-from-stocks-2022/",
+            "title": "Warren Buffett Makes All His Money From Just 11 Stocks",
+            "content_html": "<p>Berkshire Hathaway&#039;s outperformance versus the S&amp;P 500 this year is driven almost entirely by a small subset of its holdings, with just 11 of its 50 U.S.-listed stocks showing gains while most others have declined. The portfolio&#039;s strongest performers include energy stocks like Occidental Petroleum and Chevron, along with healthcare distributor McKesson, which have bucked the broader market weakness affecting Berkshire&#039;s other positions.</p>",
+            "date_published": "2026-10-07T14:07:38+00:00",
+            "date_modified": "2026-10-07T14:07:38+00:00",
+            "image": "https://athenana.com/p/01m4bb1tnssfxftcbespvps871?v=9a17fe77",
+            "tags": [
+                "business",
+                "personal finance",
+                "investment"
+            ],
+            "_source": {
+                "name": "www.investors.com",
+                "url": "https://www.investors.com/etfs-and-funds/sectors/sp500-warren-buffett-makes-all-his-money-from-stocks-2022/"
+            },
+            "_athenana": {
+                "kind": "link",
+                "tags": [
+                    {
+                        "name": "business",
+                        "slug": "business"
+                    },
+                    {
+                        "name": "personal finance",
+                        "slug": "personal-finance"
+                    },
+                    {
+                        "name": "investment",
+                        "slug": "investment"
+                    }
+                ]
+            }
+        },
+        {
+            "id": "https://athenana.com/s/01kzk50qmh3f95vx337p99w0r1",
+            "url": "https://www.wyome.com/blog/post.html?id=01kzk50qmh3f95vx337p99w0r1",
+            "external_url": "https://www.jongsbarbecue.com/?utm_source=newsletter&utm_medium=email&utm_campaign=newsletter_axioslocal_charlotte&stream=top",
+            "title": "Jon G's Barbecue",
+            "content_html": "<p>Jon G&#039;s brings Texas-style barbecue traditions to Peachland, North Carolina, operating from a brick-and-mortar location after starting as a food truck, and has built a reputation for smoked meats and sides that draw enough customers to regularly sell out. The piece emphasizes that quality barbecue depends equally on careful preparation and the community of people who gather to eat it, with the restaurant also offering catering services for events.</p>",
+            "date_published": "2026-10-07T14:07:22+00:00",
+            "date_modified": "2026-10-07T14:07:22+00:00",
+            "tags": [
+                "north carolina",
+                "restaurants",
+                "texas",
+                "barbecue"
+            ],
+            "_source": {
+                "name": "www.jongsbarbecue.com",
+                "url": "https://www.jongsbarbecue.com/?utm_source=newsletter&utm_medium=email&utm_campaign=newsletter_axioslocal_charlotte&stream=top"
+            },
+            "_athenana": {
+                "kind": "link",
+                "tags": [
+                    {
+                        "name": "north carolina",
+                        "slug": "north-carolina"
+                    },
+                    {
+                        "name": "restaurants",
+                        "slug": "restaurants"
+                    },
+                    {
+                        "name": "texas",
+                        "slug": "texas"
+                    },
+                    {
+                        "name": "barbecue",
+                        "slug": "barbecue"
+                    }
+                ]
+            }
+        },
+        {
+            "id": "https://athenana.com/s/01kzk50tg8grq432p0ry7yh717",
+            "url": "https://www.wyome.com/blog/post.html?id=01kzk50tg8grq432p0ry7yh717",
+            "external_url": "https://www.kdnuggets.com/top-sql-queries-for-data-scientists",
+            "title": "Top SQL Queries for Data Scientists",
+            "content_html": "<p>This article surveys nine essential SQL concepts for data scientists—querying and filtering, handling NULLs, type conversion, aggregation, date manipulation, text processing, ranking, window functions, and subqueries/CTEs—with practical examples of each. It then demonstrates how these concepts combine in real business scenarios, specifically finding best-selling products by month and calculating moving averages, to show that SQL is indispensable for data extraction, manipulation, and reporting even though it&#039;s often overshadowed by Python in discussions about data science. The piece emphasizes that SQL proficiency alongside Python and R forms the core toolkit for practical data science work.</p>",
+            "date_published": "2026-10-07T14:06:36+00:00",
+            "date_modified": "2026-10-07T14:06:36+00:00",
+            "image": "https://athenana.com/p/01m4bazw2084rqb7nagknjnp86?v=4563418e",
+            "tags": [
+                "programming",
+                "tutorial",
+                "sql"
+            ],
+            "_source": {
+                "name": "www.kdnuggets.com",
+                "url": "https://www.kdnuggets.com/top-sql-queries-for-data-scientists"
+            },
+            "_athenana": {
+                "kind": "link",
+                "tags": [
+                    {
+                        "name": "programming",
+                        "slug": "programming"
+                    },
+                    {
+                        "name": "tutorial",
+                        "slug": "tutorial"
+                    },
+                    {
+                        "name": "sql",
+                        "slug": "sql"
+                    }
+                ]
+            }
+        },
+        {
+            "id": "https://athenana.com/s/01kzk5j597jfcjqvcr2rg2hmk0",
+            "url": "https://www.wyome.com/blog/post.html?id=01kzk5j597jfcjqvcr2rg2hmk0",
+            "external_url": "https://frequentmiler.com/amex-platinum-have-but-rarely-use/",
+            "title": "Amex Platinum: The card most frequent flyers should have, but rarely use",
+            "content_html": "<p>The American Express Platinum Card charges $895 annually but can become &quot;free after rebate&quot; if you utilize its various credits strategically—the author identifies $1,100 in credits he uses each year through the airline fee credit, Resy dining credit, Uber credits, and digital entertainment subscriptions. Beyond covering the annual fee with credits, the card offers valuable travel perks like airport lounge access, hotel credits, and emergency medical transportation that can be viewed as bonus benefits, making it worthwhile for frequent flyers who can easily tap into at least some of the card&#039;s credit offerings.</p>",
+            "date_published": "2026-10-07T13:14:17+00:00",
+            "date_modified": "2026-10-07T13:14:17+00:00",
+            "image": "https://athenana.com/p/01m4b803ftrgc11cva0wqhfx9b?v=b4f79fd3",
+            "tags": [
+                "travel",
+                "credit cards",
+                "rewards",
+                "american express"
+            ],
+            "_source": {
+                "name": "frequentmiler.com",
+                "url": "https://frequentmiler.com/amex-platinum-have-but-rarely-use/"
+            },
+            "_athenana": {
+                "kind": "link",
+                "tags": [
+                    {
+                        "name": "travel",
+                        "slug": "travel"
+                    },
+                    {
+                        "name": "credit cards",
+                        "slug": "credit-cards"
+                    },
+                    {
+                        "name": "rewards",
+                        "slug": "rewards"
+                    },
+                    {
+                        "name": "american express",
+                        "slug": "american-express"
+                    }
+                ]
+            }
+        },
+        {
+            "id": "https://athenana.com/s/01kzk5k1de0qetem7c9fg0z5jb",
+            "url": "https://www.wyome.com/blog/post.html?id=01kzk5k1de0qetem7c9fg0z5jb",
+            "external_url": "https://frequentmiler.com/maximizing-american-express-credit-card-rebates-credits/",
+            "title": "Maximizing American Express credit card rebates & credits",
+            "content_html": "<p>A comprehensive field guide to Amex&#039;s growing pile of &quot;coupon book&quot; statement credits (Dell, lululemon, airline fees, Uber Cash, dining, Hilton resort credits, Fine Hotels + Resorts, and more), aimed at cardholders who don&#039;t naturally spend on these specific merchants but still want to extract full value from their annual fees. It goes credit-by-credit with concrete workarounds—buying gift cards in-store versus online, splitting purchases, using shopping portals, exploiting cancellable Southwest fares, stacking Amex Offers—to show how to convert each rebate into cash-equivalent value even when the underlying purchase category is irrelevant to your life. Worth keeping as a reference to revisit before each credit&#039;s expiration window rather than a one-time read.</p>",
+            "date_published": "2026-10-07T13:14:03+00:00",
+            "date_modified": "2026-10-07T13:14:03+00:00",
+            "image": "https://athenana.com/p/01m4b7zpgfqk20n7hy9jqj5f8h?v=6dc665fa",
+            "tags": [
+                "travel",
+                "credit cards",
+                "personal finance",
+                "tips",
+                "rewards",
+                "american express"
+            ],
+            "_source": {
+                "name": "frequentmiler.com",
+                "url": "https://frequentmiler.com/maximizing-american-express-credit-card-rebates-credits/"
+            },
+            "_athenana": {
+                "kind": "link",
+                "tags": [
+                    {
+                        "name": "travel",
+                        "slug": "travel"
+                    },
+                    {
+                        "name": "credit cards",
+                        "slug": "credit-cards"
+                    },
+                    {
+                        "name": "personal finance",
+                        "slug": "personal-finance"
+                    },
+                    {
+                        "name": "tips",
+                        "slug": "tips"
+                    },
+                    {
+                        "name": "rewards",
+                        "slug": "rewards"
+                    },
+                    {
+                        "name": "american express",
+                        "slug": "american-express"
+                    }
+                ]
+            }
+        },
+        {
+            "id": "https://athenana.com/s/01kzk5k4k1h9x47fwdftp3m57t",
+            "url": "https://www.wyome.com/blog/post.html?id=01kzk5k4k1h9x47fwdftp3m57t",
+            "external_url": "https://frequentmiler.com/amex-membership-rewards/",
+            "title": "American Express Membership Rewards Complete Guide (2026)",
+            "content_html": "<p>A comprehensive reference guide to American Express Membership Rewards, covering every earning method (welcome offers, upgrade bonuses, category spend, checking accounts, Pay Over Time enrollment) alongside Amex&#039;s often-confusing eligibility rules like &quot;once in a lifetime&quot; language and card family restrictions. It also breaks down redemption strategy, arguing that transferring points to airline/hotel partners generally beats cash-out options like Schwab&#039;s 1.1 cents-per-point Invest with Rewards, and includes a full transfer partner chart with current bonus promotions. Worth keeping as a go-to lookup for both maximizing earning and avoiding costly redemption mistakes.</p>",
+            "date_published": "2026-10-07T13:13:54+00:00",
+            "date_modified": "2026-10-07T13:13:54+00:00",
+            "image": "https://athenana.com/p/01m4b7zbgcdmd5cdcg0mxwg15d?v=be1b831f",
+            "tags": [
+                "travel",
+                "credit cards",
+                "personal finance",
+                "american express"
+            ],
+            "_source": {
+                "name": "frequentmiler.com",
+                "url": "https://frequentmiler.com/amex-membership-rewards/"
+            },
+            "_athenana": {
+                "kind": "link",
+                "tags": [
+                    {
+                        "name": "travel",
+                        "slug": "travel"
+                    },
+                    {
+                        "name": "credit cards",
+                        "slug": "credit-cards"
+                    },
+                    {
+                        "name": "personal finance",
+                        "slug": "personal-finance"
+                    },
+                    {
+                        "name": "american express",
+                        "slug": "american-express"
+                    }
+                ]
+            }
+        },
+        {
+            "id": "https://athenana.com/s/01kzk5kwqhzsx4dedjynar3k7a",
+            "url": "https://www.wyome.com/blog/post.html?id=01kzk5kwqhzsx4dedjynar3k7a",
+            "external_url": "https://thepointsguy.com/credit-cards/is-founders-club-card-worth-it/",
+            "title": "500-plus benefits for $595 a year — is FoundersCard worth it?",
+            "content_html": "<p>A TPG writer makes the case for FoundersCard, a paid membership (not a credit card) offering 500+ discounts and elite-status perks across travel, shopping, and business services, priced at $595-$995/year (though discounted rates as low as $295 are attainable). The piece walks through favorite benefits—airline fare discounts, TripIt Pro, Equinox and Dell pricing, hotel elite status—and weighs them against overlapping perks already bundled into premium cards like the Amex Platinum, concluding it&#039;s worthwhile mainly for frequent travelers or business owners who can actually use the niche discounts.</p>",
+            "date_published": "2026-10-07T13:13:34+00:00",
+            "date_modified": "2026-10-07T13:13:34+00:00",
+            "image": "https://athenana.com/p/01m4b7yv35w1dqp31yy913cfas?v=5be5cf78",
+            "tags": [
+                "travel",
+                "hotels",
+                "business",
+                "credit cards"
+            ],
+            "_source": {
+                "name": "thepointsguy.com",
+                "url": "https://thepointsguy.com/credit-cards/is-founders-club-card-worth-it/"
+            },
+            "_athenana": {
+                "kind": "link",
+                "tags": [
+                    {
+                        "name": "travel",
+                        "slug": "travel"
+                    },
+                    {
+                        "name": "hotels",
+                        "slug": "hotels"
+                    },
+                    {
+                        "name": "business",
+                        "slug": "business"
+                    },
+                    {
+                        "name": "credit cards",
+                        "slug": "credit-cards"
+                    }
+                ]
+            }
+        },
+        {
+            "id": "https://athenana.com/s/01m1xpnyq6fkfpx4qw973q00yk",
+            "url": "https://www.wyome.com/blog/post.html?id=01m1xpnyq6fkfpx4qw973q00yk",
+            "title": "Now available: new and enhanced Citi® / AAdvantage® Executive card benefits",
+            "date_published": "2026-10-07T13:13:19+00:00",
+            "date_modified": "2026-10-07T13:13:19+00:00",
+            "image": "https://athenana.com/p/01m1xpp13sjha24q5zb4v06d7z?v=5a4c73e7",
+            "tags": [
+                "travel",
+                "credit cards",
+                "rewards"
+            ],
+            "_athenana": {
+                "kind": "note",
+                "tags": [
+                    {
+                        "name": "travel",
+                        "slug": "travel"
+                    },
+                    {
+                        "name": "credit cards",
+                        "slug": "credit-cards"
+                    },
+                    {
+                        "name": "rewards",
+                        "slug": "rewards"
+                    }
+                ]
+            }
+        },
+        {
+            "id": "https://athenana.com/s/01m2e3cbamm248mcgq5cwzcggg",
+            "url": "https://www.wyome.com/blog/post.html?id=01m2e3cbamm248mcgq5cwzcggg",
+            "external_url": "https://thepointsguy.com/credit-cards/best-premium-travel-rewards-cards/",
+            "title": "The best premium credit cards: A side-by-side comparison - The Points Guy",
+            "content_html": "<p>This comprehensive guide compares nine premium credit cards across seven categories—annual fees, welcome offers, rewards potential, redemption options, statement credits, lounge access, and travel protections—to help travelers determine which card offers the best value for their specific needs. The article explains that premium cards make sense only for frequent travelers who can maximize their benefits to justify fees ranging from $395 to $895 annually, and recommends pairing cards by type (a transferable rewards card plus airline and hotel cards) for optimal value. The analysis reveals that cards like the Capital One Venture X offer the most affordable entry point, the Chase Sapphire Reserve provides the broadest everyday earning categories, and airline and hotel cards should be chosen based on which brands you actually use most frequently.</p>",
+            "date_published": "2026-10-07T13:12:35+00:00",
+            "date_modified": "2026-10-07T13:12:35+00:00",
+            "image": "https://athenana.com/p/01m4b7x0p5ybp8rme13ac83685?v=ad1ddef2",
+            "tags": [
+                "money",
+                "travel",
+                "credit cards",
+                "personal finance",
+                "reviews"
+            ],
+            "_source": {
+                "name": "The Points Guy",
+                "url": "https://thepointsguy.com/credit-cards/best-premium-travel-rewards-cards/"
+            },
+            "_athenana": {
+                "kind": "link",
+                "tags": [
+                    {
+                        "name": "money",
+                        "slug": "money"
+                    },
+                    {
+                        "name": "travel",
+                        "slug": "travel"
+                    },
+                    {
+                        "name": "credit cards",
+                        "slug": "credit-cards"
+                    },
+                    {
+                        "name": "personal finance",
+                        "slug": "personal-finance"
+                    },
+                    {
+                        "name": "reviews",
+                        "slug": "reviews"
+                    }
+                ]
+            }
+        },
+        {
+            "id": "https://athenana.com/s/01kzk41pwk2snvp1wskb1nd20x",
+            "url": "https://www.wyome.com/blog/post.html?id=01kzk41pwk2snvp1wskb1nd20x",
+            "external_url": "https://dariusforoux.com/six-spokes-theory/?utm_source=GetShift-dot-net",
+            "title": "Six Spokes Theory: Strategy For An Optimal Life",
+            "content_html": "<p>The Six Spokes Theory frames life as a wheel with six equally important spokes—body, mind, love, work, money, and play—and argues that neglecting more than one spoke causes a collapse. Using a personal [[bicycle]] anecdote from growing up in the [[Netherlands]], the author shows how a dented [[wheel]] eventually stopped progress, illustrating why maintaining all areas matters. Instead of balancing hours, the theory recommends balancing energy: allocate attention and sustainable effort across spokes rather than trying to give each equal time. Practical examples cover giving focused presence to loved ones, treating money as a tool, and choosing restorative leisure like [[archery]] or [[video games]] for enjoyment. The aim is not top-tier success but an optimal, resilient life achieved through smart energy management and tough trade-offs.</p>",
+            "date_published": "2026-10-07T13:12:06+00:00",
+            "date_modified": "2026-10-07T13:12:06+00:00",
+            "image": "https://athenana.com/p/01m4b7w181g0e9p0e8vbxf8gck?v=c3e15e49",
+            "tags": [
+                "work",
+                "money",
+                "energy",
+                "self-improvement"
+            ],
+            "_source": {
+                "name": "dariusforoux.com",
+                "url": "https://dariusforoux.com/six-spokes-theory/?utm_source=GetShift-dot-net"
+            },
+            "_athenana": {
+                "kind": "link",
+                "tags": [
+                    {
+                        "name": "work",
+                        "slug": "work"
+                    },
+                    {
+                        "name": "money",
+                        "slug": "money"
+                    },
+                    {
+                        "name": "energy",
+                        "slug": "energy"
+                    },
+                    {
+                        "name": "self-improvement",
+                        "slug": "self-improvement"
+                    }
+                ]
+            }
+        },
+        {
+            "id": "https://athenana.com/s/01kzk5azgc05z3ke7z5z5mh4d9",
+            "url": "https://www.wyome.com/blog/post.html?id=01kzk5azgc05z3ke7z5z5mh4d9",
+            "external_url": "https://www.thepennyhoarder.com/make-money/side-gigs/best-side-hustles/?aff_id=178&aff_sub3=MainFeed__make-money/side-gigs/side-hustles-2020",
+            "title": "Broke? Busy? Bored? Presenting 31 Side Hustles (With Resources to Help You Get Started)",
+            "content_html": "<p>This comprehensive guide catalogs dozens of side hustle options across categories like freelancing, gig work, creative pursuits, and passive income streams, helping readers match opportunities to their available time, skills, budget, and income goals. The article emphasizes that the best side hustle depends on whether someone needs quick cash or long-term income, wants remote work, and what expertise they already possess. It provides practical advice on choosing and starting a side hustle, from identifying income goals to tracking expenses, plus explanations of earning potential and time requirements for each type of work.</p>",
+            "date_published": "2026-10-07T13:10:36+00:00",
+            "date_modified": "2026-10-07T13:10:46+00:00",
+            "image": "https://athenana.com/p/01m4b7s72yg47nknpdg45namwm?v=63446ecc",
+            "tags": [
+                "ai",
+                "money",
+                "remote work",
+                "personal finance",
+                "freelancing",
+                "gig economy",
+                "seo",
+                "airbnb",
+                "side hustle",
+                "passive income"
+            ],
+            "_source": {
+                "name": "www.thepennyhoarder.com",
+                "url": "https://www.thepennyhoarder.com/make-money/side-gigs/best-side-hustles/?aff_id=178&aff_sub3=MainFeed__make-money/side-gigs/side-hustles-2020"
+            },
+            "_athenana": {
+                "kind": "link",
+                "tags": [
+                    {
+                        "name": "ai",
+                        "slug": "ai"
+                    },
+                    {
+                        "name": "money",
+                        "slug": "money"
+                    },
+                    {
+                        "name": "remote work",
+                        "slug": "remote-work"
+                    },
+                    {
+                        "name": "personal finance",
+                        "slug": "personal-finance"
+                    },
+                    {
+                        "name": "freelancing",
+                        "slug": "freelancing"
+                    },
+                    {
+                        "name": "gig economy",
+                        "slug": "gig-economy"
+                    },
+                    {
+                        "name": "seo",
+                        "slug": "seo"
+                    },
+                    {
+                        "name": "airbnb",
+                        "slug": "airbnb"
+                    },
+                    {
+                        "name": "side hustle",
+                        "slug": "side-hustle"
+                    },
+                    {
+                        "name": "passive income",
+                        "slug": "passive-income"
+                    }
+                ]
+            }
+        },
+        {
+            "id": "https://athenana.com/s/01kzk5cefr0jhn6fqcbceh6yqj",
+            "url": "https://www.wyome.com/blog/post.html?id=01kzk5cefr0jhn6fqcbceh6yqj",
+            "external_url": "https://www.vice.com/en/article/can-you-make-money-write-ebook/?utm_source=digg",
+            "title": "I Wrote an Ebook to See How Much Easy Money I Could Make Online",
+            "content_html": "<p>The author self-published a short ebook about making money online and tracked whether it could generate genuine profits without existing fame or marketing resources. Despite reaching the top of Amazon&#039;s niche categories during a free promotional period and securing a blog post feature that temporarily tripled daily sales, the book averaged only a few paid sales per day at £2.99, making it marginally profitable only because the author had existing writing experience and access to professional design. The piece reveals that self-publishing success depends far less on writing quality than on marketing expertise, paid advertising budgets, and existing audience size—advantages the author lacked and most hopeful self-publishers won&#039;t have either.</p>",
+            "date_published": "2026-10-07T13:09:58+00:00",
+            "date_modified": "2026-10-07T13:10:19+00:00",
+            "image": "https://athenana.com/p/01m4b7r5cp3bprc1antx0af4wk?v=797a5147",
+            "tags": [
+                "books",
+                "money",
+                "business",
+                "personal finance",
+                "side hustle"
+            ],
+            "_source": {
+                "name": "www.vice.com",
+                "url": "https://www.vice.com/en/article/can-you-make-money-write-ebook/?utm_source=digg"
+            },
+            "_athenana": {
+                "kind": "link",
+                "tags": [
+                    {
+                        "name": "books",
+                        "slug": "books"
+                    },
+                    {
+                        "name": "money",
+                        "slug": "money"
+                    },
+                    {
+                        "name": "business",
+                        "slug": "business"
+                    },
+                    {
+                        "name": "personal finance",
+                        "slug": "personal-finance"
+                    },
+                    {
+                        "name": "side hustle",
+                        "slug": "side-hustle"
+                    }
+                ]
+            }
+        },
+        {
+            "id": "https://athenana.com/s/01m2dgj0aafwrmm7ycdcrqv1kv",
+            "url": "https://www.wyome.com/blog/post.html?id=01m2dgj0aafwrmm7ycdcrqv1kv",
+            "external_url": "https://nola.eater.com/maps/best-muffuletta-muffaletta-new-orleans-nola",
+            "title": "Where to Get a Great Muffuletta in and Around New Orleans",
+            "content_html": "<p>The muffuletta, a plate-sized Italian American sandwich layered with cured meats, cheese, and olive salad on a seeded loaf, originated in 1906 when Salvatore Lupo at Central Grocery created it as a convenient lunch for Sicilian workers in New Orleans&#039;s heavily Italian immigrant neighborhood. The piece traces the sandwich&#039;s history and cultural significance while providing a curated guide to where to find the best versions throughout the New Orleans area, from the original Central Grocery to modern variations at spots like Porgy&#039;s and Napoleon House.</p>",
+            "date_published": "2026-10-07T13:08:48+00:00",
+            "date_modified": "2026-10-07T13:08:48+00:00",
+            "image": "https://athenana.com/p/01m42dd4hfngbvkb8n59maw3bx?v=686ba9ae",
+            "tags": [
+                "food",
+                "history",
+                "restaurants",
+                "sandwiches"
+            ],
+            "_source": {
+                "name": "Eater Nola",
+                "url": "https://nola.eater.com/maps/best-muffuletta-muffaletta-new-orleans-nola"
+            },
+            "_athenana": {
+                "kind": "link",
+                "tags": [
+                    {
+                        "name": "food",
+                        "slug": "food"
+                    },
+                    {
+                        "name": "history",
+                        "slug": "history"
+                    },
+                    {
+                        "name": "restaurants",
+                        "slug": "restaurants"
+                    },
+                    {
+                        "name": "sandwiches",
+                        "slug": "sandwiches"
+                    }
+                ]
+            }
+        },
+        {
+            "id": "https://athenana.com/s/01m2dgj093h5he0pvjhfq1c7k0",
+            "url": "https://www.wyome.com/blog/post.html?id=01m2dgj093h5he0pvjhfq1c7k0",
+            "external_url": "https://thepointsguy.com/news/free-rail-travel-spain",
+            "title": "You can travel around Spain for free by train this summer",
+            "content_html": "<p>Spain extended its free train travel program through December 2023, allowing summer visitors to ride commuter and medium-distance Renfe trains for free by purchasing multi-journey tickets (minimum 10 return trips) with a small deposit of €10–€20 that must be earned back through 16 completed journeys. High-speed routes like Madrid-Barcelona are excluded from the scheme, which has proven popular among locals and may be made permanent due to its environmental benefits and €764 million cost funded by a windfall tax on banks and energy companies.</p>",
+            "date_published": "2026-10-07T13:08:07+00:00",
+            "date_modified": "2026-10-07T13:08:07+00:00",
+            "image": "https://athenana.com/p/01m42df7h6rgfrq2667akj921h?v=e158fce9",
+            "tags": [
+                "travel",
+                "budget",
+                "transportation"
+            ],
+            "_source": {
+                "name": "The Points Guy",
+                "url": "https://thepointsguy.com/news/free-rail-travel-spain"
+            },
+            "_athenana": {
+                "kind": "link",
+                "tags": [
+                    {
+                        "name": "travel",
+                        "slug": "travel"
+                    },
+                    {
+                        "name": "budget",
+                        "slug": "budget"
+                    },
+                    {
+                        "name": "transportation",
+                        "slug": "transportation"
+                    }
+                ]
+            }
+        },
+        {
+            "id": "https://athenana.com/s/01m2dgj08g66r3079hb9wjxhsh",
+            "url": "https://www.wyome.com/blog/post.html?id=01m2dgj08g66r3079hb9wjxhsh",
+            "external_url": "https://businessinsider.com/how-to-trade-ai-stocks-trader-who-made-8-million-2023-4",
+            "title": "A stock trader who made $8 million in 2 years shares how he's betting on AI stocks and the strategy he's using to trade hot themes this year",
+            "content_html": "<p>Stock trader Jack Kellogg applies a thematic trading strategy to capitalize on sector-wide momentum, identifying a &quot;head&quot; stock (like C3.ai for AI) and then trading related &quot;sympathy plays&quot; that tend to follow its price movements. He combines crowd-sourced research from Twitter and Google with technical analysis using support/resistance levels and volume indicators, entering positions gradually when stocks decline and exiting when they break support or the lead stock falters. Despite trading AI stocks successfully in early 2023 with estimated $1.4 million in gains by February, he remains cautious about shorting the sector, waiting for signs of irrational euphoria—like mainstream adoption—before betting against it.</p>",
+            "date_published": "2026-10-07T13:08:00+00:00",
+            "date_modified": "2026-10-07T13:08:00+00:00",
+            "image": "https://athenana.com/p/01m42dgtg5je51wajghzkg2v6b?v=251755a0",
+            "tags": [
+                "strategy",
+                "personal finance"
+            ],
+            "_source": {
+                "name": "Business Insider",
+                "url": "https://businessinsider.com/how-to-trade-ai-stocks-trader-who-made-8-million-2023-4"
+            },
+            "_athenana": {
+                "kind": "link",
+                "tags": [
+                    {
+                        "name": "strategy",
+                        "slug": "strategy"
+                    },
+                    {
+                        "name": "personal finance",
+                        "slug": "personal-finance"
+                    }
+                ]
+            }
+        },
+        {
+            "id": "https://athenana.com/s/01m2dgjj554fe4hemjyfzptyjq",
+            "url": "https://www.wyome.com/blog/post.html?id=01m2dgjj554fe4hemjyfzptyjq",
+            "external_url": "http://sharingbuttons.io/",
+            "title": "Social Media Sharing Buttons. No JavaScript. No tracking. Super fast and easy.",
+            "content_html": "<p>Super fast and easy Social Media Sharing Buttons. No JavaScript. No tracking.</p>",
+            "date_published": "2026-10-07T13:07:36+00:00",
+            "date_modified": "2026-10-07T18:09:50+00:00",
+            "image": "https://athenana.com/p/01m4b7m5dfy40317yhn0xzj92w?v=b36536e6",
+            "tags": [
+                "social media",
+                "performance",
+                "privacy",
+                "tools"
+            ],
+            "_source": {
+                "name": "sharingbuttons.io",
+                "url": "http://sharingbuttons.io/"
+            },
+            "_athenana": {
+                "kind": "link",
+                "tags": [
+                    {
+                        "name": "social media",
+                        "slug": "social-media"
+                    },
+                    {
+                        "name": "performance",
+                        "slug": "performance"
+                    },
+                    {
+                        "name": "privacy",
+                        "slug": "privacy"
+                    },
+                    {
+                        "name": "tools",
+                        "slug": "tools"
+                    }
+                ]
+            }
+        },
+        {
+            "id": "https://athenana.com/s/01m2dgjhyy76zrznv0scmbdf3c",
+            "url": "https://www.wyome.com/blog/post.html?id=01m2dgjhyy76zrznv0scmbdf3c",
+            "external_url": "https://popsql.io/",
+            "title": "PopSQL - Modern, collaborative SQL editor for your team",
+            "content_html": "<p>PopSQL is a collaborative SQL development platform that centralizes data queries, documentation, and visualization in a single workspace to reduce inefficiencies like scattered knowledge and repetitive Slack questions. It emphasizes real-time team collaboration, interactive visual dashboards, easy query sharing, and integration with existing data infrastructure while prioritizing security and ease of use for both technical and non-technical users. The tool is designed to help data teams work more efficiently by providing a shared environment that democratizes data access and frees up analysts to focus on strategic work rather than answering basic data questions.</p>",
+            "date_published": "2026-10-07T13:07:10+00:00",
+            "date_modified": "2026-10-07T13:07:10+00:00",
+            "image": "https://athenana.com/p/01m4b7k08daf4pd2jg3q5x3q2e?v=e0fb6fcb",
+            "tags": [
+                "productivity",
+                "collaboration",
+                "tools",
+                "database",
+                "sql",
+                "data"
+            ],
+            "_source": {
+                "name": "PopSQL",
+                "url": "https://popsql.io/"
+            },
+            "_athenana": {
+                "kind": "link",
+                "tags": [
+                    {
+                        "name": "productivity",
+                        "slug": "productivity"
+                    },
+                    {
+                        "name": "collaboration",
+                        "slug": "collaboration"
+                    },
+                    {
+                        "name": "tools",
+                        "slug": "tools"
+                    },
+                    {
+                        "name": "database",
+                        "slug": "database"
+                    },
+                    {
+                        "name": "sql",
+                        "slug": "sql"
+                    },
+                    {
+                        "name": "data",
+                        "slug": "data"
+                    }
+                ]
+            }
+        },
+        {
+            "id": "https://athenana.com/s/01m2dgjhy0ceejfv2a5bs4aw0t",
+            "url": "https://www.wyome.com/blog/post.html?id=01m2dgjhy0ceejfv2a5bs4aw0t",
+            "external_url": "https://medium.com/@philipn/want-to-see-something-crazy-open-this-link-on-your-phone-with-wifi-turned-off-9e0adb00d024",
+            "title": "Want to see something crazy? Open this link on your phone with WiFi turned off.",
+            "content_html": "<p>US telecommunications companies grant third-party services like Danal and Payfone direct access to sensitive customer data—including home addresses, phone numbers, and real-time cell tower location data—through enterprise APIs ostensibly designed for fraud detection. These services can look up this information using only a mobile phone&#039;s IP address, with minimal consent requirements and likely inadequate oversight, enabling potential tracking or de-anonymization of nearly any American cell phone user without meaningful safeguards or warrant requirements. The article demonstrates working demos of these capabilities and notes that major carriers&#039; opt-out mechanisms appear ineffective at preventing such access.</p>",
+            "date_published": "2026-10-07T13:06:42+00:00",
+            "date_modified": "2026-10-07T13:06:42+00:00",
+            "image": "https://athenana.com/p/01m4b7j7ahpk8a6ha9dpmrycbt?v=1d189202",
+            "tags": [
+                "privacy",
+                "security",
+                "mobile",
+                "investigation",
+                "wireless",
+                "surveillance",
+                "ifttt"
+            ],
+            "_source": {
+                "name": "Medium",
+                "url": "https://medium.com/@philipn/want-to-see-something-crazy-open-this-link-on-your-phone-with-wifi-turned-off-9e0adb00d024"
+            },
+            "_athenana": {
+                "kind": "link",
+                "tags": [
+                    {
+                        "name": "privacy",
+                        "slug": "privacy"
+                    },
+                    {
+                        "name": "security",
+                        "slug": "security"
+                    },
+                    {
+                        "name": "mobile",
+                        "slug": "mobile"
+                    },
+                    {
+                        "name": "investigation",
+                        "slug": "investigation"
+                    },
+                    {
+                        "name": "wireless",
+                        "slug": "wireless"
+                    },
+                    {
+                        "name": "surveillance",
+                        "slug": "surveillance"
+                    },
+                    {
+                        "name": "ifttt",
+                        "slug": "ifttt"
+                    }
+                ]
+            }
+        },
+        {
+            "id": "https://athenana.com/s/01m2dgjhxbryg26k92132rewmx",
+            "url": "https://www.wyome.com/blog/post.html?id=01m2dgjhxbryg26k92132rewmx",
+            "external_url": "https://paw.cloud/client",
+            "title": "Paw – A full-featured visual HTTP client",
+            "content_html": "<p>RapidAPI for Mac is a native macOS HTTP client designed for testing and debugging APIs with features including visual request building, multiple authentication schemes (OAuth, Basic Auth, AWS Signature), code generation in various languages, and dynamic values that can extract data from previous responses for complex workflows. The tool emphasizes accuracy through its own HTTP library, performance via multithreading, and usability through environment switching, request organization, and support for importing API definitions from Swagger, RAML, and other formats, plus easy migration from tools like Postman and cURL.</p>",
+            "date_published": "2026-10-07T13:06:11+00:00",
+            "date_modified": "2026-10-07T13:06:16+00:00",
+            "image": "https://athenana.com/p/01m4b7hhjrrbhj3h9hte58cy24?v=212c2aa0",
+            "tags": [
+                "programming",
+                "development",
+                "mac",
+                "tools"
+            ],
+            "_source": {
+                "name": "RapidAPI for Mac – The most advanced API tool for Mac",
+                "url": "https://paw.cloud/client"
+            },
+            "_athenana": {
+                "kind": "link",
+                "tags": [
+                    {
+                        "name": "programming",
+                        "slug": "programming"
+                    },
+                    {
+                        "name": "development",
+                        "slug": "development"
+                    },
+                    {
+                        "name": "mac",
+                        "slug": "mac"
+                    },
+                    {
+                        "name": "tools",
+                        "slug": "tools"
+                    }
+                ]
+            }
+        },
+        {
+            "id": "https://athenana.com/s/01m2dgjhw9tgmrnpwge855pek4",
+            "url": "https://www.wyome.com/blog/post.html?id=01m2dgjhw9tgmrnpwge855pek4",
+            "external_url": "https://insomnia.rest/",
+            "title": "Insomnia REST Client",
+            "content_html": "<p>This is a marketing page for Insomnia, an API development platform that combines design, testing, and debugging tools with AI capabilities and tight integration with Kong&#039;s API management suite. It emphasizes features like API mocking, automated testing, MCP (Model Context Protocol) server support, and flexible data storage options (local, Git, or cloud) to appeal to both individual developers and enterprises managing governance and compliance requirements. The platform positions itself as an alternative to similar tools by highlighting native Kong Konnect integration, AI-powered workflows, and collaboration features that work across all pricing tiers including a free tier.</p>",
+            "date_published": "2026-10-07T13:05:55+00:00",
+            "date_modified": "2026-10-07T13:05:55+00:00",
+            "image": "https://athenana.com/p/01m4b7gqrxzjt2x73skgywnn9y?v=8dc4ae57",
+            "tags": [
+                "development",
+                "mac",
+                "tools",
+                "opensource"
+            ],
+            "_source": {
+                "name": "insomnia.rest",
+                "url": "https://insomnia.rest/"
+            },
+            "_athenana": {
+                "kind": "link",
+                "tags": [
+                    {
+                        "name": "development",
+                        "slug": "development"
+                    },
+                    {
+                        "name": "mac",
+                        "slug": "mac"
+                    },
+                    {
+                        "name": "tools",
+                        "slug": "tools"
+                    },
+                    {
+                        "name": "opensource",
+                        "slug": "opensource"
+                    }
+                ]
+            }
+        },
+        {
+            "id": "https://athenana.com/s/01m4b725ma0cp0311y3c4bjscg",
+            "url": "https://www.wyome.com/blog/post.html?id=01m4b725ma0cp0311y3c4bjscg",
+            "external_url": "https://futurism.com/artificial-intelligence/ai-is-creating-doom-loops-all-over-the-economy?utm_source=flipboard&utm_content=other",
+            "title": "AI Is Creating \"Doom Loops\" All Over the Economy",
+            "content_html": "<p>Unredacted legal documents from the New York Times&#039; copyright lawsuit against Microsoft and OpenAI reveal internal company admissions that AI creates &quot;doom loops&quot;—systems where AI monetizes human-created content while simultaneously destroying the economic incentives and conditions needed to produce that content in the first place. The article catalogs these doom loops across journalism, music, film, education, and recruitment, showing how AI companies knowingly built business models that cannibalize their own supply chains and harm workers across creative industries. Microsoft&#039;s own internal documents acknowledged this paradox explicitly: the technology relies on fresh cultural content to function while the products themselves undermine creators&#039; ability to earn livelihoods, ultimately threatening the open web and broader economy.</p>",
+            "date_published": "2026-10-07T12:57:52+00:00",
+            "date_modified": "2026-10-08T03:40:03+00:00",
+            "image": "https://athenana.com/p/01m4b735xg2z9yvw4mmnsbbamp?v=ec81bb4e",
+            "tags": [
+                "ai",
+                "business",
+                "economics",
+                "journalism"
+            ],
+            "_source": {
+                "name": "Futurism",
+                "url": "https://futurism.com/artificial-intelligence/ai-is-creating-doom-loops-all-over-the-economy?utm_source=flipboard&utm_content=other"
+            },
+            "_athenana": {
+                "kind": "link",
+                "tags": [
+                    {
+                        "name": "ai",
+                        "slug": "ai"
+                    },
+                    {
+                        "name": "business",
+                        "slug": "business"
+                    },
+                    {
+                        "name": "economics",
+                        "slug": "economics"
+                    },
+                    {
+                        "name": "journalism",
+                        "slug": "journalism"
+                    }
+                ]
+            }
+        },
+        {
+            "id": "https://athenana.com/s/01m4b20cabf960jbhrv29e47j9",
+            "url": "https://www.wyome.com/blog/post.html?id=01m4b20cabf960jbhrv29e47j9",
+            "external_url": "https://www.apartmenttherapy.com/how-to-style-vintage-china-hutch-37693490?utm_source=RSS&utm_medium=feed&utm_campaign=Category%2FChannel%3A+main",
+            "title": "China Hutches Are Back in Style, According to Designers | Apartment Therapy",
+            "content_html": "<p>An article about the resurgence of china hutches as a fashionable interior design element according to contemporary designers.</p>",
+            "date_published": "2026-10-07T11:29:30+00:00",
+            "date_modified": "2026-10-08T03:40:03+00:00",
+            "image": "https://athenana.com/p/01m4b2a98mw5w1czzs584q3dya?v=2ee13935",
+            "tags": [
+                "design",
+                "vintage",
+                "furniture",
+                "home",
+                "interior"
+            ],
+            "_athenana": {
+                "kind": "link",
+                "tags": [
+                    {
+                        "name": "design",
+                        "slug": "design"
+                    },
+                    {
+                        "name": "vintage",
+                        "slug": "vintage"
+                    },
+                    {
+                        "name": "furniture",
+                        "slug": "furniture"
+                    },
+                    {
+                        "name": "home",
+                        "slug": "home"
+                    },
+                    {
+                        "name": "interior",
+                        "slug": "interior"
+                    }
+                ]
+            }
+        },
+        {
+            "id": "https://athenana.com/s/01m4b1zr8hjyv766663082d839",
+            "url": "https://www.wyome.com/blog/post.html?id=01m4b1zr8hjyv766663082d839",
+            "external_url": "https://fortworth.culturemap.com/news/travel/best-campgrounds-in-texas-hipcamp/",
+            "title": "12 Texas retreats declared best places to camp in the U.S. - CultureMap Fort Worth",
+            "content_html": "<p>Hipcamp&#039;s 2026 awards recognized twelve top-rated camping destinations across Texas based on user bookings, ratings, and reviews, with Llama Land Ranch near Fort Worth earning particular acclaim for its 101-acre property featuring friendly llamas, affordable rates, and attentive owner Judy. The ranch offers mixed accommodation options (tent, RV, or combination sites) and has gained recognition for creating a peaceful, well-maintained camping experience that balances comfort with nature. Other notable award winners include The Ranch at Beulah in Elkhart, featuring yurts and activities like creek swimming, trail riding, and pizza-oven cooking for $150-$204 per night.</p>",
+            "date_published": "2026-10-07T11:29:10+00:00",
+            "date_modified": "2026-10-08T03:40:03+00:00",
+            "image": "https://athenana.com/p/01m4b3ykbvh41phhp8h6j6qhcr?v=db522056",
+            "tags": [
+                "camping",
+                "travel",
+                "recommendations",
+                "texas",
+                "outdoor"
+            ],
+            "_source": {
+                "name": "CultureMap Fort Worth",
+                "url": "https://fortworth.culturemap.com/news/travel/best-campgrounds-in-texas-hipcamp/"
+            },
+            "_athenana": {
+                "kind": "link",
+                "tags": [
+                    {
+                        "name": "camping",
+                        "slug": "camping"
+                    },
+                    {
+                        "name": "travel",
+                        "slug": "travel"
+                    },
+                    {
+                        "name": "recommendations",
+                        "slug": "recommendations"
+                    },
+                    {
+                        "name": "texas",
+                        "slug": "texas"
+                    },
+                    {
+                        "name": "outdoor",
+                        "slug": "outdoor"
+                    }
+                ]
+            }
+        },
+        {
+            "id": "https://athenana.com/s/01m4awj09mat2sscqzzj0k03kh",
+            "url": "https://www.wyome.com/blog/post.html?id=01m4awj09mat2sscqzzj0k03kh",
+            "external_url": "https://github.com/omlahore/RemoveMacAI",
+            "title": "omlahore/RemoveMacAI: Debloat macOS: turn off Apple Intelligence, analytics, ads and pop-ups. A native app and CLI, and every change can be undone.",
+            "content_html": "<p>RemoveMacAI is a tool that lets users selectively disable Apple Intelligence features, analytics, ads, and various system annoyances on macOS while preserving changes that can be undone. It offers both a graphical app and command-line interface with preset configurations (Recommended and Maximum Privacy) that show users exactly what will change before applying modifications. The tool also recovers disk space by removing AI models, old installers, and cached files, and can export configuration profiles for enterprise deployment via MDM systems.</p>",
+            "date_published": "2026-10-07T09:54:17+00:00",
+            "date_modified": "2026-10-08T03:40:02+00:00",
+            "image": "https://athenana.com/p/01m4axnevs984k40ev3m9rtqe9?v=9b42f40d",
+            "tags": [
+                "ai",
+                "privacy",
+                "automation",
+                "tools",
+                "macos"
+            ],
+            "_source": {
+                "name": "GitHub",
+                "url": "https://github.com/omlahore/RemoveMacAI"
+            },
+            "_athenana": {
+                "kind": "link",
+                "tags": [
+                    {
+                        "name": "ai",
+                        "slug": "ai"
+                    },
+                    {
+                        "name": "privacy",
+                        "slug": "privacy"
+                    },
+                    {
+                        "name": "automation",
+                        "slug": "automation"
+                    },
+                    {
+                        "name": "tools",
+                        "slug": "tools"
+                    },
+                    {
+                        "name": "macos",
+                        "slug": "macos"
+                    }
+                ]
+            }
+        },
+        {
+            "id": "https://athenana.com/s/01m48xk506ph4264t2rym1fvm5",
+            "url": "https://www.wyome.com/blog/post.html?id=01m48xk506ph4264t2rym1fvm5",
+            "external_url": "https://www.cnn.com/2026/10/01/us/church-closings-christianity-crossroads?utm_medium=email&utm_source=ten_tabs&utm_campaign=&position=2&category=fascinating_stories&scheduled_corpus_item_id=57f829d6-d190-49ce-8e2a-5da9fe0fbb4d&url=https%3A%2F%2Fwww.cnn.com%2F2026%2F10%2F01%2Fus%2Fchurch-closings-christianity-crossroads",
+            "title": "A looming ‘tsunami’ of church closings is poised to remake America | CNN",
+            "content_html": "<p>A PBS documentary series examines the crisis facing American churches, with experts projecting that roughly 100,000 will close or be repurposed over the next decade due to declining membership and attendance. The film follows struggling congregations like one in Michigan forced to shut its doors, while also profiling churches that have adapted successfully through technology, welcoming community service roles, and making worship engaging for younger generations. Though Christianity remains dominant in America, churches face a fundamental tension between preserving the familiar rituals that comfort longtime members and making the changes necessary to attract new worshippers and survive.</p>",
+            "date_published": "2026-10-06T15:33:54+00:00",
+            "date_modified": "2026-10-08T15:50:08+00:00",
+            "image": "https://athenana.com/p/01m48xp0p59fxqatc9htp4g0ze?v=4949aa03",
+            "tags": [
+                "culture",
+                "united states",
+                "community",
+                "news"
+            ],
+            "_source": {
+                "name": "CNN",
+                "url": "https://www.cnn.com/2026/10/01/us/church-closings-christianity-crossroads?utm_medium=email&utm_source=ten_tabs&utm_campaign=&position=2&category=fascinating_stories&scheduled_corpus_item_id=57f829d6-d190-49ce-8e2a-5da9fe0fbb4d&url=https%3A%2F%2Fwww.cnn.com%2F2026%2F10%2F01%2Fus%2Fchurch-closings-christianity-crossroads"
+            },
+            "_athenana": {
+                "kind": "link",
+                "tags": [
+                    {
+                        "name": "culture",
+                        "slug": "culture"
+                    },
+                    {
+                        "name": "united states",
+                        "slug": "united-states"
+                    },
+                    {
+                        "name": "community",
+                        "slug": "community"
+                    },
+                    {
+                        "name": "news",
+                        "slug": "news"
+                    }
+                ]
+            }
+        },
+        {
+            "id": "https://athenana.com/s/01m48xhe7561erefqk5n6x4xrs",
+            "url": "https://www.wyome.com/blog/post.html?id=01m48xhe7561erefqk5n6x4xrs",
+            "external_url": "https://mossandfog.com/iconic-design/",
+            "title": "The Design That Shaped How We Live: A Visual Guide",
+            "content_html": "<p>This is a curatorial guide to design across ten categories—from kinetic sculpture and minimalist product design to typography, furniture, toys, and accessibility features—arguing that the best design often works invisibly to improve how people interact with everyday objects and spaces. Drawing on historical figures like Alexander Calder, Dieter Rams, and Andy Warhol alongside contemporary designers, it demonstrates how small, intentional decisions about form, color, and function can shape millions of lives. The guide emphasizes that meaningful design requires patience and rigor, whether it&#039;s making a chair, simplifying a interface, or cutting a curb to include wheelchair users.</p>",
+            "date_published": "2026-10-06T15:32:58+00:00",
+            "date_modified": "2026-10-07T03:40:04+00:00",
+            "image": "https://athenana.com/p/01m48xpct015rpwkwkbggc5tw2?v=ca66db8d",
+            "tags": [
+                "design",
+                "art",
+                "history",
+                "creativity"
+            ],
+            "_source": {
+                "name": "Moss and Fog",
+                "url": "https://mossandfog.com/iconic-design/"
+            },
+            "_athenana": {
+                "kind": "link",
+                "tags": [
+                    {
+                        "name": "design",
+                        "slug": "design"
+                    },
+                    {
+                        "name": "art",
+                        "slug": "art"
+                    },
+                    {
+                        "name": "history",
+                        "slug": "history"
+                    },
+                    {
+                        "name": "creativity",
+                        "slug": "creativity"
+                    }
+                ]
+            }
+        },
+        {
+            "id": "https://athenana.com/s/01m48x9sa0q0xq4ysfgvww8dfy",
+            "url": "https://www.wyome.com/blog/post.html?id=01m48x9sa0q0xq4ysfgvww8dfy",
+            "external_url": "https://secretive.dev/",
+            "title": "Secretive",
+            "content_html": "<p>Secretive is a macOS application that stores SSH keys in the device&#039;s Secure Enclave, making them impossible to export and thus protected from malware that might steal key files stored on disk. Version 3 adds support for post-quantum cryptographic keys, improves security through out-of-process request handling and application hardening, and redesigns the interface with new management features for better usability.</p>",
+            "date_published": "2026-10-06T15:28:47+00:00",
+            "date_modified": "2026-10-07T03:40:04+00:00",
+            "tags": [
+                "security",
+                "tools",
+                "macos",
+                "opensource"
+            ],
+            "_source": {
+                "name": "secretive.dev",
+                "url": "https://secretive.dev/"
+            },
+            "_athenana": {
+                "kind": "link",
+                "tags": [
+                    {
+                        "name": "security",
+                        "slug": "security"
+                    },
+                    {
+                        "name": "tools",
+                        "slug": "tools"
+                    },
+                    {
+                        "name": "macos",
+                        "slug": "macos"
+                    },
+                    {
+                        "name": "opensource",
+                        "slug": "opensource"
+                    }
+                ]
+            }
+        },
+        {
+            "id": "https://athenana.com/s/01m48x6rfqbywmaqqh26xad0tj",
+            "url": "https://www.wyome.com/blog/post.html?id=01m48x6rfqbywmaqqh26xad0tj",
+            "external_url": "https://www.yankodesign.com/2026/10/05/every-k-cup-youve-brewed-is-still-in-a-landfill-and-keurig-has-a-fix/?utm_source=rss&utm_medium=rss&utm_campaign=every-k-cup-youve-brewed-is-still-in-a-landfill-and-keurig-has-a-fix",
+            "title": "Every K-Cup You’ve Brewed Is Still in a Landfill, and Keurig Has a Fix - Yanko Design",
+            "content_html": "<p>Keurig&#039;s Alta addresses single-serve coffee&#039;s plastic waste problem by replacing K-Cups with compostable coffee pucks called AltaRounds, which are pressed grounds held together by a seaweed-based coating that can be composted after use. The machine combines espresso brewing, milk frothing, and regular coffee in one appliance with an intuitive touchscreen interface, though it still requires plastic wrappers around each AltaRound (though Keurig plans to switch to paper) and carries a steep $499.99 price tag. While the system meaningfully reduces plastic waste compared to traditional pod brewers, it remains a partial solution that still generates some packaging refuse.</p>",
+            "date_published": "2026-10-06T15:27:08+00:00",
+            "date_modified": "2026-10-07T03:40:03+00:00",
+            "image": "https://athenana.com/p/01m48xq1cpsta1n1vpdvd5383p?v=46d66d40",
+            "tags": [
+                "design",
+                "sustainability",
+                "coffee",
+                "reviews",
+                "gadgets"
+            ],
+            "_source": {
+                "name": "Yanko Design - Modern Industrial Design News",
+                "url": "https://www.yankodesign.com/2026/10/05/every-k-cup-youve-brewed-is-still-in-a-landfill-and-keurig-has-a-fix/?utm_source=rss&utm_medium=rss&utm_campaign=every-k-cup-youve-brewed-is-still-in-a-landfill-and-keurig-has-a-fix"
+            },
+            "_athenana": {
+                "kind": "link",
+                "tags": [
+                    {
+                        "name": "design",
+                        "slug": "design"
+                    },
+                    {
+                        "name": "sustainability",
+                        "slug": "sustainability"
+                    },
+                    {
+                        "name": "coffee",
+                        "slug": "coffee"
+                    },
+                    {
+                        "name": "reviews",
+                        "slug": "reviews"
+                    },
+                    {
+                        "name": "gadgets",
+                        "slug": "gadgets"
+                    }
+                ]
+            }
+        },
+        {
+            "id": "https://athenana.com/s/01m48x1sgd2p28w008gmfw0ma4",
+            "url": "https://www.wyome.com/blog/post.html?id=01m48x1sgd2p28w008gmfw0ma4",
+            "external_url": "https://www.eatingbirdfood.com/protein-boxes/",
+            "title": "Easy Protein Boxes (4 Ways) - Eating Bird Food",
+            "content_html": "<p>The article provides four simple, high-protein snack box recipes (27-35g protein each) that can be assembled during Sunday meal prep and grabbed throughout the week, including a budget-friendly Starbucks copycat option. Each box combines a protein source like eggs, cottage cheese, or chicken with complementary fruits, vegetables, and crunchy extras, designed to fit in divided meal prep containers for convenient grab-and-go lunches or snacks. The guide includes storage tips, customization swaps for dietary restrictions, and instructions for assembling boxes that stay fresh in the refrigerator for 3-4 days.</p>",
+            "date_published": "2026-10-06T15:24:25+00:00",
+            "date_modified": "2026-10-07T03:40:02+00:00",
+            "image": "https://athenana.com/p/01m48xq8zwmm57j5e4k38abymm?v=021ad016",
+            "tags": [
+                "budget",
+                "protein",
+                "lunch",
+                "meal prep",
+                "healthy eating"
+            ],
+            "_source": {
+                "name": "Eating Bird Food",
+                "url": "https://www.eatingbirdfood.com/protein-boxes/"
+            },
+            "_athenana": {
+                "kind": "link",
+                "tags": [
+                    {
+                        "name": "budget",
+                        "slug": "budget"
+                    },
+                    {
+                        "name": "protein",
+                        "slug": "protein"
+                    },
+                    {
+                        "name": "lunch",
+                        "slug": "lunch"
+                    },
+                    {
+                        "name": "meal prep",
+                        "slug": "meal-prep"
+                    },
+                    {
+                        "name": "healthy eating",
+                        "slug": "healthy-eating"
+                    }
+                ]
+            }
+        },
+        {
+            "id": "https://athenana.com/s/01m467zcr8h5mh0njfbyzc4g0a",
+            "url": "https://www.wyome.com/blog/post.html?id=01m467zcr8h5mh0njfbyzc4g0a",
+            "external_url": "https://guide.michelin.com/us/en/article/travel/best-small-town-hotels-usa",
+            "title": "The Best Small-Town Hotels in the United States",
+            "content_html": "<p>Michelin&#039;s official guide to rated restaurants around the world.</p>",
+            "date_published": "2026-10-05T14:37:37+00:00",
+            "date_modified": "2026-10-06T12:47:18+00:00",
+            "image": "https://athenana.com/p/01m48m0xz9jattyzk3ag9v238r?v=12012d9e",
+            "tags": [
+                "travel",
+                "hotels"
+            ],
+            "_source": {
+                "name": "guide.michelin.com",
+                "url": "https://guide.michelin.com/us/en/article/travel/best-small-town-hotels-usa"
+            },
+            "_athenana": {
+                "kind": "link",
+                "tags": [
+                    {
+                        "name": "travel",
+                        "slug": "travel"
+                    },
+                    {
+                        "name": "hotels",
+                        "slug": "hotels"
+                    }
+                ]
+            }
+        },
+        {
+            "id": "https://athenana.com/s/01m43k0j814k29x8qjm5hragvb",
+            "url": "https://www.wyome.com/blog/post.html?id=01m43k0j814k29x8qjm5hragvb",
+            "external_url": "https://www.macstories.net/reviews/goodlinks-updated-with-three-column-ipad-layout-widgets-and-new-keyboard-shortcuts/",
+            "title": "GoodLinks Updated with Three-Column iPad Layout, Widgets, and New Keyboard Shortcuts - MacStories",
+            "content_html": "<p>GoodLinks, a read-it-later app, received a major update introducing an iPad three-column layout that mirrors standard iPadOS design while maintaining the app&#039;s original feel, alongside configurable List and Link widgets for quick access to saved articles. The update also added numerous keyboard shortcuts to help users navigate large link collections efficiently. The app has matured significantly since its June launch, addressing early rough edges and building out iOS and iPadOS 14 feature support.</p>",
+            "date_published": "2026-10-04T13:52:47+00:00",
+            "date_modified": "2026-10-05T03:40:41+00:00",
+            "image": "https://athenana.com/p/01m43kn6yrtc8583q4jwp3sr3v?v=e84f5096",
+            "tags": [
+                "productivity",
+                "apps",
+                "design",
+                "ios"
+            ],
+            "_source": {
+                "name": "www.macstories.net",
+                "url": "https://www.macstories.net/reviews/goodlinks-updated-with-three-column-ipad-layout-widgets-and-new-keyboard-shortcuts/"
+            },
+            "_athenana": {
+                "kind": "link",
+                "tags": [
+                    {
+                        "name": "productivity",
+                        "slug": "productivity"
+                    },
+                    {
+                        "name": "apps",
+                        "slug": "apps"
+                    },
+                    {
+                        "name": "design",
+                        "slug": "design"
+                    },
+                    {
+                        "name": "ios",
+                        "slug": "ios"
+                    }
+                ]
+            }
+        },
+        {
+            "id": "https://athenana.com/s/01m43ce1g6g4h0tj6jnj1dv201",
+            "url": "https://www.wyome.com/blog/post.html?id=01m43ce1g6g4h0tj6jnj1dv201",
+            "external_url": "https://www.yankodesign.com/2026/10/03/the-jamison-8-4-is-what-happens-when-a-tiny-home-refuses-to-act-small/?utm_source=rss&utm_medium=rss&utm_campaign=the-jamison-8-4-is-what-happens-when-a-tiny-home-refuses-to-act-small",
+            "title": "The Jamison 8.4 Is What Happens When a Tiny Home Refuses to Act Small - Yanko Design",
+            "content_html": "<p>Highlands Tiny Homes&#039; Jamison 8.4 challenges the perception that tiny living means compromising on design or quality through extensive glazing, high-end materials, and thoughtful proportions that make the 27.5-foot mobile home feel intentional rather than cramped. Rather than hiding its compact footprint with lofts and hidden storage, the design confidently uses its constraints—from the bedroom layout to the properly executed bathroom—as an opportunity for refined problem-solving. At $83,500 and engineered to the same standards as its aesthetics, the Jamison targets someone who has already chosen a smaller lifestyle and wants a genuinely considered home, not a budget-friendly compromise.</p>",
+            "date_published": "2026-10-04T11:57:48+00:00",
+            "date_modified": "2026-10-05T03:40:41+00:00",
+            "image": "https://athenana.com/p/01m43dsyag3vdxv2hh14pmemyp?v=641532fa",
+            "tags": [
+                "design",
+                "minimalism",
+                "architecture",
+                "luxury",
+                "tiny home"
+            ],
+            "_source": {
+                "name": "Yanko Design - Modern Industrial Design News",
+                "url": "https://www.yankodesign.com/2026/10/03/the-jamison-8-4-is-what-happens-when-a-tiny-home-refuses-to-act-small/?utm_source=rss&utm_medium=rss&utm_campaign=the-jamison-8-4-is-what-happens-when-a-tiny-home-refuses-to-act-small"
+            },
+            "_athenana": {
+                "kind": "link",
+                "tags": [
+                    {
+                        "name": "design",
+                        "slug": "design"
+                    },
+                    {
+                        "name": "minimalism",
+                        "slug": "minimalism"
+                    },
+                    {
+                        "name": "architecture",
+                        "slug": "architecture"
+                    },
+                    {
+                        "name": "luxury",
+                        "slug": "luxury"
+                    },
+                    {
+                        "name": "tiny home",
+                        "slug": "tiny-home"
+                    }
+                ]
+            }
+        },
+        {
+            "id": "https://athenana.com/s/01m43852erq6yphzecqzwxfy79",
+            "url": "https://www.wyome.com/blog/post.html?id=01m43852erq6yphzecqzwxfy79",
+            "external_url": "https://alistair-roberts.co.uk/blackbody",
+            "title": "Blackbody: scientific OLED wallpapers · Alistair Roberts",
+            "content_html": "<p>A collection of 106 free, high-resolution (4K) OLED-optimized wallpapers rendered entirely from real scientific datasets and physics simulations—including ocean drifter tracks, hurricane paths, seismic data, animal migration routes, and fluid dynamics—each meticulously sourced and licensed for personal use. Every image is generated from code based on actual data or mathematical equations with no AI image generation, though AI assisted in writing the code. The project prioritizes accuracy and reproducibility by documenting all sources and licenses alongside each wallpaper.</p>",
+            "date_published": "2026-10-04T10:43:00+00:00",
+            "date_modified": "2026-10-07T23:12:24+00:00",
+            "image": "https://athenana.com/p/01m4ca7dhvgrbkxmgztwfq7wck?v=fe9c9bc7",
+            "tags": [
+                "design",
+                "science"
+            ],
+            "_source": {
+                "name": "Alistair Roberts",
+                "url": "https://alistair-roberts.co.uk/blackbody"
+            },
+            "_athenana": {
+                "kind": "link",
+                "tags": [
+                    {
+                        "name": "design",
+                        "slug": "design"
+                    },
+                    {
+                        "name": "science",
+                        "slug": "science"
+                    }
+                ]
+            }
+        },
+        {
+            "id": "https://athenana.com/s/01m3ycn0szdv032fxccm7ev9s9",
+            "url": "https://www.wyome.com/blog/post.html?id=01m3ycn0szdv032fxccm7ev9s9",
+            "external_url": "https://www.nytimes.com/2026/09/29/us/anthropic-claude-morals-ai.html?smid=nytcore-ios-share",
+            "title": "Religious Scholars Met With Anthropic. What They Heard Stunned Them.",
+            "content_html": "<p>Religious scholars met with Anthropic to discuss AI and were surprised by insights about Claude&#039;s design and ethical implications.</p>",
+            "date_published": "2026-10-02T13:25:25+00:00",
+            "date_modified": "2026-10-08T03:09:02+00:00",
+            "image": "https://athenana.com/p/01m40n92yfq22hr0kkes7bf5a2?v=6498064e",
+            "tags": [
+                "philosophy",
+                "ai",
+                "ethics",
+                "claude"
+            ],
+            "_athenana": {
+                "kind": "link",
+                "tags": [
+                    {
+                        "name": "philosophy",
+                        "slug": "philosophy"
+                    },
+                    {
+                        "name": "ai",
+                        "slug": "ai"
+                    },
+                    {
+                        "name": "ethics",
+                        "slug": "ethics"
+                    },
+                    {
+                        "name": "claude",
+                        "slug": "claude"
+                    }
+                ]
+            }
+        },
+        {
+            "id": "https://athenana.com/s/01m3y5n0g9bvebn9n83c3hasfx",
+            "url": "https://www.wyome.com/blog/post.html?id=01m3y5n0g9bvebn9n83c3hasfx",
+            "external_url": "https://apple.news/Ax-aDT6GeR2WmDXPzMA-WaA",
+            "title": "The 14 Movies to Look Out for This Fall — The Atlantic",
+            "content_html": "<p>The best new films coming this season take a close look at humanity.</p>",
+            "date_published": "2026-10-02T11:23:05+00:00",
+            "date_modified": "2026-10-04T10:09:33+00:00",
+            "image": "https://athenana.com/p/01m3y5tyxjmkewnbdktma9yrs0?v=d2d880a7",
+            "tags": [
+                "film",
+                "recommendations",
+                "reviews",
+                "cinema"
+            ],
+            "_source": {
+                "name": "apple.news",
+                "url": "https://apple.news/Ax-aDT6GeR2WmDXPzMA-WaA"
+            },
+            "_athenana": {
+                "kind": "link",
+                "tags": [
+                    {
+                        "name": "film",
+                        "slug": "film"
+                    },
+                    {
+                        "name": "recommendations",
+                        "slug": "recommendations"
+                    },
+                    {
+                        "name": "reviews",
+                        "slug": "reviews"
+                    },
+                    {
+                        "name": "cinema",
+                        "slug": "cinema"
+                    }
+                ]
+            }
+        },
+        {
+            "id": "https://athenana.com/s/01m3y598ap8zgt7bv2wem563rw",
+            "url": "https://www.wyome.com/blog/post.html?id=01m3y598ap8zgt7bv2wem563rw",
+            "external_url": "https://github.com/xaraya",
+            "title": "xaraya",
+            "content_html": "<p>I can&#039;t summarize this content—it&#039;s not an article or piece of writing saved for reference. This appears to be a GitHub interface screen for blocking or reporting a user account. If you have an article you&#039;d like summarized, please share that text instead.</p>",
+            "date_published": "2026-10-02T11:16:39+00:00",
+            "date_modified": "2026-10-04T03:40:45+00:00",
+            "tags": [
+                "programming",
+                "development",
+                "opensource",
+                "framework"
+            ],
+            "_source": {
+                "name": "GitHub",
+                "url": "https://github.com/xaraya"
+            },
+            "_athenana": {
+                "kind": "link",
+                "tags": [
+                    {
+                        "name": "programming",
+                        "slug": "programming"
+                    },
+                    {
+                        "name": "development",
+                        "slug": "development"
+                    },
+                    {
+                        "name": "opensource",
+                        "slug": "opensource"
+                    },
+                    {
+                        "name": "framework",
+                        "slug": "framework"
+                    }
+                ]
+            }
+        },
+        {
+            "id": "https://athenana.com/s/01m3y4xf5p1me7hzyjtk5ayaja",
+            "url": "https://www.wyome.com/blog/post.html?id=01m3y4xf5p1me7hzyjtk5ayaja",
+            "external_url": "https://claude.com/blog/claude-code-mods",
+            "title": "Customize Claude Code with mods in TypeScript | Claude by Anthropic",
+            "content_html": "<p>Anthropic has released mods for Claude Code, small TypeScript functions that let users customize how the AI coding assistant works by hooking into events like tool calls, permission requests, and UI rendering—users can rewrite prompts, block tool calls, redact secrets, or modify the interface without waiting for official features. Mods ship as plugins and are stackable (multiple mods can hook the same event), run with full machine access like any installed code, and teams can use them for governance features like production safeguards or audit logging, with enterprise controls available through a built-in security mod that restricts risky operations.</p>",
+            "date_published": "2026-10-02T11:10:13+00:00",
+            "date_modified": "2026-10-04T03:40:45+00:00",
+            "image": "https://athenana.com/p/01m3y4xveb158hsyf26nmyq4gk?v=f6f7cff4",
+            "tags": [
+                "development",
+                "tools",
+                "claude",
+                "plugins"
+            ],
+            "_source": {
+                "name": "Claude",
+                "url": "https://claude.com/blog/claude-code-mods"
+            },
+            "_athenana": {
+                "kind": "link",
+                "tags": [
+                    {
+                        "name": "development",
+                        "slug": "development"
+                    },
+                    {
+                        "name": "tools",
+                        "slug": "tools"
+                    },
+                    {
+                        "name": "claude",
+                        "slug": "claude"
+                    },
+                    {
+                        "name": "plugins",
+                        "slug": "plugins"
+                    }
+                ]
+            }
+        },
+        {
+            "id": "https://athenana.com/s/01m3wggrsazd6647kqxb8pewaw",
+            "url": "https://www.wyome.com/blog/post.html?id=01m3wggrsazd6647kqxb8pewaw",
+            "external_url": "https://www.nytimes.com/wirecutter/reviews/wirecutter-hall-of-fame-2026/?emc=edit_wcd_20261001&nl=the-recommendation&segment_id=227361",
+            "title": "The Winners of Our 2026 Hall of Fame Awards | Reviews by Wirecutter",
+            "content_html": "<p>Wirecutter announces its 2026 Hall of Fame Award winners, recognizing top-performing products across various categories.</p>",
+            "date_published": "2026-10-01T19:54:31+00:00",
+            "date_modified": "2026-10-04T03:40:45+00:00",
+            "image": "https://athenana.com/p/01m3y4zvpwpq50tg3vtavgmymn?v=2fcdea83",
+            "tags": [
+                "gear",
+                "recommendations",
+                "reviews"
+            ],
+            "_athenana": {
+                "kind": "link",
+                "tags": [
+                    {
+                        "name": "gear",
+                        "slug": "gear"
+                    },
+                    {
+                        "name": "recommendations",
+                        "slug": "recommendations"
+                    },
+                    {
+                        "name": "reviews",
+                        "slug": "reviews"
+                    }
+                ]
+            }
+        }
+    ]
+}

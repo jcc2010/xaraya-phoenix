@@ -1,0 +1,1956 @@
+{
+    "version": "https://jsonfeed.org/version/1.1",
+    "title": "John Cox",
+    "description": "Notes, photos and the things worth saying something about.",
+    "home_page_url": "https://www.wyome.com/blog/",
+    "feed_url": "https://athenana.com/blog/wyome/feed.json",
+    "language": "en",
+    "icon": "https://athenana.com/img/apple-touch-icon.png",
+    "favicon": "https://athenana.com/favicon.ico",
+    "authors": [
+        {
+            "name": "John Cox",
+            "url": "https://www.wyome.com/blog/"
+        }
+    ],
+    "_athenana": {
+        "subscribe_url": "https://athenana.com/blog/wyome/subscribe"
+    },
+    "items": [
+        {
+            "id": "https://athenana.com/s/01m3wb04bycz40wts95zmzdyfx",
+            "url": "https://www.wyome.com/blog/post.html?id=01m3wb04bycz40wts95zmzdyfx",
+            "external_url": "https://www.howtogeek.com/the-best-fun-r-rated-movies-to-watch-this-week-on-netflix-hbo-max-hulu-and-more/",
+            "title": "The 4 best fun R-rated movies to watch on Netflix, HBO Max, Disney+, and more",
+            "content_html": "<p>A curated list of four entertaining R-rated films available across popular streaming platforms.</p>",
+            "date_published": "2026-10-01T18:18:03+00:00",
+            "date_modified": "2026-10-04T03:40:45+00:00",
+            "image": "https://athenana.com/p/01m3y4ynym49fsx7r7qdetk53x?v=2d256bb1",
+            "tags": [
+                "recommendations",
+                "entertainment",
+                "streaming",
+                "movies"
+            ],
+            "_athenana": {
+                "kind": "link",
+                "tags": [
+                    {
+                        "name": "recommendations",
+                        "slug": "recommendations"
+                    },
+                    {
+                        "name": "entertainment",
+                        "slug": "entertainment"
+                    },
+                    {
+                        "name": "streaming",
+                        "slug": "streaming"
+                    },
+                    {
+                        "name": "movies",
+                        "slug": "movies"
+                    }
+                ]
+            }
+        },
+        {
+            "id": "https://athenana.com/s/01m3vjkrs9m6ec83ww5g91qxxz",
+            "url": "https://www.wyome.com/blog/post.html?id=01m3vjkrs9m6ec83ww5g91qxxz",
+            "external_url": "https://www.oreilly.com/radar/the-agentic-data-science-playbook/",
+            "title": "The Agentic Data Science Playbook – O’Reilly",
+            "content_html": "<p>When AI agents can conduct entire analyses independently, data scientists shift from executing every step to framing questions, equipping agents with proper context and tools, organizing how investigations proceed, reviewing results critically, and converting lessons into reusable expertise. The piece demonstrates this through examples like a fraud-detection model that initially reported excellent metrics (F1: 0.87) using a temporally mixed test set and a leaking feature—problems that emerged only when proper framing was supplied, dropping real performance to F1: 0.70. Success requires specifying the analytical task (not just desired outcomes), building skills that encode recurring methodological requirements, protecting evaluation from the agent&#039;s modifications through bounded experiments or competing analyses, using independent agent reviewers to challenge conclusions, and systematically preserving evidence trails so that corrections become standing guidance for future work.</p>",
+            "date_published": "2026-10-01T11:11:52+00:00",
+            "date_modified": "2026-10-05T10:40:23+00:00",
+            "image": "https://athenana.com/p/01m3vjn8tajq1xt0f9eh7ja26x?v=235f3b56",
+            "tags": [
+                "programming",
+                "ai",
+                "automation",
+                "data"
+            ],
+            "_source": {
+                "name": "O’Reilly Media",
+                "url": "https://www.oreilly.com/radar/the-agentic-data-science-playbook/"
+            },
+            "_athenana": {
+                "kind": "link",
+                "tags": [
+                    {
+                        "name": "programming",
+                        "slug": "programming"
+                    },
+                    {
+                        "name": "ai",
+                        "slug": "ai"
+                    },
+                    {
+                        "name": "automation",
+                        "slug": "automation"
+                    },
+                    {
+                        "name": "data",
+                        "slug": "data"
+                    }
+                ]
+            }
+        },
+        {
+            "id": "https://athenana.com/s/01m3vjj9yrrmdjnk57pkz4h2vt",
+            "url": "https://www.wyome.com/blog/post.html?id=01m3vjj9yrrmdjnk57pkz4h2vt",
+            "external_url": "https://www.mindbodygreen.com/articles/why-postbiotics-are-what-make-fermented-foods-especially-healthy-what-fermentation-actually-does-to-food",
+            "title": "The Real Reason Fermented Foods Are Beneficial (It's Not Probiotics)",
+            "content_html": "<p>Fermented foods deliver health benefits through bioactive compounds created during fermentation—including peptides, short-chain fatty acids, and organic acids—that work together to support gut health, strengthen the intestinal barrier, and reduce chronic inflammation linked to metabolic disease. These compounds work independently of whether the bacteria survive digestion, meaning even pasteurized fermented foods retain functional benefits, and different fermented foods (dairy, vegetables, legumes, cereals, and teas) offer distinct compounds suited to various health outcomes. The most effective approach combines a variety of fermented foods with fiber-rich plants to fuel beneficial bacteria and maximize metabolic and immune benefits.</p>",
+            "date_published": "2026-10-01T11:11:04+00:00",
+            "date_modified": "2026-10-04T03:40:44+00:00",
+            "image": "https://athenana.com/p/01m3vjnhg4vs40a789y9tzk5kd?v=89cda996",
+            "tags": [
+                "nutrition",
+                "health",
+                "fermentation"
+            ],
+            "_source": {
+                "name": "mindbodygreen",
+                "url": "https://www.mindbodygreen.com/articles/why-postbiotics-are-what-make-fermented-foods-especially-healthy-what-fermentation-actually-does-to-food"
+            },
+            "_athenana": {
+                "kind": "link",
+                "tags": [
+                    {
+                        "name": "nutrition",
+                        "slug": "nutrition"
+                    },
+                    {
+                        "name": "health",
+                        "slug": "health"
+                    },
+                    {
+                        "name": "fermentation",
+                        "slug": "fermentation"
+                    }
+                ]
+            }
+        },
+        {
+            "id": "https://athenana.com/s/01m3vj19sj0crag236r23dt9mq",
+            "url": "https://www.wyome.com/blog/post.html?id=01m3vj19sj0crag236r23dt9mq",
+            "external_url": "https://www.monarch.com/blog/september-product-update?_cio_id=d0d8050eb956daa71a&utm_campaign=email_subs_monthly_update_september_093026&utm_content=Monthly+Product+Update+September+2026&utm_medium=cio&utm_source=email#get-the-best-connection-for-your-bank-without-starting-over-4f2ec2d3e005",
+            "title": "Easier Bank Connections, a Faster AI Assistant, and more | Monarch",
+            "content_html": "<p>Monarch has streamlined switching between data providers for connected bank accounts, allowing users to move to better connections while preserving transaction history in just a few steps, and the platform now recommends superior providers when available. The AI Assistant has been upgraded to provide faster and more actionable answers about spending and financial goals, while a new automatic sorting feature keeps the accounts list organized by balance without manual intervention. Additional updates include the ability to add notes to accounts, elimination of duplicate Apple Card transactions on new iPhones, improved reporting detail pages, and several refinements across goals, tax tracking, and visual displays.</p>",
+            "date_published": "2026-10-01T11:01:47+00:00",
+            "date_modified": "2026-10-04T03:40:44+00:00",
+            "image": "https://athenana.com/p/01m3vjntyrjbvr0k1cr6me2y9y?v=30108806",
+            "tags": [
+                "productivity",
+                "ai",
+                "software",
+                "personal finance"
+            ],
+            "_source": {
+                "name": "Monarch",
+                "url": "https://www.monarch.com/blog/september-product-update?_cio_id=d0d8050eb956daa71a&utm_campaign=email_subs_monthly_update_september_093026&utm_content=Monthly+Product+Update+September+2026&utm_medium=cio&utm_source=email#get-the-best-connection-for-your-bank-without-starting-over-4f2ec2d3e005"
+            },
+            "_athenana": {
+                "kind": "link",
+                "tags": [
+                    {
+                        "name": "productivity",
+                        "slug": "productivity"
+                    },
+                    {
+                        "name": "ai",
+                        "slug": "ai"
+                    },
+                    {
+                        "name": "software",
+                        "slug": "software"
+                    },
+                    {
+                        "name": "personal finance",
+                        "slug": "personal-finance"
+                    }
+                ]
+            }
+        },
+        {
+            "id": "https://athenana.com/s/01m3vhtvwf5x884m5eb7bfw5d0",
+            "url": "https://www.wyome.com/blog/post.html?id=01m3vhtvwf5x884m5eb7bfw5d0",
+            "external_url": "https://www.apartmenttherapy.com/taskrabbit-clothing-donation-drop-off-37692660?utm_source=RSS&utm_medium=feed&utm_campaign=Category%2FChannel%3A+main",
+            "title": "How to Donate Things Without Ever Leaving the House | Apartment Therapy",
+            "content_html": "<p>A guide to donating belongings conveniently from home without requiring in-person trips.</p>",
+            "date_published": "2026-10-01T10:58:16+00:00",
+            "date_modified": "2026-10-05T10:40:23+00:00",
+            "image": "https://athenana.com/p/01m3vjpwtern0xyje7f7z7m72v?v=2b6be0fd",
+            "tags": [
+                "organization",
+                "home",
+                "decluttering"
+            ],
+            "_athenana": {
+                "kind": "link",
+                "tags": [
+                    {
+                        "name": "organization",
+                        "slug": "organization"
+                    },
+                    {
+                        "name": "home",
+                        "slug": "home"
+                    },
+                    {
+                        "name": "decluttering",
+                        "slug": "decluttering"
+                    }
+                ]
+            }
+        },
+        {
+            "id": "https://athenana.com/s/01m3vhqzg3f8xjhxwtnzmfpryy",
+            "url": "https://www.wyome.com/blog/post.html?id=01m3vhqzg3f8xjhxwtnzmfpryy",
+            "external_url": "https://www.nytimes.com/athletic/7643353/2026/09/30/nfl-ponzi-scheme-steve-keim-ponzi-scheme-mohamed-coulibaly/",
+            "title": "NFL players were promised big returns. Then an alleged Ponzi scheme began to unravel - The Athletic",
+            "content_html": "<p>An investigation into how NFL players were defrauded through an alleged Ponzi scheme that promised substantial investment returns.</p>",
+            "date_published": "2026-10-01T10:56:41+00:00",
+            "date_modified": "2026-10-04T03:40:44+00:00",
+            "image": "https://athenana.com/p/01m3vjqmxdayw75e75gj7hrq2w?v=158c2fab",
+            "tags": [
+                "business",
+                "personal finance",
+                "sports"
+            ],
+            "_athenana": {
+                "kind": "link",
+                "tags": [
+                    {
+                        "name": "business",
+                        "slug": "business"
+                    },
+                    {
+                        "name": "personal finance",
+                        "slug": "personal-finance"
+                    },
+                    {
+                        "name": "sports",
+                        "slug": "sports"
+                    }
+                ]
+            }
+        },
+        {
+            "id": "https://athenana.com/s/01m3tfpthp532z1rr4zvv14zew",
+            "url": "https://www.wyome.com/blog/post.html?id=01m3tfpthp532z1rr4zvv14zew",
+            "external_url": "https://sourceforge.net/projects/xaraya/",
+            "title": "Xaraya download | SourceForge.net",
+            "content_html": "<p>Xaraya is a PHP-based open-source CMS framework that emphasizes security through strict input validation and granular permission controls, allowing administrators to grant or deny access at both broad and specific levels. The platform provides extensibility through modules and blocks, a custom templating system called BlockLayout, and dynamic data objects that users can create or customize without deep technical knowledge. Built-in multilingual support and a robust API make it suitable for developers building scalable, localized web applications across multiple cloud providers.</p>",
+            "date_published": "2026-10-01T01:01:52+00:00",
+            "date_modified": "2026-10-04T03:40:44+00:00",
+            "tags": [
+                "development",
+                "opensource",
+                "cms",
+                "framework"
+            ],
+            "_source": {
+                "name": "SourceForge",
+                "url": "https://sourceforge.net/projects/xaraya/"
+            },
+            "_athenana": {
+                "kind": "link",
+                "tags": [
+                    {
+                        "name": "development",
+                        "slug": "development"
+                    },
+                    {
+                        "name": "opensource",
+                        "slug": "opensource"
+                    },
+                    {
+                        "name": "cms",
+                        "slug": "cms"
+                    },
+                    {
+                        "name": "framework",
+                        "slug": "framework"
+                    }
+                ]
+            }
+        },
+        {
+            "id": "https://athenana.com/s/01m3t19wn8reaww81zg1m47tjq",
+            "url": "https://www.wyome.com/blog/post.html?id=01m3t19wn8reaww81zg1m47tjq",
+            "external_url": "https://music.apple.com/us/album/flagpole-sitta/1440923485?i=1440923493",
+            "title": "Flagpole Sitta by Harvey Danger on Apple Music",
+            "content_html": "<p>Song · 1998 · Duration 3:37</p>",
+            "date_published": "2026-09-30T20:50:08+00:00",
+            "date_modified": "2026-10-04T03:40:43+00:00",
+            "tags": [
+                "music",
+                "comedy",
+                "1990s",
+                "rock"
+            ],
+            "_video": {
+                "provider": "youtube",
+                "id": "sVt1Dy_LblQ",
+                "thumbnail": "https://athenana.com/p/01m3t1bb3wrk4azp4tth96cezk?v=48888177",
+                "source": "matched"
+            },
+            "_source": {
+                "name": "Apple Music - Web Player",
+                "url": "https://music.apple.com/us/album/flagpole-sitta/1440923485?i=1440923493"
+            },
+            "_athenana": {
+                "kind": "link",
+                "song": {
+                    "channel": "Harvey Danger - Topic",
+                    "duration_seconds": 218
+                },
+                "tags": [
+                    {
+                        "name": "music",
+                        "slug": "music"
+                    },
+                    {
+                        "name": "comedy",
+                        "slug": "comedy"
+                    },
+                    {
+                        "name": "1990s",
+                        "slug": "1990s"
+                    },
+                    {
+                        "name": "rock",
+                        "slug": "rock"
+                    }
+                ]
+            }
+        },
+        {
+            "id": "https://athenana.com/s/01m3t0f9hvx0k92teksftn5dhr",
+            "url": "https://www.wyome.com/blog/post.html?id=01m3t0f9hvx0k92teksftn5dhr",
+            "external_url": "https://www.reddit.com/r/ClaudeAI/comments/1wu40t8/whats_the_one_line_in_your_claudemd_that_made_the/",
+            "title": "What's the one line in your CLAUDE.md that made the biggest difference ?",
+            "content_html": "<p>A social news aggregation and discussion platform where users share content and engage in community conversations.</p>",
+            "date_published": "2026-09-30T20:35:37+00:00",
+            "date_modified": "2026-10-04T03:40:43+00:00",
+            "tags": [
+                "ai",
+                "internet"
+            ],
+            "_source": {
+                "name": "www.reddit.com",
+                "url": "https://www.reddit.com/r/ClaudeAI/comments/1wu40t8/whats_the_one_line_in_your_claudemd_that_made_the/"
+            },
+            "_athenana": {
+                "kind": "link",
+                "tags": [
+                    {
+                        "name": "ai",
+                        "slug": "ai"
+                    },
+                    {
+                        "name": "internet",
+                        "slug": "internet"
+                    }
+                ]
+            }
+        },
+        {
+            "id": "https://athenana.com/s/01m3sx9vxj71zjz0rrfq7p03nq",
+            "url": "https://www.wyome.com/blog/post.html?id=01m3sx9vxj71zjz0rrfq7p03nq",
+            "external_url": "https://www.reddit.com/r/MonarchMoney/comments/1wu576i/recent_updates_roundup_september_2026/",
+            "title": "Recent Updates Roundup - September 2026 : r/MonarchMoney",
+            "content_html": "<p>A roundup of recent updates and new features for Monarch Money personal finance software from September 2026.</p>",
+            "date_published": "2026-09-30T19:40:13+00:00",
+            "date_modified": "2026-10-08T03:08:57+00:00",
+            "tags": [
+                "productivity",
+                "software",
+                "news",
+                "personal finance",
+                "2020s"
+            ],
+            "_athenana": {
+                "kind": "link",
+                "tags": [
+                    {
+                        "name": "productivity",
+                        "slug": "productivity"
+                    },
+                    {
+                        "name": "software",
+                        "slug": "software"
+                    },
+                    {
+                        "name": "news",
+                        "slug": "news"
+                    },
+                    {
+                        "name": "personal finance",
+                        "slug": "personal-finance"
+                    },
+                    {
+                        "name": "2020s",
+                        "slug": "2020s"
+                    }
+                ]
+            }
+        },
+        {
+            "id": "https://athenana.com/s/01m3sc3savemp4x55377mzmy05",
+            "url": "https://www.wyome.com/blog/post.html?id=01m3sc3savemp4x55377mzmy05",
+            "external_url": "https://9to5mac.com/2026/09/29/apple-tv-unveils-chilling-serial-killer-thriller-based-on-bestselling-novel/",
+            "title": "Apple TV unveils chilling serial killer thriller based on bestselling novel - 9to5Mac",
+            "content_html": "<p>Apple TV is launching Nocturne, a thriller series based on Lars Kepler&#039;s novel &quot;The Sandman,&quot; starring Liev Schreiber as a former soldier-turned-detective and Stephen Graham as a serial killer terrorizing a small Pennsylvania town. The series premieres October 30 with two episodes, followed by weekly releases through December 25.</p>",
+            "date_published": "2026-09-30T14:39:48+00:00",
+            "date_modified": "2026-10-04T03:40:43+00:00",
+            "image": "https://athenana.com/p/01m3sc8ktcmfjvvv0dhmfy2asg?v=1e14f2de",
+            "tags": [
+                "television",
+                "thriller",
+                "crime",
+                "streaming",
+                "apple"
+            ],
+            "_source": {
+                "name": "9to5Mac",
+                "url": "https://9to5mac.com/2026/09/29/apple-tv-unveils-chilling-serial-killer-thriller-based-on-bestselling-novel/"
+            },
+            "_athenana": {
+                "kind": "link",
+                "tags": [
+                    {
+                        "name": "television",
+                        "slug": "television"
+                    },
+                    {
+                        "name": "thriller",
+                        "slug": "thriller"
+                    },
+                    {
+                        "name": "crime",
+                        "slug": "crime"
+                    },
+                    {
+                        "name": "streaming",
+                        "slug": "streaming"
+                    },
+                    {
+                        "name": "apple",
+                        "slug": "apple"
+                    }
+                ]
+            }
+        },
+        {
+            "id": "https://athenana.com/s/01m3ryyv0j6bwmcgkma7f6hz44",
+            "url": "https://www.wyome.com/blog/post.html?id=01m3ryyv0j6bwmcgkma7f6hz44",
+            "external_url": "https://www.bbc.com/culture/article/20260929-digger-review",
+            "title": "Digger review: Tom Cruise takes the 'biggest risk of his career' in this 'love-it-or-hate-it' folly ★★★★☆",
+            "content_html": "<p>Directed by Alejandro G Iñárritu, *Digger* is an intentionally bizarre and politically uncompromising eco-satire in which Tom Cruise transforms himself into a bloated, grotesque Texas oil baron whose drilling operation causes a catastrophic iceberg to drift toward Europe, forcing a bumbling US government to respond. The film combines heavy-handed satire about environmental destruction and bureaucratic incompetence with two significant high-concept twists that reframe the entire narrative, making it a divisive &quot;love-it-or-hate-it folly&quot; rather than a prestige picture designed to win awards. Though audiences will likely be divided by its excessive style and sometimes exhausting runtime, *Digger* represents Cruise committing to an unconventional artistic vision with the same ambitious intensity he brings to his action films.</p>",
+            "date_published": "2026-09-30T10:49:54+00:00",
+            "date_modified": "2026-10-04T03:40:43+00:00",
+            "image": "https://athenana.com/p/01m3sc8vk5b6s7x2zj2k9abrgt?v=4469e20e",
+            "tags": [
+                "film",
+                "comedy",
+                "reviews",
+                "climate"
+            ],
+            "_source": {
+                "name": "www.bbc.com",
+                "url": "https://www.bbc.com/culture/article/20260929-digger-review"
+            },
+            "_athenana": {
+                "kind": "link",
+                "tags": [
+                    {
+                        "name": "film",
+                        "slug": "film"
+                    },
+                    {
+                        "name": "comedy",
+                        "slug": "comedy"
+                    },
+                    {
+                        "name": "reviews",
+                        "slug": "reviews"
+                    },
+                    {
+                        "name": "climate",
+                        "slug": "climate"
+                    }
+                ]
+            }
+        },
+        {
+            "id": "https://athenana.com/s/01m3qjrt57ghjndb0pvq1ybv0m",
+            "url": "https://www.wyome.com/blog/post.html?id=01m3qjrt57ghjndb0pvq1ybv0m",
+            "external_url": "https://www.currentreader.app/",
+            "title": "Current - A River of Reading",
+            "content_html": "<p>Current is a premium RSS reader ($9.99 one-time purchase) for Apple devices that organizes feeds by content velocity—breaking news expires within hours while essays remain for weeks—so your reading stream stays fresh without manual curation. It groups feeds into customizable &quot;Currents&quot; for different topics, highlights individual writers as distinct voices rather than faceless sources, and offers nine carefully designed reading themes alongside features like keyboard navigation, offline saving, and sync with multiple backend services. The app prioritizes a serene reading experience with no subscriptions, ads, or tracking.</p>",
+            "date_published": "2026-09-29T21:57:40+00:00",
+            "date_modified": "2026-10-04T03:40:43+00:00",
+            "image": "https://athenana.com/p/01m3rxbx3727r1wb62vdazwm0k?v=09eb3371",
+            "tags": [
+                "productivity",
+                "design",
+                "ios",
+                "macos"
+            ],
+            "_source": {
+                "name": "Current",
+                "url": "https://www.currentreader.app/"
+            },
+            "_athenana": {
+                "kind": "link",
+                "tags": [
+                    {
+                        "name": "productivity",
+                        "slug": "productivity"
+                    },
+                    {
+                        "name": "design",
+                        "slug": "design"
+                    },
+                    {
+                        "name": "ios",
+                        "slug": "ios"
+                    },
+                    {
+                        "name": "macos",
+                        "slug": "macos"
+                    }
+                ]
+            }
+        },
+        {
+            "id": "https://athenana.com/s/01m3pe9red1v8ym8y92c23r4qk",
+            "url": "https://www.wyome.com/blog/post.html?id=01m3pe9red1v8ym8y92c23r4qk",
+            "external_url": "https://webdesignerdepot.com/traditional-web-development-is-dead-and-honestly-good-riddance/",
+            "title": "Traditional Web Development is Dead...(and Honestly? Good Riddance.)",
+            "content_html": "<p>Rather than traditional web development dying, AI and automation are simply the next layer of abstraction that will increase developer leverage—just as previous tools like frameworks and cloud services did before them. The real opportunity lies in shifting from &quot;writing code&quot; to &quot;solving business problems,&quot; focusing on system architecture, product thinking, and AI integration rather than syntax proficiency. With AI handling routine boilerplate work, individual developers can now build complete products alone, making it feasible to launch micro-SaaS ventures or command premium consulting rates without needing entire teams.</p>",
+            "date_published": "2026-09-29T11:20:18+00:00",
+            "date_modified": "2026-10-07T18:09:55+00:00",
+            "image": "https://athenana.com/p/01m3peagkpjv8agjxqskvnz8xz?v=dbeabb2c",
+            "tags": [
+                "technology",
+                "ai",
+                "automation",
+                "careers"
+            ],
+            "_source": {
+                "name": "Web Designer Depot",
+                "url": "https://webdesignerdepot.com/traditional-web-development-is-dead-and-honestly-good-riddance/"
+            },
+            "_athenana": {
+                "kind": "link",
+                "tags": [
+                    {
+                        "name": "technology",
+                        "slug": "technology"
+                    },
+                    {
+                        "name": "ai",
+                        "slug": "ai"
+                    },
+                    {
+                        "name": "automation",
+                        "slug": "automation"
+                    },
+                    {
+                        "name": "careers",
+                        "slug": "careers"
+                    }
+                ]
+            }
+        },
+        {
+            "id": "https://athenana.com/s/01m3pe73n75t4dh54dbc7d8vdj",
+            "url": "https://www.wyome.com/blog/post.html?id=01m3pe73n75t4dh54dbc7d8vdj",
+            "external_url": "https://www.bostonmagazine.com/news/2026/09/13/boston-greek-restaurant-feud-lawsuit-xenia-krasi/?utm_medium=email&utm_source=ten_tabs&utm_campaign=&position=3&category=fascinating_stories&scheduled_corpus_item_id=a51fcbc8-1e5b-4ffc-8ea0-5a45058a7d2f&url=https%3A%2F%2Fwww.bostonmagazine.com%2Fnews%2F2026%2F09%2F13%2Fboston-greek-restaurant-feud-lawsuit-xenia-krasi%2F",
+            "title": "Inside Demetri Tsolakis's Legal Battle With His Former Boss",
+            "content_html": "<p>Demetri Tsolakis rose from a young promoter to become George Aboujaoude&#039;s trusted general manager at the Seaport restaurant Committee, helping build it into a success before launching his own acclaimed Greek restaurant empire starting in 2017. In March 2024, Aboujaoude&#039;s company sued Tsolakis for allegedly misappropriating over $1 million in Committee funds to finance his personal restaurants, presenting checks and invoices suggesting Committee paid for items destined for Krasi and other Xenia establishments, though Tsolakis argues these expenses either benefited Committee directly or occurred with Aboujaoude&#039;s knowledge and approval. The lawsuit comes after years of tension following Tsolakis&#039;s departure from Committee in 2023 and coincides with Aboujaoude&#039;s personal and professional struggles, including the loss of his nightclub Bijou and his ongoing divorce.</p>",
+            "date_published": "2026-09-29T11:18:51+00:00",
+            "date_modified": "2026-10-04T03:40:42+00:00",
+            "image": "https://athenana.com/p/01m3peayxrqhz633ctttm3m2ds?v=eaf64fe5",
+            "tags": [
+                "restaurants",
+                "business"
+            ],
+            "_source": {
+                "name": "Boston Magazine",
+                "url": "https://www.bostonmagazine.com/news/2026/09/13/boston-greek-restaurant-feud-lawsuit-xenia-krasi/?utm_medium=email&utm_source=ten_tabs&utm_campaign=&position=3&category=fascinating_stories&scheduled_corpus_item_id=a51fcbc8-1e5b-4ffc-8ea0-5a45058a7d2f&url=https%3A%2F%2Fwww.bostonmagazine.com%2Fnews%2F2026%2F09%2F13%2Fboston-greek-restaurant-feud-lawsuit-xenia-krasi%2F"
+            },
+            "_athenana": {
+                "kind": "link",
+                "tags": [
+                    {
+                        "name": "restaurants",
+                        "slug": "restaurants"
+                    },
+                    {
+                        "name": "business",
+                        "slug": "business"
+                    }
+                ]
+            }
+        },
+        {
+            "id": "https://athenana.com/s/01m3pe6nwnf9xeqzfjfp8sr64s",
+            "url": "https://www.wyome.com/blog/post.html?id=01m3pe6nwnf9xeqzfjfp8sr64s",
+            "external_url": "https://www.zdnet.com/article/how-to-find-and-remove-your-personal-information-online/?utm_medium=email&utm_source=ten_tabs&utm_campaign=&position=7&category=fascinating_stories&scheduled_corpus_item_id=011c3881-2dda-4e63-891d-5844ea96692a&url=https%3A%2F%2Fwww.zdnet.com%2Farticle%2Fhow-to-find-and-remove-your-personal-information-online%2F",
+            "title": "A stranger can learn a lot about you in 5 minutes online - how to check and delete it ASAP - ZDNET",
+            "content_html": "<p>The article demonstrates how easily strangers can compile detailed personal profiles in minutes using freely available tools—including basic Google searches, people-finder websites like Whitepages, reverse image searches, social media scanning, and AI platforms like ChatGPT. It then provides practical steps for reducing your digital footprint, such as privatizing social media accounts, using Google&#039;s Results About You tool, removing data through broker removal services, and checking Have I Been Pwned to identify exposed passwords from data breaches.</p>",
+            "date_published": "2026-09-29T11:18:37+00:00",
+            "date_modified": "2026-10-05T10:40:23+00:00",
+            "image": "https://athenana.com/p/01m3pedqngghmgfkh86h74df76?v=58bf8112",
+            "tags": [
+                "privacy",
+                "security",
+                "personal finance",
+                "tips"
+            ],
+            "_source": {
+                "name": "ZDNET",
+                "url": "https://www.zdnet.com/article/how-to-find-and-remove-your-personal-information-online/?utm_medium=email&utm_source=ten_tabs&utm_campaign=&position=7&category=fascinating_stories&scheduled_corpus_item_id=011c3881-2dda-4e63-891d-5844ea96692a&url=https%3A%2F%2Fwww.zdnet.com%2Farticle%2Fhow-to-find-and-remove-your-personal-information-online%2F"
+            },
+            "_athenana": {
+                "kind": "link",
+                "tags": [
+                    {
+                        "name": "privacy",
+                        "slug": "privacy"
+                    },
+                    {
+                        "name": "security",
+                        "slug": "security"
+                    },
+                    {
+                        "name": "personal finance",
+                        "slug": "personal-finance"
+                    },
+                    {
+                        "name": "tips",
+                        "slug": "tips"
+                    }
+                ]
+            }
+        },
+        {
+            "id": "https://athenana.com/s/01m3pd8qgghpakmq3x6139k695",
+            "url": "https://www.wyome.com/blog/post.html?id=01m3pd8qgghpakmq3x6139k695",
+            "external_url": "https://www.howtogeek.com/here-is-how-to-find-the-best-dns-server-for-your-home/",
+            "title": "Stop trusting Reddit's DNS recommendations—here's how to find the best one for your home",
+            "content_html": "<p>Rather than assuming popular DNS providers work best for everyone, you should benchmark which DNS server performs fastest on your specific network, since your location and ISP routing both affect speed. The article explains how to use two free benchmark tools (DNS Speed Test and Control D&#039;s DNS Speed Test) to measure latency, jitter, availability, and resolve times across providers, then recommends choosing a reasonably fast option that also offers features you value—like ad-blocking or content filtering—rather than obsessing over marginal millisecond differences.</p>",
+            "date_published": "2026-09-29T11:02:15+00:00",
+            "date_modified": "2026-10-05T10:40:23+00:00",
+            "image": "https://athenana.com/p/01m3pecp77h5fyek03kstxwj2d?v=52e29044",
+            "tags": [
+                "performance",
+                "tutorial",
+                "internet",
+                "dns"
+            ],
+            "_source": {
+                "name": "How-To Geek",
+                "url": "https://www.howtogeek.com/here-is-how-to-find-the-best-dns-server-for-your-home/"
+            },
+            "_athenana": {
+                "kind": "link",
+                "tags": [
+                    {
+                        "name": "performance",
+                        "slug": "performance"
+                    },
+                    {
+                        "name": "tutorial",
+                        "slug": "tutorial"
+                    },
+                    {
+                        "name": "internet",
+                        "slug": "internet"
+                    },
+                    {
+                        "name": "dns",
+                        "slug": "dns"
+                    }
+                ]
+            }
+        },
+        {
+            "id": "https://athenana.com/s/01m3kxa7mdy2af8nxc22yec3d1",
+            "url": "https://www.wyome.com/blog/post.html?id=01m3kxa7mdy2af8nxc22yec3d1",
+            "external_url": "https://www.kiplinger.com/retirement/inheritance/dont-wait-until-youre-gone-why-retirees-are-giving-away-wealth-early",
+            "title": "Early Inheritance: The Pros and Cons of Giving While Living | Kiplinger",
+            "content_html": "<p>Rather than waiting until death to transfer wealth, some affluent older adults are choosing to give money to their adult children and grandchildren during their lifetimes, when recipients are in their 40s and 50s and can use funds for immediate needs like homes and debt repayment. Giving while living offers tax advantages for donors (such as the $19,000 annual gift limit without triggering gift taxes) and eliminates probate delays for heirs, while also allowing givers to witness the impact of their generosity. However, retirees must ensure their own financial security first by separating retirement needs into three categories—stable (essential expenses), variable (discretionary spending), and legacy (gifts)—to avoid running out of money in their later years.</p>",
+            "date_published": "2026-09-28T11:44:59+00:00",
+            "date_modified": "2026-10-04T03:40:40+00:00",
+            "image": "https://athenana.com/p/01m3kxbjznybb9999ae8nw9ma3?v=1f0f6709",
+            "tags": [
+                "retirement",
+                "advice",
+                "personal finance",
+                "gift guide"
+            ],
+            "_source": {
+                "name": "Kiplinger",
+                "url": "https://www.kiplinger.com/retirement/inheritance/dont-wait-until-youre-gone-why-retirees-are-giving-away-wealth-early"
+            },
+            "_athenana": {
+                "kind": "link",
+                "tags": [
+                    {
+                        "name": "retirement",
+                        "slug": "retirement"
+                    },
+                    {
+                        "name": "advice",
+                        "slug": "advice"
+                    },
+                    {
+                        "name": "personal finance",
+                        "slug": "personal-finance"
+                    },
+                    {
+                        "name": "gift guide",
+                        "slug": "gift-guide"
+                    }
+                ]
+            }
+        },
+        {
+            "id": "https://athenana.com/s/01m3krxxmjxhy9ryjztkx1jt7j",
+            "url": "https://www.wyome.com/blog/post.html?id=01m3krxxmjxhy9ryjztkx1jt7j",
+            "external_url": "https://www.nytimes.com/2026/08/18/magazine/national-blackout-power-electricity-outage.html?unlocked_article_code=1.DVE.aani.d0qM5n0DF9wb",
+            "title": "The Blackout That Could Devastate America - The New York Times",
+            "content_html": "<p>A New York Times article examining the vulnerability of America&#039;s power grid to catastrophic failures and blackouts.</p>",
+            "date_published": "2026-09-28T10:28:21+00:00",
+            "date_modified": "2026-10-08T03:08:54+00:00",
+            "image": "https://athenana.com/p/01m3krz6bqy820hf2v8aks73q7?v=0d611bd6",
+            "tags": [
+                "security",
+                "news",
+                "infrastructure",
+                "climate"
+            ],
+            "_athenana": {
+                "kind": "link",
+                "tags": [
+                    {
+                        "name": "security",
+                        "slug": "security"
+                    },
+                    {
+                        "name": "news",
+                        "slug": "news"
+                    },
+                    {
+                        "name": "infrastructure",
+                        "slug": "infrastructure"
+                    },
+                    {
+                        "name": "climate",
+                        "slug": "climate"
+                    }
+                ]
+            }
+        },
+        {
+            "id": "https://athenana.com/s/01m3krhjvqpa7108d1v9bh0jnp",
+            "url": "https://www.wyome.com/blog/post.html?id=01m3krhjvqpa7108d1v9bh0jnp",
+            "external_url": "https://www.reelizer.com/",
+            "title": "Reelizer | Movie Culture, Curated",
+            "content_html": "<p>A curated collection of standout film art, posters, and collectibles, selected since 2011.</p>",
+            "date_published": "2026-09-28T10:21:37+00:00",
+            "date_modified": "2026-10-04T03:40:40+00:00",
+            "image": "https://athenana.com/p/01m3krzscw7870k02bhmqnfaqm?v=c107fd46",
+            "tags": [
+                "design",
+                "art",
+                "film",
+                "cinema"
+            ],
+            "_source": {
+                "name": "Reelizer",
+                "url": "https://www.reelizer.com/"
+            },
+            "_athenana": {
+                "kind": "link",
+                "tags": [
+                    {
+                        "name": "design",
+                        "slug": "design"
+                    },
+                    {
+                        "name": "art",
+                        "slug": "art"
+                    },
+                    {
+                        "name": "film",
+                        "slug": "film"
+                    },
+                    {
+                        "name": "cinema",
+                        "slug": "cinema"
+                    }
+                ]
+            }
+        },
+        {
+            "id": "https://athenana.com/s/01m3j3aq9zcgc5k5emrtnj3mh1",
+            "url": "https://www.wyome.com/blog/post.html?id=01m3j3aq9zcgc5k5emrtnj3mh1",
+            "external_url": "https://bootiemashup.com/best-of-bootie/best-of-bootie-2006/",
+            "title": "Best of Bootie 2006",
+            "content_html": "<p>I can see this is a page describing Bootie&#039;s 2006 annual mashup compilation with bonus tracks, but the content provided doesn&#039;t include the actual article text or arguments that would typically be saved. The page appears to be primarily navigation and structural elements for a music download platform, showing sections for tracks, bonus tracks, videos, monthly top 10 mashups, and themed albums. Without the substantive content of what was actually saved, I cannot write an accurate summary explaining why this particular piece was worth keeping.</p>",
+            "date_published": "2026-09-27T18:51:37+00:00",
+            "date_modified": "2026-10-04T03:40:40+00:00",
+            "image": "https://athenana.com/p/01m3kmv6zkp3ww3thy61mh4h3b?v=b4cc43b6",
+            "tags": [
+                "audio",
+                "music"
+            ],
+            "_source": {
+                "name": "Bootie Mashup",
+                "url": "https://bootiemashup.com/best-of-bootie/best-of-bootie-2006/"
+            },
+            "_athenana": {
+                "kind": "link",
+                "tags": [
+                    {
+                        "name": "audio",
+                        "slug": "audio"
+                    },
+                    {
+                        "name": "music",
+                        "slug": "music"
+                    }
+                ]
+            }
+        },
+        {
+            "id": "https://athenana.com/s/01m3hdwf5hgvdtyp330372mt0y",
+            "url": "https://www.wyome.com/blog/post.html?id=01m3hdwf5hgvdtyp330372mt0y",
+            "external_url": "https://www.reddit.com/r/ClaudeAI/comments/1wr140j/i_built_my_own_monarchstyle_finance_dashboard/",
+            "title": "I built my own Monarch-style finance dashboard with Opus 5.5 for less than $20 : r/ClaudeAI",
+            "content_html": "<p>A developer built a Monarch-style personal finance dashboard using Claude Opus 5.5 for under $20.</p>",
+            "date_published": "2026-09-27T12:36:50+00:00",
+            "date_modified": "2026-10-04T03:40:40+00:00",
+            "tags": [
+                "productivity",
+                "diy",
+                "ai",
+                "personal finance",
+                "claude"
+            ],
+            "_source": {
+                "name": "www.reddit.com",
+                "url": "https://www.reddit.com/r/ClaudeAI/comments/1wr140j/i_built_my_own_monarchstyle_finance_dashboard/"
+            },
+            "_athenana": {
+                "kind": "link",
+                "tags": [
+                    {
+                        "name": "productivity",
+                        "slug": "productivity"
+                    },
+                    {
+                        "name": "diy",
+                        "slug": "diy"
+                    },
+                    {
+                        "name": "ai",
+                        "slug": "ai"
+                    },
+                    {
+                        "name": "personal finance",
+                        "slug": "personal-finance"
+                    },
+                    {
+                        "name": "claude",
+                        "slug": "claude"
+                    }
+                ]
+            }
+        },
+        {
+            "id": "https://athenana.com/s/01m3hdsc1jcrnb67fcsrmz51sj",
+            "url": "https://www.wyome.com/blog/post.html?id=01m3hdsc1jcrnb67fcsrmz51sj",
+            "external_url": "https://www.reddit.com/r/ClaudeAI/comments/1wqztx3/i_built_a_newsdriven_world_map_of_current/",
+            "title": "I built a news-driven world map of current conflicts with Claude Code : r/ClaudeAI",
+            "content_html": "<p>A user-built interactive world map displaying current conflicts using Claude&#039;s coding capabilities.</p>",
+            "date_published": "2026-09-27T12:35:08+00:00",
+            "date_modified": "2026-10-07T18:09:55+00:00",
+            "tags": [
+                "ai",
+                "news"
+            ],
+            "_athenana": {
+                "kind": "link",
+                "tags": [
+                    {
+                        "name": "ai",
+                        "slug": "ai"
+                    },
+                    {
+                        "name": "news",
+                        "slug": "news"
+                    }
+                ]
+            }
+        },
+        {
+            "id": "https://athenana.com/s/01m3ft7swsz9pvr87f2nyzzfzj",
+            "url": "https://www.wyome.com/blog/post.html?id=01m3ft7swsz9pvr87f2nyzzfzj",
+            "external_url": "https://linktr.ee/theradbrewco?utm_source=linktree_profile_share&ltsid=3c98d5dc-125a-4a14-b515-abf982931437",
+            "title": "River Arts District Brewing Co Restaurant - Visit to Find Food Options & See River Arts District Brewing Co Social Media & Official Accounts | Linktree",
+            "content_html": "<p>A community driven brewery and taproom located in the River Arts District.</p>",
+            "date_published": "2026-09-26T21:34:15+00:00",
+            "date_modified": "2026-10-04T03:40:40+00:00",
+            "image": "https://athenana.com/p/01m3hfh8nd4aq166zns42bck4h?v=6a683a3e",
+            "tags": [
+                "north carolina",
+                "restaurants",
+                "entertainment",
+                "community",
+                "breweries"
+            ],
+            "_source": {
+                "name": "Linktree",
+                "url": "https://linktr.ee/theradbrewco?utm_source=linktree_profile_share&ltsid=3c98d5dc-125a-4a14-b515-abf982931437"
+            },
+            "_athenana": {
+                "kind": "link",
+                "tags": [
+                    {
+                        "name": "north carolina",
+                        "slug": "north-carolina"
+                    },
+                    {
+                        "name": "restaurants",
+                        "slug": "restaurants"
+                    },
+                    {
+                        "name": "entertainment",
+                        "slug": "entertainment"
+                    },
+                    {
+                        "name": "community",
+                        "slug": "community"
+                    },
+                    {
+                        "name": "breweries",
+                        "slug": "breweries"
+                    }
+                ]
+            }
+        },
+        {
+            "id": "https://athenana.com/s/01m3ety5zd265gzaz26qsyc5ba",
+            "url": "https://www.wyome.com/blog/post.html?id=01m3ety5zd265gzaz26qsyc5ba",
+            "external_url": "https://www.youtube.com/watch?v=RjEZaUBbUvU",
+            "title": "THE FURTHER MIS-ADVENTURES OF CLIFF BOOTH | Official Trailer | Netflix - YouTube",
+            "content_html": "<p>Brad Pitt returns as Cliff Booth, only this time it’s 1977 and it’s a very different Hollywood.Directed by David Fincher from a screenplay by Quentin Taranti...</p>",
+            "date_published": "2026-09-26T12:27:14+00:00",
+            "date_modified": "2026-10-04T03:40:03+00:00",
+            "tags": [
+                "film",
+                "1970s",
+                "hollywood",
+                "cinema",
+                "netflix"
+            ],
+            "_video": {
+                "provider": "youtube",
+                "id": "RjEZaUBbUvU",
+                "thumbnail": "https://athenana.com/p/01m3ety75t18g04cv1nptsvgg8?v=5bc88214",
+                "source": "url"
+            },
+            "_source": {
+                "name": "YouTube",
+                "url": "https://www.youtube.com/watch?v=RjEZaUBbUvU"
+            },
+            "_athenana": {
+                "kind": "link",
+                "tags": [
+                    {
+                        "name": "film",
+                        "slug": "film"
+                    },
+                    {
+                        "name": "1970s",
+                        "slug": "1970s"
+                    },
+                    {
+                        "name": "hollywood",
+                        "slug": "hollywood"
+                    },
+                    {
+                        "name": "cinema",
+                        "slug": "cinema"
+                    },
+                    {
+                        "name": "netflix",
+                        "slug": "netflix"
+                    }
+                ]
+            }
+        },
+        {
+            "id": "https://athenana.com/s/01m3etx3gcgm9c00t9p2bxavk7",
+            "url": "https://www.wyome.com/blog/post.html?id=01m3etx3gcgm9c00t9p2bxavk7",
+            "external_url": "https://animationobsessive.substack.com/p/why-whats-opera-doc-looks-like-that",
+            "title": "Why ‘What’s Opera, Doc?’ Looks Like That",
+            "content_html": "<p>Maurice Noble&#039;s design work was essential to the success of What&#039;s Opera, Doc? (1957), transforming Chuck Jones&#039;s initial concept from a stagey theatrical production into an over-the-top operatic satire through experimental color choices, dramatic layouts, and innovative techniques like the spotlight effect. Working collaboratively with Jones, Noble adjusted his background designs to support the story and emotional tone rather than overwhelm it, making each of the film&#039;s 100+ shots visually distinctive while maintaining narrative clarity. Though the production was more ambitious and expensive than typical Warner cartoons, What&#039;s Opera, Doc? initially received little critical attention before eventually becoming regarded as a masterpiece, largely through the success of Noble&#039;s visual approach and his willingness to take design risks.</p>",
+            "date_published": "2026-09-26T12:26:39+00:00",
+            "date_modified": "2026-10-05T10:40:06+00:00",
+            "image": "https://athenana.com/p/01m3hfgkca22sk1mqpepsajqks?v=de78f6ec",
+            "tags": [
+                "design",
+                "animation",
+                "1950s",
+                "classics"
+            ],
+            "_source": {
+                "name": "animationobsessive.substack.com",
+                "url": "https://animationobsessive.substack.com/p/why-whats-opera-doc-looks-like-that"
+            },
+            "_athenana": {
+                "kind": "link",
+                "tags": [
+                    {
+                        "name": "design",
+                        "slug": "design"
+                    },
+                    {
+                        "name": "animation",
+                        "slug": "animation"
+                    },
+                    {
+                        "name": "1950s",
+                        "slug": "1950s"
+                    },
+                    {
+                        "name": "classics",
+                        "slug": "classics"
+                    }
+                ]
+            }
+        },
+        {
+            "id": "https://athenana.com/s/01m3er77vam9z531ywjmfh9zmq",
+            "url": "https://www.wyome.com/blog/post.html?id=01m3er77vam9z531ywjmfh9zmq",
+            "external_url": "https://gcdatlas.com/#o=sun&c=0.287%2C0.240%2C1.800&tour=grand",
+            "title": "gcdatlas",
+            "content_html": "<p>The real universe, drawn entirely in ASCII. Zoom from Earth to the edge of the observable universe.</p>",
+            "date_published": "2026-09-26T11:39:45+00:00",
+            "date_modified": "2026-10-03T03:42:23+00:00",
+            "tags": [
+                "science"
+            ],
+            "_source": {
+                "name": "gcdatlas.com",
+                "url": "https://gcdatlas.com/#o=sun&c=0.287%2C0.240%2C1.800&tour=grand"
+            },
+            "_athenana": {
+                "kind": "link",
+                "tags": [
+                    {
+                        "name": "science",
+                        "slug": "science"
+                    }
+                ]
+            }
+        },
+        {
+            "id": "https://athenana.com/s/01m3er4f2q9qr9hh2wtaz94j24",
+            "url": "https://www.wyome.com/blog/post.html?id=01m3er4f2q9qr9hh2wtaz94j24",
+            "external_url": "https://www.nytimes.com/interactive/2026/arts/television/watch-tv-shows-21st-century.html",
+            "title": "The Best TV Shows of the 21st Century: What to Watch - The New York Times",
+            "content_html": "<p>A curated list of the best television shows from the 2000s onward, recommended by The New York Times.</p>",
+            "date_published": "2026-09-26T11:38:14+00:00",
+            "date_modified": "2026-10-08T03:08:51+00:00",
+            "image": "https://athenana.com/p/01m3et9ssmhq35khwpm1ttz0w0?v=a1275acf",
+            "tags": [
+                "television",
+                "recommendations",
+                "entertainment"
+            ],
+            "_athenana": {
+                "kind": "link",
+                "tags": [
+                    {
+                        "name": "television",
+                        "slug": "television"
+                    },
+                    {
+                        "name": "recommendations",
+                        "slug": "recommendations"
+                    },
+                    {
+                        "name": "entertainment",
+                        "slug": "entertainment"
+                    }
+                ]
+            }
+        },
+        {
+            "id": "https://athenana.com/s/01m3djcewe3hqjcbe358tmxby6",
+            "url": "https://www.wyome.com/blog/post.html?id=01m3djcewe3hqjcbe358tmxby6",
+            "external_url": "https://music.apple.com/us/album/god-shuffled-his-feet/309226405?i=309226518",
+            "title": "God Shuffled His Feet by Crash Test Dummies on Apple Music",
+            "content_html": "<p>Song · 1993 · Duration 5:10</p>",
+            "date_published": "2026-09-26T00:38:31+00:00",
+            "date_modified": "2026-10-03T03:42:23+00:00",
+            "tags": [
+                "vintage",
+                "music",
+                "1990s",
+                "rock"
+            ],
+            "_video": {
+                "provider": "youtube",
+                "id": "iBiEicBn2is",
+                "thumbnail": "https://athenana.com/p/01m3djczyp1r7ejrsf88ndwbff?v=89a5d606",
+                "source": "matched"
+            },
+            "_source": {
+                "name": "Apple Music - Web Player",
+                "url": "https://music.apple.com/us/album/god-shuffled-his-feet/309226405?i=309226518"
+            },
+            "_athenana": {
+                "kind": "link",
+                "song": {
+                    "channel": "Canalman",
+                    "duration_seconds": 310
+                },
+                "tags": [
+                    {
+                        "name": "vintage",
+                        "slug": "vintage"
+                    },
+                    {
+                        "name": "music",
+                        "slug": "music"
+                    },
+                    {
+                        "name": "1990s",
+                        "slug": "1990s"
+                    },
+                    {
+                        "name": "rock",
+                        "slug": "rock"
+                    }
+                ]
+            }
+        },
+        {
+            "id": "https://athenana.com/s/01m3cm7x6xx9n1mctekwmwp5zp",
+            "url": "https://www.wyome.com/blog/post.html?id=01m3cm7x6xx9n1mctekwmwp5zp",
+            "external_url": "https://www.outsideonline.com/health/wellness/fireflies-light-pollution-circadian-rhythm-sleep-longevity/",
+            "title": "What Fireflies Teach Us About Sleep, Light Pollution, and Longevity",
+            "content_html": "<p>Dr. Ingrid Yang draws a parallel between declining firefly populations in Bali and human sleep disorders caused by artificial nighttime light. Through her encounter with conservationist Wayan Wardika, she reveals that both fireflies and humans rely on darkness for critical biological signaling—fireflies for mating via bioluminescence, humans for melatonin production and sleep regulation—yet artificial lighting disrupts both systems identically. Recent research showing that nighttime light exposure increases risks of cardiometabolic disease, type 2 diabetes, and mortality suggests that restoring natural darkness cycles (through dimmer, warmer evening lighting and consistent sleep schedules) benefits human longevity in the same way it rescues firefly populations.</p>",
+            "date_published": "2026-09-25T15:51:44+00:00",
+            "date_modified": "2026-10-03T03:42:23+00:00",
+            "image": "https://athenana.com/p/01m3cmdy4qz8fm0tqftqxv09mx?v=bc4b15c2",
+            "tags": [
+                "health",
+                "sleep",
+                "travel",
+                "nature"
+            ],
+            "_source": {
+                "name": "Outside",
+                "url": "https://www.outsideonline.com/health/wellness/fireflies-light-pollution-circadian-rhythm-sleep-longevity/"
+            },
+            "_athenana": {
+                "kind": "link",
+                "tags": [
+                    {
+                        "name": "health",
+                        "slug": "health"
+                    },
+                    {
+                        "name": "sleep",
+                        "slug": "sleep"
+                    },
+                    {
+                        "name": "travel",
+                        "slug": "travel"
+                    },
+                    {
+                        "name": "nature",
+                        "slug": "nature"
+                    }
+                ]
+            }
+        },
+        {
+            "id": "https://athenana.com/s/01m3cm79zqd65erz2em3tqv1mx",
+            "url": "https://www.wyome.com/blog/post.html?id=01m3cm79zqd65erz2em3tqv1mx",
+            "external_url": "https://mossandfog.com/fall-foliage-map/",
+            "title": "The Turning: How Fall Color Moves Across North America",
+            "content_html": "<p>Fall foliage doesn&#039;t arrive on a calendar date but as a wave that rolls across North America over twelve weeks, driven by latitude, elevation, and proximity to coasts. This interactive map models that progression as a continuous surface rather than state-by-state blocks, showing how sugar maples peak red in New England while aspens turn gold in the Rockies and oaks bronze in the Southeast. The best strategy for seeing peak color isn&#039;t chasing a single week but driving a north-to-south or high-to-low route over several days, guaranteeing some portion of the journey will catch the foliage at its best.</p>",
+            "date_published": "2026-09-25T15:51:24+00:00",
+            "date_modified": "2026-10-03T03:42:22+00:00",
+            "image": "https://athenana.com/p/01m3cme8m7w6mqhxedfh8eaagm?v=6de6a758",
+            "tags": [
+                "travel",
+                "nature"
+            ],
+            "_source": {
+                "name": "Moss and Fog",
+                "url": "https://mossandfog.com/fall-foliage-map/"
+            },
+            "_athenana": {
+                "kind": "link",
+                "tags": [
+                    {
+                        "name": "travel",
+                        "slug": "travel"
+                    },
+                    {
+                        "name": "nature",
+                        "slug": "nature"
+                    }
+                ]
+            }
+        },
+        {
+            "id": "https://athenana.com/s/01m3cm2mnqngkk4vn6ssn8e031",
+            "url": "https://www.wyome.com/blog/post.html?id=01m3cm2mnqngkk4vn6ssn8e031",
+            "external_url": "https://www.eater.com/eater-at-home/988494/why-chefs-love-stainless-steel-cookware",
+            "title": "Why Chefs Love Cooking on Stainless Steel | Eater",
+            "content_html": "<p>Stainless steel cookware is experiencing renewed popularity among home cooks after years of nonstick dominance, driven by consumers seeking durable, long-lasting investments rather than quick fixes. Professional chefs champion stainless steel for its reliability, even heating, and ability to create a natural nonstick surface through proper technique (the Leidenfrost effect), along with its durability—it won&#039;t scratch, react with acidic foods, or degrade like nonstick coatings do. As cost-of-living pressures mount and people grow skeptical of nonstick pans that eventually lose effectiveness, stainless steel&#039;s potential to last decades with proper care makes it an increasingly attractive option for both home and professional kitchens.</p>",
+            "date_published": "2026-09-25T15:48:52+00:00",
+            "date_modified": "2026-10-05T10:40:06+00:00",
+            "image": "https://athenana.com/p/01m3cmeepkpd4y848qmd5ghmys?v=4b3d3967",
+            "tags": [
+                "cooking",
+                "kitchen",
+                "advice"
+            ],
+            "_source": {
+                "name": "Eater",
+                "url": "https://www.eater.com/eater-at-home/988494/why-chefs-love-stainless-steel-cookware"
+            },
+            "_athenana": {
+                "kind": "link",
+                "tags": [
+                    {
+                        "name": "cooking",
+                        "slug": "cooking"
+                    },
+                    {
+                        "name": "kitchen",
+                        "slug": "kitchen"
+                    },
+                    {
+                        "name": "advice",
+                        "slug": "advice"
+                    }
+                ]
+            }
+        },
+        {
+            "id": "https://athenana.com/s/01m3cccctsmftyjevxze415r98",
+            "url": "https://www.wyome.com/blog/post.html?id=01m3cccctsmftyjevxze415r98",
+            "external_url": "https://camillestyles.com/wellness/nutrition/high-protein-high-fiber-smoothie/?utm_campaign=0&utm_content=link_id%3Futm_source%3Dflodesk&utm_content=link_id&utm_id=08.18.2026&utm_medium=email&utm_medium=email&utm_source=flodesk",
+            "title": "High-Protein, High-Fiber Smoothies to Fuel Your Day",
+            "content_html": "<p>The guide argues that the key to a satisfying smoothie is combining protein (20-30 grams for a meal) with fiber-rich ingredients (8-10 grams), healthy fat, and produce, since fruit and liquid alone won&#039;t keep you full. It provides a flexible formula for building smoothies—choose a protein source like Greek yogurt or protein powder, add 1-2 cups of fruit or vegetables, include concentrated fiber from seeds or oats, add healthy fat, and incorporate liquid—along with specific ingredient swaps and six recipe examples to show how the formula works in practice. The piece emphasizes that individual nutritional needs vary, so these targets are starting points rather than universal rules, and that pairing carbohydrates with protein, fiber, and fat creates a more balanced meal that sustains hunger longer.</p>",
+            "date_published": "2026-09-25T13:34:23+00:00",
+            "date_modified": "2026-10-03T03:42:20+00:00",
+            "image": "https://athenana.com/p/01m3cmektj7mxq6dx9de9ryt4w?v=ab5b908f",
+            "tags": [
+                "nutrition",
+                "recipes",
+                "breakfast",
+                "healthy eating"
+            ],
+            "_source": {
+                "name": "Camille Styles",
+                "url": "https://camillestyles.com/wellness/nutrition/high-protein-high-fiber-smoothie/?utm_campaign=0&utm_content=link_id%3Futm_source%3Dflodesk&utm_content=link_id&utm_id=08.18.2026&utm_medium=email&utm_medium=email&utm_source=flodesk"
+            },
+            "_athenana": {
+                "kind": "link",
+                "tags": [
+                    {
+                        "name": "nutrition",
+                        "slug": "nutrition"
+                    },
+                    {
+                        "name": "recipes",
+                        "slug": "recipes"
+                    },
+                    {
+                        "name": "breakfast",
+                        "slug": "breakfast"
+                    },
+                    {
+                        "name": "healthy eating",
+                        "slug": "healthy-eating"
+                    }
+                ]
+            }
+        },
+        {
+            "id": "https://athenana.com/s/01m3catn2cz0wrawrygp0h6ka4",
+            "url": "https://www.wyome.com/blog/post.html?id=01m3catn2cz0wrawrygp0h6ka4",
+            "external_url": "https://music.apple.com/us/album/silencio/6812412381?i=6812412673",
+            "title": "Silencio by U2 on Apple Music",
+            "content_html": "<p>Song · 2026 · Duration 2:35</p>",
+            "date_published": "2026-09-25T13:07:13+00:00",
+            "date_modified": "2026-10-03T03:42:20+00:00",
+            "tags": [
+                "music",
+                "rock"
+            ],
+            "_video": {
+                "provider": "youtube",
+                "id": "1mCN-RDh0-0",
+                "thumbnail": "https://athenana.com/p/01m3caw2qg1v6xhz7688ksynn6?v=ebe7524f",
+                "source": "matched"
+            },
+            "_source": {
+                "name": "Apple Music - Web Player",
+                "url": "https://music.apple.com/us/album/silencio/6812412381?i=6812412673"
+            },
+            "_athenana": {
+                "kind": "link",
+                "song": {
+                    "channel": "U2VEVO",
+                    "duration_seconds": 155
+                },
+                "tags": [
+                    {
+                        "name": "music",
+                        "slug": "music"
+                    },
+                    {
+                        "name": "rock",
+                        "slug": "rock"
+                    }
+                ]
+            }
+        },
+        {
+            "id": "https://athenana.com/s/01m3caf6wzqx2sbhtr8vzynav8",
+            "url": "https://www.wyome.com/blog/post.html?id=01m3caf6wzqx2sbhtr8vzynav8",
+            "external_url": "https://www.howtogeek.com/microsoft-excel-tools-fix-other-peoples-messy-spreadsheets/",
+            "title": "Someone else's Excel spreadsheet, my problem now—these 5 tools help me handle it",
+            "content_html": "<p>A guide to five essential tools for managing and working with Excel spreadsheets inherited from others.</p>",
+            "date_published": "2026-09-25T13:00:58+00:00",
+            "date_modified": "2026-10-08T03:08:48+00:00",
+            "image": "https://athenana.com/p/01m3cmfqdax1fc0dv1tgca22kk?v=0839a226",
+            "tags": [
+                "productivity",
+                "work",
+                "tips",
+                "tools",
+                "excel"
+            ],
+            "_athenana": {
+                "kind": "link",
+                "tags": [
+                    {
+                        "name": "productivity",
+                        "slug": "productivity"
+                    },
+                    {
+                        "name": "work",
+                        "slug": "work"
+                    },
+                    {
+                        "name": "tips",
+                        "slug": "tips"
+                    },
+                    {
+                        "name": "tools",
+                        "slug": "tools"
+                    },
+                    {
+                        "name": "excel",
+                        "slug": "excel"
+                    }
+                ]
+            }
+        },
+        {
+            "id": "https://athenana.com/s/01m3b3cysxekcxj4rcp31rs01x",
+            "url": "https://www.wyome.com/blog/post.html?id=01m3b3cysxekcxj4rcp31rs01x",
+            "external_url": "https://www.legion.org/information-center/news/security/2026/september/8-servicemembers-in-lincoln-strike-group-attempted-suicide-on-recent-deployment?utm_campaign=Source+Code+Here&utm_content=NATIONAL%20SECURITY&utm_term=newsletter&utm_medium=email&utm_source=Adestra",
+            "title": "8 servicemembers in Lincoln strike group attempted suicide on recent deployment | The American Legion",
+            "content_html": "<p>Acting Navy Secretary Hung Cao disclosed that eight servicemembers aboard the USS Abraham Lincoln attempted suicide during a deployment exceeding 200 days of combat operations in the Middle East, contradicting earlier dismissals of mental health concerns by Trump administration officials and military leadership as &quot;dishonest&quot; media reports. The revelation came in a letter to Senator Kirsten Gillibrand after Stars and Stripes and other outlets had reported deteriorating conditions aboard the carrier during an extended deployment nearing a post-Vietnam War record, prompting calls for investigation from lawmakers. The Navy emphasized that no actual suicides occurred and that adequate mental health resources were available, while the service announced plans to improve future deployments through increased logistics and quality-of-life measures.</p>",
+            "date_published": "2026-09-25T01:38:09+00:00",
+            "date_modified": "2026-10-03T03:42:19+00:00",
+            "image": "https://athenana.com/p/01m3b3evegzgmmyas5r237ytfz?v=567d1d38",
+            "tags": [
+                "wellness",
+                "mental health",
+                "news",
+                "military"
+            ],
+            "_source": {
+                "name": "The American Legion",
+                "url": "https://www.legion.org/information-center/news/security/2026/september/8-servicemembers-in-lincoln-strike-group-attempted-suicide-on-recent-deployment?utm_campaign=Source+Code+Here&utm_content=NATIONAL%20SECURITY&utm_term=newsletter&utm_medium=email&utm_source=Adestra"
+            },
+            "_athenana": {
+                "kind": "link",
+                "tags": [
+                    {
+                        "name": "wellness",
+                        "slug": "wellness"
+                    },
+                    {
+                        "name": "mental health",
+                        "slug": "mental-health"
+                    },
+                    {
+                        "name": "news",
+                        "slug": "news"
+                    },
+                    {
+                        "name": "military",
+                        "slug": "military"
+                    }
+                ]
+            }
+        },
+        {
+            "id": "https://athenana.com/s/01m3ac4n1rypjjr13fa7g8g786",
+            "url": "https://www.wyome.com/blog/post.html?id=01m3ac4n1rypjjr13fa7g8g786",
+            "external_url": "https://claude.com/marketplace/agents-products",
+            "title": "Agents and products | Claude Marketplace | Claude by Anthropic",
+            "content_html": "<p>The Claude Marketplace allows enterprises to apply their existing Anthropic commitments across multiple Claude-powered software tools—including platforms for code review, app development, legal work, and data analysis—rather than managing separate contracts with individual vendors. This consolidation simplifies purchasing and budgeting while giving organizations access to vetted, enterprise-grade partners that can be added flexibly as needs change.</p>",
+            "date_published": "2026-09-24T18:51:40+00:00",
+            "date_modified": "2026-10-03T03:42:18+00:00",
+            "image": "https://athenana.com/p/01m3acm4qabt4q4pa6x993zsyt?v=c78b945a",
+            "tags": [
+                "ai",
+                "development",
+                "business",
+                "tools"
+            ],
+            "_source": {
+                "name": "Claude",
+                "url": "https://claude.com/marketplace/agents-products"
+            },
+            "_athenana": {
+                "kind": "link",
+                "tags": [
+                    {
+                        "name": "ai",
+                        "slug": "ai"
+                    },
+                    {
+                        "name": "development",
+                        "slug": "development"
+                    },
+                    {
+                        "name": "business",
+                        "slug": "business"
+                    },
+                    {
+                        "name": "tools",
+                        "slug": "tools"
+                    }
+                ]
+            }
+        },
+        {
+            "id": "https://athenana.com/s/01m3a8bbsxnykh3qbh2gg1hzsw",
+            "url": "https://www.wyome.com/blog/post.html?id=01m3a8bbsxnykh3qbh2gg1hzsw",
+            "external_url": "https://www.orphanedfilms.com/",
+            "title": "Orphaned Films",
+            "content_html": "<p>Forgotten films, found. Watch the films nobody claimed, hosted by the Internet Archive. Television channels that run round the clock, curated lists, and a player that remembers where you were.</p>",
+            "date_published": "2026-09-24T17:45:26+00:00",
+            "date_modified": "2026-10-03T03:42:18+00:00",
+            "image": "https://athenana.com/p/01m3acmh9g1mbct67cswb94dn9?v=34ff6691",
+            "tags": [
+                "history",
+                "streaming",
+                "documentary",
+                "cinema"
+            ],
+            "_source": {
+                "name": "Orphaned Films",
+                "url": "https://www.orphanedfilms.com/"
+            },
+            "_athenana": {
+                "kind": "link",
+                "tags": [
+                    {
+                        "name": "history",
+                        "slug": "history"
+                    },
+                    {
+                        "name": "streaming",
+                        "slug": "streaming"
+                    },
+                    {
+                        "name": "documentary",
+                        "slug": "documentary"
+                    },
+                    {
+                        "name": "cinema",
+                        "slug": "cinema"
+                    }
+                ]
+            }
+        },
+        {
+            "id": "https://athenana.com/s/01m3a7q0wwyvt8ym9e1a7xn11r",
+            "url": "https://www.wyome.com/blog/post.html?id=01m3a7q0wwyvt8ym9e1a7xn11r",
+            "external_url": "https://www.reddit.com/r/ClaudeAI/s/PSJ1HBmNLj",
+            "title": "8 Claude workflow tips from daily use (mostly Claude Code)",
+            "date_published": "2026-09-24T17:34:19+00:00",
+            "date_modified": "2026-10-03T03:42:18+00:00",
+            "_athenana": {
+                "kind": "link"
+            }
+        },
+        {
+            "id": "https://athenana.com/s/01m3a3a5jxrm65t2pd63x2z606",
+            "url": "https://www.wyome.com/blog/post.html?id=01m3a3a5jxrm65t2pd63x2z606",
+            "external_url": "https://www.yankodesign.com/2026/09/23/5-best-coffee-gadgets-tools-built-for-people-who-take-their-morning-seriously/?utm_source=rss&utm_medium=rss&utm_campaign=5-best-coffee-gadgets-tools-built-for-people-who-take-their-morning-seriously",
+            "title": "5 Best Coffee Gadgets & Tools Built for People Who Take Their Morning Seriously - Yanko Design",
+            "content_html": "<p>This gift guide profiles five premium coffee tools for people who view their morning brew as ritual rather than convenience, from the $799 xBloom machine that reads NFC tags to automate the entire brewing process, to the manual COFFEEJACK V2 hand-crank espresso maker and the Arc Mug handcrafted in Taiwan. Each product represents a distinct philosophy—automation, minimalism, craftsmanship, manual effort, and portability—chosen for their ability to transform the morning experience rather than simply accelerate it. The piece argues that the best coffee setups are built intentionally over time as you discover your own brewing philosophy, and that the right tools earn their counter space by making the ritual itself feel complete.</p>",
+            "date_published": "2026-09-24T16:17:24+00:00",
+            "date_modified": "2026-10-05T10:40:23+00:00",
+            "image": "https://athenana.com/p/01m3acnb8h74dczwgjesvjkd3e?v=fd40511e",
+            "tags": [
+                "design",
+                "coffee",
+                "tools",
+                "gadgets"
+            ],
+            "_source": {
+                "name": "Yanko Design - Modern Industrial Design News",
+                "url": "https://www.yankodesign.com/2026/09/23/5-best-coffee-gadgets-tools-built-for-people-who-take-their-morning-seriously/?utm_source=rss&utm_medium=rss&utm_campaign=5-best-coffee-gadgets-tools-built-for-people-who-take-their-morning-seriously"
+            },
+            "_athenana": {
+                "kind": "link",
+                "tags": [
+                    {
+                        "name": "design",
+                        "slug": "design"
+                    },
+                    {
+                        "name": "coffee",
+                        "slug": "coffee"
+                    },
+                    {
+                        "name": "tools",
+                        "slug": "tools"
+                    },
+                    {
+                        "name": "gadgets",
+                        "slug": "gadgets"
+                    }
+                ]
+            }
+        },
+        {
+            "id": "https://athenana.com/s/01m3a35v7dcb672xt2ab8py5xe",
+            "url": "https://www.wyome.com/blog/post.html?id=01m3a35v7dcb672xt2ab8py5xe",
+            "external_url": "https://www.thetakeout.com/2260889/best-family-owned-pizza-joints-us/",
+            "title": "11 Best Family-Owned Pizza Joints Across The US",
+            "content_html": "<p>This article profiles ten exceptional family-owned pizzerias across the United States, highlighting establishments where recipes and techniques have been passed down through generations or represent the personal vision of dedicated pizza craftspeople. Each pizzeria is featured with details about its history, signature style, and what makes it distinctive—from Frank Pepe&#039;s legendary white clam pizza in Connecticut to King Dough&#039;s naturally fermented Neapolitan pies in Indiana to Papa&#039;s Tomato Pies, the oldest continuously family-run pizzeria in America. The selections were determined through national award rankings, expert food critic reviews, and social media recognition from loyal local customers.</p>",
+            "date_published": "2026-09-24T16:15:02+00:00",
+            "date_modified": "2026-10-08T15:50:08+00:00",
+            "image": "https://athenana.com/p/01m3acnnfywfq20wdmcppxencn?v=302e9f9f",
+            "tags": [
+                "food",
+                "restaurants",
+                "united states"
+            ],
+            "_source": {
+                "name": "The Takeout",
+                "url": "https://www.thetakeout.com/2260889/best-family-owned-pizza-joints-us/"
+            },
+            "_athenana": {
+                "kind": "link",
+                "tags": [
+                    {
+                        "name": "food",
+                        "slug": "food"
+                    },
+                    {
+                        "name": "restaurants",
+                        "slug": "restaurants"
+                    },
+                    {
+                        "name": "united states",
+                        "slug": "united-states"
+                    }
+                ]
+            }
+        },
+        {
+            "id": "https://athenana.com/s/01m39zkqmm9jfbjf0ssdcfefry",
+            "url": "https://www.wyome.com/blog/post.html?id=01m39zkqmm9jfbjf0ssdcfefry",
+            "external_url": "https://www.gearpatrol.com/audio/fiio-dp11-cd-player/",
+            "title": "This Compact CD Player Is an Affordable Way to Start Listening to CDs Again",
+            "content_html": "<p>An affordable compact CD player that makes it easy to revisit physical music media.</p>",
+            "date_published": "2026-09-24T15:12:43+00:00",
+            "date_modified": "2026-10-03T03:42:17+00:00",
+            "image": "https://athenana.com/p/01m3acpk4mwh6ba17rsw8rsmcn?v=5859afe1",
+            "tags": [
+                "audio",
+                "vintage",
+                "budget",
+                "gadgets"
+            ],
+            "_athenana": {
+                "kind": "link",
+                "tags": [
+                    {
+                        "name": "audio",
+                        "slug": "audio"
+                    },
+                    {
+                        "name": "vintage",
+                        "slug": "vintage"
+                    },
+                    {
+                        "name": "budget",
+                        "slug": "budget"
+                    },
+                    {
+                        "name": "gadgets",
+                        "slug": "gadgets"
+                    }
+                ]
+            }
+        },
+        {
+            "id": "https://athenana.com/s/01m39d0xs6446m1yrs01wd3wc3",
+            "url": "https://www.wyome.com/blog/post.html?id=01m39d0xs6446m1yrs01wd3wc3",
+            "external_url": "https://www.reddit.com/r/ClaudeAI/comments/1woiotv/anthropic_offering_100_in_credits_for_cloud/",
+            "title": "Anthropic offering $100 in credits for cloud sessions : r/ClaudeAI",
+            "content_html": "<p>Anthropic is offering $100 in credits for Claude cloud sessions.</p>",
+            "date_published": "2026-09-24T09:47:52+00:00",
+            "date_modified": "2026-10-08T03:08:46+00:00",
+            "tags": [
+                "ai",
+                "news",
+                "claude"
+            ],
+            "_athenana": {
+                "kind": "link",
+                "tags": [
+                    {
+                        "name": "ai",
+                        "slug": "ai"
+                    },
+                    {
+                        "name": "news",
+                        "slug": "news"
+                    },
+                    {
+                        "name": "claude",
+                        "slug": "claude"
+                    }
+                ]
+            }
+        },
+        {
+            "id": "https://athenana.com/s/01m39d09y11vetebrh422b520m",
+            "url": "https://www.wyome.com/blog/post.html?id=01m39d09y11vetebrh422b520m",
+            "external_url": "https://www.reddit.com/r/ClaudeAI/comments/1wogab3/made_entirely_with_opus_55_321_of_openrouter_api/",
+            "title": "Made entirely with Opus 5.5 + $3.21 of OpenRouter API usage : r/ClaudeAI",
+            "content_html": "<p>A Reddit post showcasing a project built using Claude Opus 5.5 with minimal API costs.</p>",
+            "date_published": "2026-09-24T09:47:32+00:00",
+            "date_modified": "2026-10-08T03:08:43+00:00",
+            "tags": [
+                "programming",
+                "ai",
+                "development",
+                "budget",
+                "claude"
+            ],
+            "_athenana": {
+                "kind": "link",
+                "tags": [
+                    {
+                        "name": "programming",
+                        "slug": "programming"
+                    },
+                    {
+                        "name": "ai",
+                        "slug": "ai"
+                    },
+                    {
+                        "name": "development",
+                        "slug": "development"
+                    },
+                    {
+                        "name": "budget",
+                        "slug": "budget"
+                    },
+                    {
+                        "name": "claude",
+                        "slug": "claude"
+                    }
+                ]
+            }
+        },
+        {
+            "id": "https://athenana.com/s/01m38gp72q67ynhy7jcdxza3e9",
+            "url": "https://www.wyome.com/blog/post.html?id=01m38gp72q67ynhy7jcdxza3e9",
+            "external_url": "https://www.esquire.com/entertainment/tv/a73820242/best-new-tv-shows-of-2026/?utm_medium=email&utm_source=ten_tabs&utm_campaign=position=6&category=fascinating_stories&scheduled_corpus_item_id=8f21386b-a29f-45b8-adb9-5eb81a945d6e&url=https%3A%2F%2Fwww.esquire.com%2Fentertainment%2Ftv%2Fa73820242%2Fbest-new-tv-shows-of-2026%2F",
+            "title": "Best TV Shows of 2026 So Far",
+            "content_html": "<p>This is a roundup of television shows from 2026 recommended by Esquire editors, covering a range of genres from prestige dramas like *Furious* (a psychological thriller about an FBI agent hunting a female serial killer) and *The Bear*&#039;s final season to comedies like *Chad Powers* and *Ted*, as well as sci-fi shows such as *Silo* and *Lanterns*. The piece highlights both new series and returning favorites, with particular emphasis on *Widow&#039;s Bay* as the year&#039;s standout hit and discussions of why various shows succeeded or disappointed viewers. It serves as a viewing guide for people overwhelmed by streaming options and looking for curated recommendations across multiple platforms.</p>",
+            "date_published": "2026-09-24T01:32:41+00:00",
+            "date_modified": "2026-10-06T10:25:46+00:00",
+            "image": "https://athenana.com/p/01m39ddwv12y10b657rt50e8sd?v=7f7e2039",
+            "tags": [
+                "television",
+                "recommendations",
+                "entertainment",
+                "reviews",
+                "2020s"
+            ],
+            "_source": {
+                "name": "Esquire",
+                "url": "https://www.esquire.com/entertainment/tv/a73820242/best-new-tv-shows-of-2026/?utm_medium=email&utm_source=ten_tabs&utm_campaign=position=6&category=fascinating_stories&scheduled_corpus_item_id=8f21386b-a29f-45b8-adb9-5eb81a945d6e&url=https%3A%2F%2Fwww.esquire.com%2Fentertainment%2Ftv%2Fa73820242%2Fbest-new-tv-shows-of-2026%2F"
+            },
+            "_athenana": {
+                "kind": "link",
+                "tags": [
+                    {
+                        "name": "television",
+                        "slug": "television"
+                    },
+                    {
+                        "name": "recommendations",
+                        "slug": "recommendations"
+                    },
+                    {
+                        "name": "entertainment",
+                        "slug": "entertainment"
+                    },
+                    {
+                        "name": "reviews",
+                        "slug": "reviews"
+                    },
+                    {
+                        "name": "2020s",
+                        "slug": "2020s"
+                    }
+                ]
+            }
+        },
+        {
+            "id": "https://athenana.com/s/01m38gnkaed1qy5w7f1z7pg9k4",
+            "url": "https://www.wyome.com/blog/post.html?id=01m38gnkaed1qy5w7f1z7pg9k4",
+            "external_url": "https://www.macstories.net/reviews/our-favorite-indie-apps-for-ios-27-vol-2/",
+            "title": "Our Favorite Indie Apps for iOS 27, Vol. 2 - MacStories",
+            "content_html": "<p>This roundup showcases five indie apps that have integrated Apple&#039;s latest AI and on-screen awareness features into their ecosystems. Bear now uses Siri to create and append notes with voice commands and screenshot annotation; Gentler Streak and The Outsiders provide fitness data summaries via Siri and Spotlight; Cheatsheet Notes lets you query and append to notes using Siri&#039;s understanding of on-screen content; and DoMarks makes saving and organizing URLs by category simpler through voice control and the &quot;Surprise Me&quot; feature to rediscover old bookmarks. The article emphasizes how these updates make common tasks more efficient by reducing manual steps and enabling hands-free interaction.</p>",
+            "date_published": "2026-09-24T01:32:21+00:00",
+            "date_modified": "2026-10-03T03:42:16+00:00",
+            "image": "https://athenana.com/p/01m39de5ffvhjsrrvx0x8prs1x?v=e9239b5c",
+            "tags": [
+                "productivity",
+                "apps",
+                "fitness",
+                "ai",
+                "ios"
+            ],
+            "_source": {
+                "name": "www.macstories.net",
+                "url": "https://www.macstories.net/reviews/our-favorite-indie-apps-for-ios-27-vol-2/"
+            },
+            "_athenana": {
+                "kind": "link",
+                "tags": [
+                    {
+                        "name": "productivity",
+                        "slug": "productivity"
+                    },
+                    {
+                        "name": "apps",
+                        "slug": "apps"
+                    },
+                    {
+                        "name": "fitness",
+                        "slug": "fitness"
+                    },
+                    {
+                        "name": "ai",
+                        "slug": "ai"
+                    },
+                    {
+                        "name": "ios",
+                        "slug": "ios"
+                    }
+                ]
+            }
+        },
+        {
+            "id": "https://athenana.com/s/01m38gkhr87s1zgxm09srxr5c5",
+            "url": "https://www.wyome.com/blog/post.html?id=01m38gkhr87s1zgxm09srxr5c5",
+            "external_url": "https://www.mindbodygreen.com/articles/next-era-of-fitness-is-structured-social-and-competitive",
+            "title": "The HYROX Boom Proves People Want More From Their Weekly Workouts",
+            "content_html": "<p>Competitive fitness—exemplified by HYROX races that combine running with functional workout stations—has exploded from niche trend to mainstream fitness category, with participation growing from 175,000 to over 650,000 competitors in just one year and expected to reach 1.3 million by 2026. Rather than isolated workouts, people now train toward concrete, measurable goals with specific race dates, creating a psychological shift where gyms build entire class schedules around these events and participants adopt an &quot;everyday athlete&quot; identity that blends strength, endurance, and community. This hybrid format appeals broadly because it offers sport-like structure and serious training without requiring elite athlete backgrounds, positioning competitive fitness as the next evolution of group fitness where people seek trackable progress, social connection, and purposeful training simultaneously.</p>",
+            "date_published": "2026-09-24T01:31:14+00:00",
+            "date_modified": "2026-10-03T03:42:16+00:00",
+            "image": "https://athenana.com/p/01m39defb36j582kgfkbeyydsw?v=745f88e1",
+            "tags": [
+                "fitness",
+                "training",
+                "community",
+                "trends"
+            ],
+            "_source": {
+                "name": "mindbodygreen",
+                "url": "https://www.mindbodygreen.com/articles/next-era-of-fitness-is-structured-social-and-competitive"
+            },
+            "_athenana": {
+                "kind": "link",
+                "tags": [
+                    {
+                        "name": "fitness",
+                        "slug": "fitness"
+                    },
+                    {
+                        "name": "training",
+                        "slug": "training"
+                    },
+                    {
+                        "name": "community",
+                        "slug": "community"
+                    },
+                    {
+                        "name": "trends",
+                        "slug": "trends"
+                    }
+                ]
+            }
+        },
+        {
+            "id": "https://athenana.com/s/01m38ghhbjwghqkca1eevrmkn6",
+            "url": "https://www.wyome.com/blog/post.html?id=01m38ghhbjwghqkca1eevrmkn6",
+            "external_url": "https://punchdrink.com/articles/underrated-gin-classic-cocktails/",
+            "title": "5 Underrated Gin Cocktails, From a Martini Riff to a Tropical Fizz | PUNCH",
+            "content_html": "<p>The article surveys five overlooked gin-based cocktails worth rediscovering, from the Cardinale—an austere aperitivo combining gin, white wine, and Campari—to the Star Daisy with its unusual blend of London dry gin, apple brandy, and dry Curaçao. Lesser-known drinks like the Gin Fizz Tropical (a tropical silver fizz from a 1939 cocktail guide), the Wibble (a London 1990s creation slowly spreading through European cities), and the Obituary (a New Orleans Martini variation enhanced with absinthe) represent a canon of underappreciated classics that bartenders and cocktail enthusiasts are gradually reviving.</p>",
+            "date_published": "2026-09-24T01:30:08+00:00",
+            "date_modified": "2026-10-03T03:42:16+00:00",
+            "image": "https://athenana.com/p/01m39deqjm29409atasxz0r18b?v=19241d56",
+            "tags": [
+                "recipes",
+                "cocktails",
+                "recommendations",
+                "mixology",
+                "gin"
+            ],
+            "_source": {
+                "name": "PUNCH",
+                "url": "https://punchdrink.com/articles/underrated-gin-classic-cocktails/"
+            },
+            "_athenana": {
+                "kind": "link",
+                "tags": [
+                    {
+                        "name": "recipes",
+                        "slug": "recipes"
+                    },
+                    {
+                        "name": "cocktails",
+                        "slug": "cocktails"
+                    },
+                    {
+                        "name": "recommendations",
+                        "slug": "recommendations"
+                    },
+                    {
+                        "name": "mixology",
+                        "slug": "mixology"
+                    },
+                    {
+                        "name": "gin",
+                        "slug": "gin"
+                    }
+                ]
+            }
+        },
+        {
+            "id": "https://athenana.com/s/01m38gh11t05mk0ew3ch38ftmb",
+            "url": "https://www.wyome.com/blog/post.html?id=01m38gh11t05mk0ew3ch38ftmb",
+            "external_url": "https://www.wired.com/story/justice-for-css/?utm_medium=email&utm_source=ten_tabs&utm_campaign=&position=4&category=fascinating_stories&scheduled_corpus_item_id=6bc253e8-f36d-4f31-8a37-1aa8737d65ca&url=https%3A%2F%2Fwww.wired.com%2Fstory%2Fjustice-for-css%2F",
+            "title": "Justice for CSS | WIRED",
+            "content_html": "<p>CSS has evolved from a simple styling tool into a genuinely powerful programming language capable of building 3D engines and query databases, yet it remains culturally undervalued and dismissed—a dismissal rooted partly in it being coded as &quot;feminine&quot; frontend work and associated with beauty rather than serious computation. The language&#039;s accessibility to beginners and its traditional association with decorative styling have contributed to lower salaries, less rigorous job interview scrutiny, and worse diversity metrics compared to backend languages, while also resulting in a homogenized internet where frameworks like Bootstrap and Tailwind create visual sameness rather than distinctive design. Modern CSS, with features like container queries, custom properties, and upcoming conditionals, has become sophisticated enough that the philosophical arguments against calling it a &quot;real&quot; programming language no longer hold much water.</p>",
+            "date_published": "2026-09-24T01:29:51+00:00",
+            "date_modified": "2026-10-07T18:09:55+00:00",
+            "image": "https://athenana.com/p/01m39dezt5wrfpvf637wmkwy8x?v=decb22d0",
+            "tags": [
+                "design",
+                "culture",
+                "programming",
+                "css3"
+            ],
+            "_source": {
+                "name": "WIRED",
+                "url": "https://www.wired.com/story/justice-for-css/?utm_medium=email&utm_source=ten_tabs&utm_campaign=&position=4&category=fascinating_stories&scheduled_corpus_item_id=6bc253e8-f36d-4f31-8a37-1aa8737d65ca&url=https%3A%2F%2Fwww.wired.com%2Fstory%2Fjustice-for-css%2F"
+            },
+            "_athenana": {
+                "kind": "link",
+                "tags": [
+                    {
+                        "name": "design",
+                        "slug": "design"
+                    },
+                    {
+                        "name": "culture",
+                        "slug": "culture"
+                    },
+                    {
+                        "name": "programming",
+                        "slug": "programming"
+                    },
+                    {
+                        "name": "css3",
+                        "slug": "css3"
+                    }
+                ]
+            }
+        },
+        {
+            "id": "https://athenana.com/s/01m38gdz4tq1er9cjz61spm17f",
+            "url": "https://www.wyome.com/blog/post.html?id=01m38gdz4tq1er9cjz61spm17f",
+            "external_url": "https://claude.com/blog/what-a-task-costs-on-opus-5-5",
+            "title": "What a task costs on Opus 5.5 | Claude by Anthropic",
+            "content_html": "<p>Claude Code tasks cost money based on four factors: the number of turns (which resend the conversation), cache hit rates (dramatically cheaper than fresh reads), output tokens including thinking (the most expensive element), and model choice. Opus 5.5 is 20% cheaper on input and output tokens and 60% cheaper on cached reads than Opus 5, shifting the economics significantly toward long, cache-heavy sessions. The post provides interactive calculators and concrete guidance: use Opus 5.5 as your daily driver for supervised work, raise effort level before switching models, put lookup tasks on smaller models like Sonnet, keep sessions moving to maintain cache warmth, and crucially, measure your own real tasks to understand how these tradeoffs apply to your specific codebase and workflow.</p>",
+            "date_published": "2026-09-24T01:28:11+00:00",
+            "date_modified": "2026-10-03T03:42:14+00:00",
+            "image": "https://athenana.com/p/01m38gf6az7avehb4qgqr0b440?v=c1945a33",
+            "tags": [
+                "development",
+                "claude",
+                "pricing"
+            ],
+            "_source": {
+                "name": "Claude",
+                "url": "https://claude.com/blog/what-a-task-costs-on-opus-5-5"
+            },
+            "_athenana": {
+                "kind": "link",
+                "tags": [
+                    {
+                        "name": "development",
+                        "slug": "development"
+                    },
+                    {
+                        "name": "claude",
+                        "slug": "claude"
+                    },
+                    {
+                        "name": "pricing",
+                        "slug": "pricing"
+                    }
+                ]
+            }
+        }
+    ]
+}
