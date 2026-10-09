@@ -1,0 +1,28 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "phoenix",
+      "runtimeExecutable": "php",
+      "runtimeArgs": [
+        "-S",
+        "127.0.0.1:8080",
+        "-t",
+        "public",
+        "public/index.php"
+      ],
+      "port": 8080
+    },
+    {
+      "name": "wyome-local",
+      "runtimeExecutable": "php",
+      "runtimeArgs": [
+        "-S",
+        "127.0.0.1:8081",
+        "-t",
+        "/private/tmp/claude-502/-Users-johncox-Sites-localhost-xaraya/5513ffec-a648-40a9-b6e2-179e513fb761/scratchpad/wyome-local"
+      ],
+      "port": 8081
+    }
+  ]
+}
