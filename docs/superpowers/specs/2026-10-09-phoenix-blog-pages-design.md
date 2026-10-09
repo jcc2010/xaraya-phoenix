@@ -60,7 +60,7 @@ Phoenix renders the blogs it already stores as themable, server-side HTML pages.
 
 **Caching:** `Cache-Control: public, max-age=60` plus the body ETag. No `Last-Modified`, matching the feeds.
 
-**Sidebar blocks.** These are block instances in the theme's `sidebar` region, seeded when the module is enabled, with visibility limited to the `blog.*` routes:
+**Sidebar blocks.** These are block instances in the theme's `sidebar` region, with visibility limited to the `blog.*` routes. The manifest declares them as a `blocks` map from type id to class, and `blockDefaults` seeds the instances when the module is enabled (kernel Plan 2 convention).
 - `blog.info`: about snippet plus feed links.
 - `blog.tagcloud`: the top 30 tags.
 - `blog.searchbox`: a GET form to `blog.search`.
@@ -100,7 +100,9 @@ For link posts that carry an owner comment, the comment duplicates the start of 
 
 ### 2.2 Templates
 
-All templates live in `modules/blog/templates/`. Each exists as both `.twig` and `.php`, and the same name in a theme overrides it.
+All templates live in `modules/blog/templates/`. Each exists as both `.twig` and `.php`.
+
+**Naming.** Module templates are named `module::path` (kernel Plan 2 convention), so the names below are rendered as `blog::home`, `blog::partials/kinds/link`, and so on. A theme overrides one at `themes/<theme>/templates/modules/blog/<path>`.
 
 - **Pages:** `blog/home`, `blog/post`, `blog/tag`, `blog/tags`, `blog/about`, `blog/search`
 - **Post card and full post:** `blog/partials/post`, used for both via a `full` flag
