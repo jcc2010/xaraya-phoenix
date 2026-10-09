@@ -36,11 +36,18 @@ final class StreamFetcher implements HttpFetcher
             'max_redirects' => 5,
         ]]);
 
-        $body = @file_get_contents($url, false, $context, 0, max(0, $this->maxBytes) + 1);
-        // PHP 8.4+ exposes the headers through a function; $http_response_header is deprecated in 8.5.
-        $responseHeaders = function_exists('http_get_last_response_headers')
-            ? (http_get_last_response_headers() ?? [])
-            : self::legacyHeaders(get_defined_vars());
+        $handle = @fopen($url, 'rb', false, $context);
+        if ($handle === false) {
+            $error = error_get_last()['message'] ?? 'unknown error';
+            throw new RuntimeException("Fetching {$url} failed: {$error}");
+        }
+        try {
+            $wrapperData = stream_get_meta_data($handle)['wrapper_data'] ?? [];
+            $responseHeaders = is_array($wrapperData) ? array_values(array_filter($wrapperData, 'is_string')) : [];
+            $body = @stream_get_contents($handle, max(0, $this->maxBytes) + 1);
+        } finally {
+            fclose($handle);
+        }
         if ($body === false) {
             $error = error_get_last()['message'] ?? 'unknown error';
             throw new RuntimeException("Fetching {$url} failed: {$error}");
@@ -51,17 +58,6 @@ final class StreamFetcher implements HttpFetcher
         [$status, $parsed] = self::parseHeaders($responseHeaders);
 
         return new FetchResult($status, $body, $parsed['etag'] ?? null, $parsed['content-type'] ?? null);
-    }
-
-    /**
-     * @param array<string, mixed> $scope
-     * @return array<int, string>
-     */
-    private static function legacyHeaders(array $scope): array
-    {
-        $headers = $scope['http_response_header'] ?? [];
-
-        return is_array($headers) ? array_values(array_filter($headers, 'is_string')) : [];
     }
 
     /**

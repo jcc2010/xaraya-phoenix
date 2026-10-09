@@ -106,4 +106,19 @@ final class StreamFetcherTest extends TestCase
         }
         self::assertSame([], (new FetchResult(200, '{}'))->json());
     }
+
+    public function testParseHeadersKeepsOnlyTheFinalHop(): void
+    {
+        $method = new \ReflectionMethod(StreamFetcher::class, 'parseHeaders');
+        [$status, $headers] = $method->invoke(null, [
+            'HTTP/1.1 301 Moved Permanently',
+            'Location: /feed.json',
+            'ETag: "old"',
+            'HTTP/1.1 200 OK',
+            'Content-Type: application/feed+json',
+            'ETag: "v1"',
+        ]);
+        self::assertSame(200, $status);
+        self::assertSame(['content-type' => 'application/feed+json', 'etag' => '"v1"'], $headers);
+    }
 }
