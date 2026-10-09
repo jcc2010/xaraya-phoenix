@@ -124,6 +124,9 @@ final class ModuleRegistry
 
     public function registerAutoloader(): void
     {
+        if ($this->autoloader !== null) {
+            return;
+        }
         // Hold the registry weakly: a global autoloader that captured $this would keep this registry
         // (and its database connection) alive for the rest of the process.
         $self = WeakReference::create($this);

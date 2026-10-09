@@ -36,17 +36,17 @@ final class MediaStore
     /** @return array<string, mixed>|null */
     public function localize(Blog $blog, string $url, DateTimeImmutable $now): ?array
     {
-        $existing = $this->db->select('media')
-            ->where('blog_id', '=', $blog->id)
-            ->where('source_url_hash', '=', sha1($url))
-            ->first();
-        if ($existing !== null) {
-            return $existing;
-        }
         try {
+            $existing = $this->db->select('media')
+                ->where('blog_id', '=', $blog->id)
+                ->where('source_url_hash', '=', sha1($url))
+                ->first();
+            if ($existing !== null) {
+                return $existing;
+            }
             $result = $this->fetcher->get($url);
         } catch (Throwable $e) {
-            $this->logger->warning('Media {url} for {blog} could not be fetched: {reason}', ['url' => $url, 'blog' => $blog->handle, 'reason' => $e->getMessage()]);
+            $this->logger->warning('Media {url} for {blog} could not be localized: {reason}', ['url' => $url, 'blog' => $blog->handle, 'reason' => $e->getMessage()]);
 
             return null;
         }
@@ -174,11 +174,9 @@ final class MediaStore
     private static function isRealImage(string $bytes): bool
     {
         $info = @getimagesizefromstring($bytes);
-        if ($info === false || $info[0] < 1 || $info[1] < 1 || $info[0] * $info[1] > 50_000_000) {
-            return false;
-        }
 
-        return !function_exists('imagecreatefromstring') || @imagecreatefromstring($bytes) !== false;
+        // No GD decode: the check must behave the same on every host, with or without GD.
+        return $info !== false && $info[0] >= 1 && $info[1] >= 1 && $info[0] * $info[1] <= 50_000_000;
     }
 
     /** @return array{0: ?int, 1: ?int} */

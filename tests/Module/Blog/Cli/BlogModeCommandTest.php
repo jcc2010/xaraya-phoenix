@@ -52,7 +52,7 @@ final class BlogModeCommandTest extends BlogTestCase
         self::assertNotNull($blog);
         $ulid = Ulid::generate();
         $this->app()->container()->get(PostRepository::class)->save($blog->id, new PostRecord(
-            "http://xar.test/s/{$ulid}",
+            "https://elsewhere.example/s/{$ulid}",
             $ulid,
             'note',
             'Mine',
@@ -64,8 +64,10 @@ final class BlogModeCommandTest extends BlogTestCase
             null,
             [],
             [],
-            'h',
+            null,
         ), $this->now());
+        $posts = $this->app()->container()->get(PostRepository::class);
+        self::assertSame(1, $posts->countLiveNative($blog->id));
 
         $args = ['blog:mode', 'mine', 'mirror', '--source=https://src.test/blog/src/feed.json', '--format=athena'];
         [$code, , $err] = $this->xar($args);
@@ -79,6 +81,41 @@ final class BlogModeCommandTest extends BlogTestCase
         $blog = $this->blogs($this->app())->find('mine');
         self::assertSame('https://src.test/blog/src/feed.json', $blog?->sourceUrl);
         self::assertSame('athena', $blog?->sourceFormat);
+        self::assertSame(1, $posts->countLiveNative($blog->id), 'the native post stays live right after the switch');
+        $feed = json_decode((string) $this->app()->handle(new ServerRequest('GET', '/blog/mine/feed.json'))->getBody(), true);
+        self::assertSame(['Mine'], array_column($feed['items'], 'title'));
+    }
+
+    public function testSyncedPostsAreNotNative(): void
+    {
+        $app = $this->enableBlog();
+        $this->xar(['blog:create', 'src', '--mode=mirror', '--format=athena', '--source=https://src.test/blog/src/feed.json'], $app);
+        $app = $this->app();
+        $app->container()->instance(HttpFetcher::class, FeedFactory::fetcher(FeedFactory::pages(FeedFactory::items(3, 'http://xar.test'))));
+        $this->xar(['blog:sync', 'src', '--full'], $app);
+        $blog = $this->blogs($this->app())->find('src');
+        self::assertNotNull($blog);
+        $posts = $this->app()->container()->get(PostRepository::class);
+        self::assertSame(3, $posts->countLive($blog->id));
+        self::assertSame(0, $posts->countLiveNative($blog->id), 'synced posts carry a source hash even on the app.url host');
+
+        self::assertSame(0, $this->xar(['blog:mode', 'src', 'native'])[0]);
+        [$code, $out] = $this->xar(['blog:mode', 'src', 'mirror']);
+        self::assertSame(0, $code, 'no native posts, so no --force needed');
+        self::assertStringContainsString("Blog 'src' is now mirror.", $out);
+    }
+
+    public function testSourceAndFormatAreRejectedWhenSwitchingToNative(): void
+    {
+        $app = $this->enableBlog();
+        $this->xar(['blog:create', 'src', '--mode=mirror', '--format=athena', '--source=https://src.test/blog/src/feed.json'], $app);
+        foreach (['--source=https://other.test/feed.json', '--format=jsonfeed'] as $option) {
+            [$code, , $err] = $this->xar(['blog:mode', 'src', 'native', $option]);
+            self::assertSame(1, $code, $option);
+            self::assertStringContainsString('--source and --format only apply when switching to mirror', $err);
+            self::assertStringContainsString('Usage: xar blog:mode', $err);
+        }
+        self::assertSame('mirror', $this->blogs($this->app())->find('src')?->mode);
     }
 
     public function testUsageErrors(): void

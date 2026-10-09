@@ -8,6 +8,12 @@ use DateTimeImmutable;
 use Xaraya\Kernel\Db\Connection;
 use Xaraya\Kernel\Support\Ulid;
 
+/**
+ * Posts of every blog.
+ *
+ * Native vs mirrored: a post is native when its source_hash IS NULL. Only sync and the source
+ * adapters set source_hash; native writes leave it null. Do not infer nativeness from item_id.
+ */
 final class PostRepository
 {
     private const CHUNK = 500;
@@ -38,7 +44,7 @@ final class PostRepository
             ];
             if ($existing !== null) {
                 $id = (string) $existing['id'];
-                if ($existing['source_hash'] === $record->sourceHash && $existing['status'] === 'published') {
+                if ($record->sourceHash !== null && $existing['source_hash'] === $record->sourceHash && $existing['status'] === 'published') {
                     return new SaveResult(SaveResult::UNCHANGED, $id);
                 }
                 $this->db->update('posts', $columns, ['id' => $id]);
@@ -91,6 +97,16 @@ final class PostRepository
     public function countLive(int $blogId): int
     {
         return $this->db->select('posts')->where('blog_id', '=', $blogId)->where('status', '=', 'published')->count();
+    }
+
+    /** Live posts written natively (source_hash IS NULL), which a full mirror sync would tombstone. */
+    public function countLiveNative(int $blogId): int
+    {
+        return $this->db->select('posts')
+            ->where('blog_id', '=', $blogId)
+            ->where('status', '=', 'published')
+            ->whereNull('source_hash')
+            ->count();
     }
 
     /**

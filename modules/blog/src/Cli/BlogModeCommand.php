@@ -10,7 +10,6 @@ use InvalidArgumentException;
 use Xaraya\Kernel\Cli\Command;
 use Xaraya\Kernel\Cli\Input;
 use Xaraya\Kernel\Cli\Output;
-use Xaraya\Kernel\Config\Config;
 use Xaraya\Module\Blog\Blog;
 use Xaraya\Module\Blog\BlogRepository;
 use Xaraya\Module\Blog\Post\PostRepository;
@@ -20,7 +19,6 @@ final class BlogModeCommand extends Command
     public function __construct(
         private readonly BlogRepository $blogs,
         private readonly PostRepository $posts,
-        private readonly Config $config,
     ) {}
 
     public function name(): string
@@ -35,7 +33,7 @@ final class BlogModeCommand extends Command
 
     public function usage(): string
     {
-        return 'blog:mode <handle> mirror|native [--source=<url> --format=athena|jsonfeed] [--force]';
+        return 'blog:mode <handle> mirror [--source=<url> --format=athena|jsonfeed] [--force] | blog:mode <handle> native';
     }
 
     public function run(Input $input, Output $output): int
@@ -47,6 +45,12 @@ final class BlogModeCommand extends Command
 
             return 1;
         }
+        if ($mode === 'native' && ($input->option('source') !== null || $input->option('format') !== null)) {
+            $output->error('--source and --format only apply when switching to mirror.');
+            $output->error('Usage: xar ' . $this->usage());
+
+            return 1;
+        }
         $blog = $this->blogs->find($handle) ?? throw new InvalidArgumentException("Unknown blog '{$handle}'");
         if ($blog->mode === $mode) {
             $output->line("Blog '{$handle}' is already {$mode}.");
@@ -54,8 +58,7 @@ final class BlogModeCommand extends Command
             return 0;
         }
         if ($mode === 'mirror') {
-            $prefix = rtrim((string) $this->config->get('app.url', ''), '/') . '/s/';
-            $native = count(array_filter($this->posts->liveItemIds($blog->id), static fn(string $id): bool => str_starts_with($id, $prefix)));
+            $native = $this->posts->countLiveNative($blog->id);
             if ($native > 0 && !$input->flag('force')) {
                 $output->error("Blog '{$handle}' has {$native} native post(s); the next full sync would tombstone them. Re-run with --force to switch anyway.");
 

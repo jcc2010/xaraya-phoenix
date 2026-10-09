@@ -33,8 +33,6 @@ composer stan   # PHPStan level 8
 composer cs     # coding style check
 ```
 
-License: GPL-2.0-or-later.
-
 ## Blog (Athena-compatible)
 
 Enable the module and mirror an existing JSON Feed blog (Athena or any JSON Feed 1.1 source):
@@ -70,3 +68,5 @@ third-party files referenced by the posts onto your server. Fetches only go to p
 private, link-local and other internal addresses are refused unless `blog.fetch_allow_private` is
 set to true in the config.
 `bin/xar blog:mode <handle> native` stops mirroring; post ids never change.
+
+License: GPL-2.0-or-later.

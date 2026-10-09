@@ -20,6 +20,17 @@ final class AthenaParityTest extends BlogTestCase
         return json_decode((string) file_get_contents(self::DIR . "/{$name}.json"), true, 512, JSON_THROW_ON_ERROR);
     }
 
+    /** Recursive ksort, so assertSame compares values and types but not key order. */
+    private static function sorted(mixed $value): mixed
+    {
+        if (!is_array($value)) {
+            return $value;
+        }
+        ksort($value);
+
+        return array_map(self::sorted(...), $value);
+    }
+
     private static function cursor(mixed $url): ?string
     {
         if (!is_string($url)) {
@@ -64,7 +75,7 @@ final class AthenaParityTest extends BlogTestCase
             self::assertSame(self::cursor($expected['next_url'] ?? null), self::cursor($served['next_url'] ?? null), 'page ' . ($n + 1) . ' cursor');
             $next = $served['next_url'] ?? null;
             unset($expected['feed_url'], $expected['next_url'], $served['feed_url'], $served['next_url']);
-            self::assertEquals($expected, $served, 'page ' . ($n + 1) . ' differs from Athena');
+            self::assertSame(self::sorted($expected), self::sorted($served), 'page ' . ($n + 1) . ' differs from Athena');
             if (!is_string($next)) {
                 break;
             }
@@ -75,6 +86,6 @@ final class AthenaParityTest extends BlogTestCase
         $item = self::fixture('item');
         $single = $app->handle(new ServerRequest('GET', '/s/' . substr((string) $item['id'], -26) . '.json'));
         self::assertSame(200, $single->getStatusCode());
-        self::assertEquals($item, json_decode((string) $single->getBody(), true, 512, JSON_THROW_ON_ERROR));
+        self::assertSame(self::sorted($item), self::sorted(json_decode((string) $single->getBody(), true, 512, JSON_THROW_ON_ERROR)));
     }
 }

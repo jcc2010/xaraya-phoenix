@@ -103,20 +103,23 @@ class JsonFeedAdapter implements SourceAdapter
         $meta = [];
         foreach (self::FEED_COLUMNS as $key => $column) {
             $value = self::str($feed, $key);
-            if ($value !== null) {
-                $meta[$column] = $column === 'language' ? substr($value, 0, 16) : $value;
-            }
+            $meta[$column] = match ($column) {
+                'title' => $value === null ? null : mb_substr($value, 0, 255),
+                'language' => $value === null ? 'en' : substr($value, 0, 16),
+                'home_page_url', 'icon', 'favicon' => self::url($value),
+                default => $value,
+            };
+        }
+        if ($meta['title'] === null) {
+            unset($meta['title']); // never clear the required title; keep the stored one
         }
         $authors = $feed['authors'] ?? null;
         $author = is_array($authors) && is_array($authors[0] ?? null) ? $authors[0] : ($feed['author'] ?? null);
-        if (is_array($author)) {
-            if (($name = self::str($author, 'name')) !== null) {
-                $meta['author_name'] = $name;
-            }
-            if (($url = self::str($author, 'url')) !== null) {
-                $meta['author_url'] = $url;
-            }
+        $author = is_array($author) ? $author : [];
+        if (($name = self::str($author, 'name')) !== null) {
+            $meta['author_name'] = mb_substr($name, 0, 255);
         }
+        $meta['author_url'] = self::url(self::str($author, 'url'));
         $extra = [];
         foreach ($feed as $key => $value) {
             if (is_string($key) && str_starts_with($key, '_')) {
@@ -178,6 +181,12 @@ class JsonFeedAdapter implements SourceAdapter
         $value = $data[$key] ?? null;
 
         return is_string($value) && $value !== '' ? $value : null;
+    }
+
+    /** URLs over 1024 bytes are dropped rather than stored cut. */
+    private static function url(?string $value): ?string
+    {
+        return $value !== null && strlen($value) <= 1024 ? $value : null;
     }
 
     /** @param array<string, mixed> $item */

@@ -95,7 +95,35 @@ final class JsonFeedAdapterTest extends TestCase
         ], $meta);
 
         $bare = (new JsonFeedAdapter())->feedMeta(['version' => 'https://jsonfeed.org/version/1.1', 'items' => []]);
-        self::assertSame(['pinned_item_id' => null, 'extra' => []], $bare);
+        self::assertSame([
+            'description_html' => null,
+            'home_page_url' => null,
+            'icon' => null,
+            'favicon' => null,
+            'language' => 'en',
+            'author_url' => null,
+            'pinned_item_id' => null,
+            'extra' => [],
+        ], $bare, 'removed fields clear; title and author_name keep their stored values');
+    }
+
+    public function testFeedMetaTruncatesTextAndDropsOverlongUrls(): void
+    {
+        $long = 'https://e.test/' . str_repeat('a', 1009);
+        $meta = (new JsonFeedAdapter())->feedMeta([
+            'title' => str_repeat('é', 300),
+            'home_page_url' => $long,
+            'icon' => $long . 'aa',
+            'favicon' => 'https://e.test/favicon.ico',
+            'authors' => [['name' => str_repeat('n', 300), 'url' => $long . 'aa']],
+        ]);
+        self::assertSame(str_repeat('é', 255), $meta['title']);
+        self::assertSame(str_repeat('n', 255), $meta['author_name']);
+        self::assertSame(1024, strlen($long));
+        self::assertSame($long, $meta['home_page_url'], 'URLs up to 1024 bytes are kept');
+        self::assertNull($meta['icon'], 'an overlong URL is dropped, not cut');
+        self::assertNull($meta['author_url']);
+        self::assertSame('https://e.test/favicon.ico', $meta['favicon']);
     }
 
     public function testFeedMetaIgnoresIntegerKeys(): void

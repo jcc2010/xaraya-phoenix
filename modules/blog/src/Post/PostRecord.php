@@ -11,6 +11,9 @@ final class PostRecord
     /**
      * @param array<string, mixed> $doc
      * @param list<array{name: string, slug: string}> $tags
+     * @param ?string $sourceHash sha1 of the source item. Only sync and the source adapters set it; a
+     *                            post written natively leaves it null, and null is what marks a post as
+     *                            native (see PostRepository::countLiveNative()).
      */
     public function __construct(
         public readonly string $itemId,
@@ -25,6 +28,6 @@ final class PostRecord
         public readonly ?DateTimeImmutable $dateModified,
         public readonly array $doc,
         public readonly array $tags,
-        public readonly string $sourceHash,
+        public readonly ?string $sourceHash,
     ) {}
 }

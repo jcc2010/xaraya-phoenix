@@ -142,4 +142,16 @@ final class ModuleRegistryTest extends DbTestCase
         self::assertSame('alpha', (new \Xaraya\Module\Alpha\Thing())->hello());
         unset($registry);
     }
+
+    public function testAutoloaderIsRegisteredOnce(): void
+    {
+        $registry = $this->registry();
+        $before = count(spl_autoload_functions());
+        $registry->registerAutoloader();
+        $registry->registerAutoloader();
+        $registry->registerAutoloader();
+        self::assertSame($before + 1, count(spl_autoload_functions()));
+        unset($registry);
+        self::assertSame($before, count(spl_autoload_functions()), 'released with the registry');
+    }
 }

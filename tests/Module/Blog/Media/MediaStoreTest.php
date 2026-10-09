@@ -73,6 +73,30 @@ final class MediaStoreTest extends BlogTestCase
         }
     }
 
+    private static function pngHeader(int $width, int $height): string
+    {
+        $ihdr = 'IHDR' . pack('NNCCCCC', $width, $height, 8, 6, 0, 0, 0);
+
+        return "\x89PNG\r\n\x1a\n" . pack('N', 13) . $ihdr . pack('N', crc32($ihdr));
+    }
+
+    public function testImageCheckDoesNotDependOnGd(): void
+    {
+        // A header-only PNG: getimagesize reads it, GD could not decode it. The check must not differ
+        // between hosts with and without GD, so it is accepted everywhere.
+        $row = $this->store->store($this->blog, self::pngHeader(2, 3), null, $this->now());
+        self::assertNotNull($row);
+        self::assertSame([2, 3], [(int) $row['width'], (int) $row['height']]);
+        self::assertNull($this->store->store($this->blog, self::pngHeader(10_000, 5_001), null, $this->now()), 'over 50M pixels');
+    }
+
+    public function testLocalizeNeverThrowsEvenWhenTheLookupFails(): void
+    {
+        $this->db($this->app())->query('DROP TABLE {media}');
+        self::assertNull($this->store->localize($this->blog, 'https://img.test/a.png', $this->now()));
+        self::assertSame([], $this->fetcher->requests);
+    }
+
     public function testUrlsCollectsEveryMediaField(): void
     {
         $record = new PostRecord(

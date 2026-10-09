@@ -94,10 +94,20 @@ final class AthenaAdapterTest extends TestCase
 
     public function testOverlongAthenaTagIsCapped(): void
     {
-        $item = ['id' => 'x-1', '_athenana' => ['tags' => [['name' => str_repeat('n', 300), 'slug' => 'A B']]]];
-        $tag = (new AthenaAdapter())->toRecord($item, new DateTimeImmutable())->tags[0];
-        self::assertSame(128, mb_strlen($tag['name']));
-        self::assertSame('a-b', $tag['slug']);
+        $item = ['id' => 'x-1', '_athenana' => ['tags' => [
+            ['name' => str_repeat('n', 300), 'slug' => 'A B'],
+            ['name' => 'Long', 'slug' => str_repeat('Z', 300)],
+            ['name' => 'Exact', 'slug' => str_repeat('y', 128)],
+            ['name' => 'Missing Slug'],
+            ['name' => 'Empty', 'slug' => ''],
+        ]]];
+        $tags = (new AthenaAdapter())->toRecord($item, new DateTimeImmutable())->tags;
+        self::assertSame(128, mb_strlen($tags[0]['name']));
+        self::assertSame('A B', $tags[0]['slug'], 'a source slug up to 128 bytes is kept verbatim');
+        self::assertSame(str_repeat('z', 128), $tags[1]['slug'], 'an overlong slug is derived');
+        self::assertSame(str_repeat('y', 128), $tags[2]['slug']);
+        self::assertSame('missing-slug', $tags[3]['slug']);
+        self::assertSame('empty', $tags[4]['slug']);
     }
 
     public function testRegistry(): void
