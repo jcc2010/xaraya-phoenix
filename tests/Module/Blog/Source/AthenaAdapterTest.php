@@ -92,6 +92,14 @@ final class AthenaAdapterTest extends TestCase
         self::assertSame('link', (new AthenaAdapter())->toRecord($item, new DateTimeImmutable())->kind);
     }
 
+    public function testOverlongAthenaTagIsCapped(): void
+    {
+        $item = ['id' => 'x-1', '_athenana' => ['tags' => [['name' => str_repeat('n', 300), 'slug' => 'A B']]]];
+        $tag = (new AthenaAdapter())->toRecord($item, new DateTimeImmutable())->tags[0];
+        self::assertSame(128, mb_strlen($tag['name']));
+        self::assertSame('a-b', $tag['slug']);
+    }
+
     public function testRegistry(): void
     {
         $registry = new AdapterRegistry();

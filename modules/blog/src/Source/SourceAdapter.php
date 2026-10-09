@@ -17,7 +17,7 @@ interface SourceAdapter
     public function toRecord(array $item, DateTimeImmutable $now): PostRecord;
 
     /**
-     * @param array<string, mixed> $feed a page envelope
+     * @param array<array-key, mixed> $feed a page envelope
      * @return array<string, mixed> blog column => value; always has 'pinned_item_id' and 'extra'
      */
     public function feedMeta(array $feed): array;

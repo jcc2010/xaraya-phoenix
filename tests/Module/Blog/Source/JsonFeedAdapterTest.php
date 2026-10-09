@@ -97,4 +97,29 @@ final class JsonFeedAdapterTest extends TestCase
         $bare = (new JsonFeedAdapter())->feedMeta(['version' => 'https://jsonfeed.org/version/1.1', 'items' => []]);
         self::assertSame(['pinned_item_id' => null, 'extra' => []], $bare);
     }
+
+    public function testFeedMetaIgnoresIntegerKeys(): void
+    {
+        $feed = json_decode('{"1":"x","_a":1,"version":"https://jsonfeed.org/version/1.1","items":[]}', true);
+        self::assertSame(['_a' => 1], (new JsonFeedAdapter())->feedMeta($feed)['extra']);
+    }
+
+    public function testNonFiniteNumberIsRejected(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->record(json_decode('{"id":"1","n":1e999}', true));
+    }
+
+    public function testOverlongUrlsAreRejected(): void
+    {
+        foreach ([['url', 1025], ['external_url', 2049], ['image', 2049]] as [$key, $len]) {
+            try {
+                $this->record(['id' => '1', $key => 'https://e.test/' . str_repeat('a', $len)]);
+                self::fail("expected rejection of {$key}");
+            } catch (InvalidArgumentException) {
+                self::addToAssertionCount(1);
+            }
+        }
+        self::assertSame(2048, strlen((string) $this->record(['id' => '1', 'image' => str_repeat('a', 2048)])->image));
+    }
 }

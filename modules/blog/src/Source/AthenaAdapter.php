@@ -29,7 +29,8 @@ final class AthenaAdapter extends JsonFeedAdapter
             if (!is_array($tag) || ($name = self::str($tag, 'name')) === null) {
                 continue;
             }
-            $slug = self::str($tag, 'slug') ?? Text::slug($name);
+            $name = mb_substr($name, 0, 128);
+            $slug = Text::slug(self::str($tag, 'slug') ?? $name);
             $tags[$slug] ??= ['name' => $name, 'slug' => $slug];
         }
 

@@ -8,6 +8,7 @@ use DateTimeImmutable;
 use DateTimeZone;
 use Exception;
 use InvalidArgumentException;
+use JsonException;
 use Xaraya\Module\Blog\Post\PostRecord;
 use Xaraya\Module\Blog\Support\Text;
 
@@ -42,12 +43,24 @@ class JsonFeedAdapter implements SourceAdapter
         $contentText = self::str($item, 'content_text');
         $externalUrl = self::str($item, 'external_url');
         $image = self::str($item, 'image');
+        $url = self::str($item, 'url');
+        foreach (['url' => [$url, 1024], 'external_url' => [$externalUrl, 2048], 'image' => [$image, 2048]] as $field => [$value, $max]) {
+            if ($value !== null && strlen($value) > $max) {
+                throw new InvalidArgumentException("Item {$field} is longer than {$max} bytes");
+            }
+        }
         $kind = $this->kind($item, $contentHtml ?? $contentText, $externalUrl, $image);
         $title = self::str($item, 'title')
             ?? Text::deriveTitle($kind, $contentHtml ?? ($contentText === null ? null : htmlspecialchars($contentText)), $externalUrl);
         $modified = self::date($item, 'date_modified');
         $published = self::date($item, 'date_published') ?? $modified ?? $now;
         $tags = $this->tags($item);
+
+        try {
+            $hash = sha1(Text::canonicalJson($item));
+        } catch (JsonException $e) {
+            throw new InvalidArgumentException('Item cannot be hashed: ' . $e->getMessage(), 0, $e);
+        }
 
         $doc = array_diff_key($item, array_flip(self::COLUMN_KEYS));
         unset($doc['tags']);
@@ -69,7 +82,7 @@ class JsonFeedAdapter implements SourceAdapter
             self::ulidFrom($itemId),
             $kind,
             $title,
-            self::str($item, 'url'),
+            $url,
             $externalUrl,
             $contentHtml,
             $image,
@@ -77,10 +90,14 @@ class JsonFeedAdapter implements SourceAdapter
             $modified,
             $doc,
             $tags,
-            sha1(Text::canonicalJson($item)),
+            $hash,
         );
     }
 
+    /**
+     * @param array<array-key, mixed> $feed
+     * @return array<string, mixed>
+     */
     public function feedMeta(array $feed): array
     {
         $meta = [];
@@ -102,7 +119,7 @@ class JsonFeedAdapter implements SourceAdapter
         }
         $extra = [];
         foreach ($feed as $key => $value) {
-            if (str_starts_with($key, '_')) {
+            if (is_string($key) && str_starts_with($key, '_')) {
                 $extra[$key] = $value;
             }
         }
