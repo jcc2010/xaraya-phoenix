@@ -33,6 +33,8 @@ final class MediaStoreTest extends BlogTestCase
             ->on('https://img.test/same.png', $png)
             ->on('https://img.test/page.html', new FetchResult(200, '<html>nope</html>'))
             ->on('https://img.test/huge.png', new FetchResult(200, (string) base64_decode(self::PNG, true) . str_repeat("\0", MediaStore::MAX_BYTES)))
+            ->on('https://img.test/poly.gif', new FetchResult(200, 'GIF89a<html><script>alert(1)</script>'))
+            ->on('https://img.test/x.svg', new FetchResult(200, '<svg xmlns="http://www.w3.org/2000/svg"><script>alert(1)</script></svg>'))
             ->on('https://img.test/boom', fn(): FetchResult => throw new RuntimeException('connection reset'));
         $app->container()->instance(HttpFetcher::class, $this->fetcher);
         $this->store = $app->container()->get(MediaStore::class);
@@ -66,7 +68,7 @@ final class MediaStoreTest extends BlogTestCase
 
     public function testFailuresReturnNull(): void
     {
-        foreach (['https://img.test/page.html', 'https://img.test/huge.png', 'https://img.test/boom', 'https://img.test/missing.png'] as $url) {
+        foreach (['https://img.test/page.html', 'https://img.test/huge.png', 'https://img.test/boom', 'https://img.test/missing.png', 'https://img.test/poly.gif', 'https://img.test/x.svg'] as $url) {
             self::assertNull($this->store->localize($this->blog, $url, $this->now()), $url);
         }
     }

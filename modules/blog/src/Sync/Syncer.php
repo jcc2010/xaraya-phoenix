@@ -80,7 +80,7 @@ final class Syncer
                     $blog = $this->blogs->update($blog, $adapter->feedMeta($feed), $now);
                     $etag = $result->etag;
                 }
-                $changed = $this->syncPage($blog, $adapter, $items, $now, $report, $seen);
+                $changed = $this->syncPage($blog, $adapter, $items, $now, $report, $seen, $full);
                 $report->pages++;
                 $visited[$url] = true;
                 $next = $feed['next_url'] ?? null;
@@ -113,7 +113,7 @@ final class Syncer
      * @param array<int|string, true> $seen
      * @return int how many items were created or updated
      */
-    private function syncPage(Blog $blog, SourceAdapter $adapter, array $items, DateTimeImmutable $now, SyncReport $report, array &$seen): int
+    private function syncPage(Blog $blog, SourceAdapter $adapter, array $items, DateTimeImmutable $now, SyncReport $report, array &$seen, bool $full): int
     {
         /** @var array<string, PostRecord> $records */
         $records = [];
@@ -171,7 +171,7 @@ final class Syncer
 
         if ($blog->media === 'local') {
             foreach ($results as $itemId => $result) {
-                if ($result->status !== SaveResult::UNCHANGED) {
+                if ($full || $result->status !== SaveResult::UNCHANGED) {
                     $this->media->localize($blog, $records[(string) $itemId], $now);
                 }
             }

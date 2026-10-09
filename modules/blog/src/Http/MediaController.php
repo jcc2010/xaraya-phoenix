@@ -29,10 +29,17 @@ final class MediaController extends Controller
             throw new NotFound();
         }
 
-        return new Response(200, [
+        $headers = [
             'Content-Type' => (string) $row['mime'],
-            'Content-Length' => (string) filesize($path),
             'Cache-Control' => 'public, max-age=31536000, immutable',
-        ], Stream::create($handle));
+            'X-Content-Type-Options' => 'nosniff',
+            'Content-Security-Policy' => "default-src 'none'; sandbox",
+        ];
+        $size = filesize($path);
+        if ($size !== false) {
+            $headers['Content-Length'] = (string) $size;
+        }
+
+        return new Response(200, $headers, Stream::create($handle));
     }
 }

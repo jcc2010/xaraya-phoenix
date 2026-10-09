@@ -62,6 +62,18 @@ final class MediaStore
     /** @return array<string, mixed>|null */
     public function store(Blog $blog, string $bytes, ?string $sourceUrl, DateTimeImmutable $now): ?array
     {
+        try {
+            return $this->doStore($blog, $bytes, $sourceUrl, $now);
+        } catch (Throwable $e) {
+            $this->logger->warning('Media {url} for {blog} could not be stored: {reason}', ['url' => $sourceUrl ?? '(upload)', 'blog' => $blog->handle, 'reason' => $e->getMessage()]);
+
+            return null;
+        }
+    }
+
+    /** @return array<string, mixed>|null */
+    private function doStore(Blog $blog, string $bytes, ?string $sourceUrl, DateTimeImmutable $now): ?array
+    {
         $size = strlen($bytes);
         if ($size === 0 || $size > self::MAX_BYTES) {
             $this->logger->warning('Media {url} for {blog} rejected: {bytes} bytes', ['url' => $sourceUrl ?? '(upload)', 'blog' => $blog->handle, 'bytes' => $size]);
@@ -72,6 +84,11 @@ final class MediaStore
         $ext = self::TYPES[$mime] ?? null;
         if ($ext === null) {
             $this->logger->warning('Media {url} for {blog} rejected: type {mime}', ['url' => $sourceUrl ?? '(upload)', 'blog' => $blog->handle, 'mime' => $mime]);
+
+            return null;
+        }
+        if (str_starts_with($mime, 'image/') && $mime !== 'image/avif' && !self::isRealImage($bytes)) {
+            $this->logger->warning('Media {url} for {blog} rejected: not a valid image', ['url' => $sourceUrl ?? '(upload)', 'blog' => $blog->handle]);
 
             return null;
         }
@@ -152,6 +169,16 @@ final class MediaStore
         }
 
         return $handle . '/' . $name;
+    }
+
+    private static function isRealImage(string $bytes): bool
+    {
+        $info = @getimagesizefromstring($bytes);
+        if ($info === false || $info[0] < 1 || $info[1] < 1 || $info[0] * $info[1] > 50_000_000) {
+            return false;
+        }
+
+        return !function_exists('imagecreatefromstring') || @imagecreatefromstring($bytes) !== false;
     }
 
     /** @return array{0: ?int, 1: ?int} */

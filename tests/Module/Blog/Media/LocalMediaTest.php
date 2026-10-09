@@ -14,10 +14,13 @@ use Xaraya\Tests\Module\Blog\Support\FeedFactory;
 
 final class LocalMediaTest extends BlogTestCase
 {
-    private function seeded(string $media): App
+    private HttpFetcher $fetcher;
+
+    /** @param array<string, mixed> $overrides */
+    private function seeded(string $media, array $overrides = []): App
     {
         $this->enableBlog();
-        $app = $this->app();
+        $app = $this->app($overrides);
         $blog = $this->blogs($app)->create([
             'handle' => 'src', 'mode' => 'mirror', 'source_url' => 'https://src.test/blog/src/feed.json',
             'source_format' => 'athena', 'media' => $media,
@@ -26,10 +29,11 @@ final class LocalMediaTest extends BlogTestCase
         $items[0]['image'] = 'https://img.test/a.png';
         $fetcher = FeedFactory::fetcher(FeedFactory::pages($items))
             ->on('https://img.test/a.png', new FetchResult(200, (string) base64_decode(MediaStoreTest::PNG, true)));
+        $this->fetcher = $fetcher;
         $app->container()->instance(HttpFetcher::class, $fetcher);
         $app->container()->get(Syncer::class)->sync($blog, true, $this->now());
 
-        return $this->app();
+        return $this->app($overrides);
     }
 
     public function testLocalBlogServesRewrittenMedia(): void
@@ -50,6 +54,8 @@ final class LocalMediaTest extends BlogTestCase
         self::assertSame('image/png', $file->getHeaderLine('Content-Type'));
         self::assertSame('public, max-age=31536000, immutable', $file->getHeaderLine('Cache-Control'));
         self::assertSame(base64_decode(MediaStoreTest::PNG, true), (string) $file->getBody());
+        self::assertSame('nosniff', $file->getHeaderLine('X-Content-Type-Options'));
+        self::assertSame("default-src 'none'; sandbox", $file->getHeaderLine('Content-Security-Policy'));
 
         $id = substr((string) parse_url($image, PHP_URL_PATH), 7, 26);
         self::assertSame(404, $app->handle(new ServerRequest('GET', "/media/{$id}.jpg"))->getStatusCode(), 'wrong extension');
@@ -62,5 +68,25 @@ final class LocalMediaTest extends BlogTestCase
         $feed = json_decode((string) $app->handle(new ServerRequest('GET', '/blog/src/feed.json'))->getBody(), true);
         self::assertSame('https://img.test/a.png', $feed['items'][0]['image']);
         self::assertDirectoryDoesNotExist($this->tmp . '/uploads/src');
+    }
+
+    public function testStorageFailureDoesNotAbortSync(): void
+    {
+        file_put_contents($this->tmp . '/notadir', 'x');
+        $app = $this->seeded('local', ['blog.uploads' => $this->tmp . '/notadir']);
+        $feed = json_decode((string) $app->handle(new ServerRequest('GET', '/blog/src/feed.json'))->getBody(), true);
+        self::assertCount(2, $feed['items']);
+        self::assertSame('https://img.test/a.png', $feed['items'][0]['image']);
+    }
+
+    public function testFullSyncBackfillsAfterSwitchingToLocal(): void
+    {
+        $app = $this->seeded('remote');
+        $app->container()->instance(HttpFetcher::class, $this->fetcher);
+        $repo = $this->blogs($app);
+        $blog = $repo->update($repo->find('src') ?? throw new \RuntimeException(), ['media' => 'local'], $this->now());
+        $app->container()->get(Syncer::class)->sync($blog, true, $this->now());
+        $feed = json_decode((string) $app->handle(new ServerRequest('GET', '/blog/src/feed.json'))->getBody(), true);
+        self::assertMatchesRegularExpression('#^http://xar\.test/media/[0-9a-z]{26}\.png$#', $feed['items'][0]['image']);
     }
 }
