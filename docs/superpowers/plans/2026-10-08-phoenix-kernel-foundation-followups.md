@@ -1,0 +1,51 @@
+# Phoenix kernel foundation follow-ups
+
+Deferred findings from the Plan 1 reviews (SDD ledger). Items fixed by the final fix wave or later are excluded where known.
+
+- [Task 1] PHP_CS_FIXER_IGNORE_ENV deprecated in php-cs-fixer 3.95
+- [Task 1] ci.yml starts mysql+postgres services for sqlite cells too
+- [Task 1] CI static job fails while src/ has no PHP files — ruling: plan-mandated & transient; Task 2 adds src files; nothing pushed before then
+- [Task 2] Env — `KEY="abc" # note` keeps quotes (quoted value + trailing comment)
+- [Task 2] Config::set overwrites scalar mid-path silently
+- [Task 2] ConfigTest temp cleanup not in finally; EnvTest keys could collide with host env vars
+- [Task 2] config cache has no invalidation except cache:clear (Task 14) — document
+- [Task 3] Container autowire treats abstract classes as resolvable (has() uses class_exists) — nullable/defaulted abstract-typed params throw instead of null/default
+- [Task 3] Container error message omits the unresolvable type; variadic/union params unhandled
+- [Task 4] ULID upper-bound (0xFFFFFFFFFFFF+1) untested; same-ms IDs not monotonic (document)
+- [Task 5] MySQL upsert ignores $conflict (ON DUPLICATE KEY fires on any unique key) and uses deprecated VALUES(); empty $conflict -> SQL error on sqlite/pg; conflict cols not ident()-validated
+- [Task 5] Schema/Blueprint never validate identifiers (global constraint); mixed-case names trap on PG
+- [Task 5] {name} placeholder regex narrower than ident() and rewrites inside string literals
+- [Task 5] Schema::table() silently ignores primary() declarations
+- [Task 5] ConnectionFactory sqlite mkdir unchecked
+- [Task 5] transaction() can't nest; MySQL DDL in transaction implicit-commits (Migrator handles via transactionalDdl)
+- [Task 5] no tests for PHP bool round-trip into bool column, default(true), DO NOTHING upsert path; index-name test only on Sqlite
+- [Task 5] rename misses hashed (>51 char table) index names; sqlite index rebuild not transactional
+- [Task 6] cursor() correctness depends on orderBy direction matching $op (undocumented); null cursor value matches nothing; list keys -> TypeError
+- [Task 6] orderBy silently treats non-'desc' as ASC; LIKE case-sensitivity and NULL ordering differ by dialect (document)
+- [Task 6] tests lack cursor '>' / 3-column / bad args / toSql param order
+- [Task 7] MySQL migrations non-atomic (document: keep small/idempotent); nested transaction() inside up() fails on sqlite/pg (document)
+- [Task 7] rollback can half-complete on unknown module path (pre-validate); no concurrency guard
+- [Task 7] untested — rollback steps>1, empty rollback, unknown path, failing up() leaves no record
+- [Task 8] EventDispatcher resolves all listeners eagerly (stopPropagation doesn't prevent later instantiation); string listeners that are function names bypass container
+- [Task 8] tests lack interface listener, non-Event dispatch, pre-stopped event
+- [Task 9] module named 'kernel' would clobber kernel migration path — reserve name; foo-bar/foo_bar namespace collision unflagged
+- [Task 9] bad module.json throws ModuleException from autoloader on any class miss
+- [Task 9] requires.kernel / version constraints never evaluated (presence only)
+- [Task 9] enable() non-atomic; re-enable overwrites installed_at; autoloader test never unregisters; glob metachars in paths
+- [Task 10] UrlGenerator ignores FastRoute optional segments [..] and doesn't validate params against regex constraints
+- [Task 10] 405 Allow omits HEAD/OPTIONS; RouteCollector::any omits OPTIONS/HEAD (undocumented)
+- [Task 11] wantsJson path check case-sensitive; RouteHandler rawurldecode turns %2F into separators (confirm intent)
+- [Task 11] [class,method] handler shape unvalidated; Emitter buffers full body; no direct Pipeline/Emitter/MiddlewareRegistry arg tests
+- [Task 11] HttpException::reason lacks 502/504 labels
+- [Task 12] If-None-Match parsing splits quoted etags containing commas; strtotime more lenient than HTTP-date
+- [Task 12] ConditionalGetTest date fixtures use wrong weekdays (8 Oct 2026 is Thursday) — use gmdate(DATE_RFC7231)
+- [Task 12] 304 omits Expires/Content-Location (plan list); tests lack HEAD, '*', combined cors+conditional, OPTIONS w/o request headers
+- [Task 13] FileLogger — unknown minLevel silently 'info'; racy mkdir; file_put_contents failure ignored; newline injection in messages; temp dir leak in test
+- [Task 13] ModuleRegistry::enabled() runs twice per request (bootModules + routes); routes() runs fully even with route cache
+- [Task 13] production config cache ignores later .env changes until cache:clear (document); invalid timezone only notices
+- [Task 14] a bad module command entry makes the whole CLI unusable (Application ctor outside try) — skip with warning
+- [Task 14] module commands can silently shadow kernel commands; --step not validated; Output::table strlen not multibyte-aware
+- [Task 15] hello route {name:[a-z]+} unbounded vs string(64) column; same-second ordering arbitrary; CountGreetings per-process (docblock); unused params note
+- [FINAL] C3 README quick start fails after `bin/xar migrate` (config cache ignores process env MODULE_PATHS) — ruling: real, not load-bearing for Plans 2/3 (dev UX only); fix in a follow-up (skip config cache for CLI, or document MODULE_PATHS in .env)
+- [FINAL] Config::stale same-second mtime; savepoint rollback can mask original exception after MySQL implicit commit; malformed module.json breaks safe-mode boot
+POST-PLAN: parked C3 fixed in 1af761bac (CLI never uses config cache); pushed
