@@ -9,6 +9,7 @@
   "commands": [
     "Xaraya\\Module\\Blog\\Cli\\BlogCreateCommand",
     "Xaraya\\Module\\Blog\\Cli\\BlogListCommand",
+    "Xaraya\\Module\\Blog\\Cli\\BlogModeCommand",
     "Xaraya\\Module\\Blog\\Cli\\BlogSyncCommand"
   ]
 }
