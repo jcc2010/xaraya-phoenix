@@ -53,7 +53,7 @@ final class FeedController extends Controller
         $feedUrl = $this->urls->generate('blog.feed.json', ['handle' => $blog->handle], true);
         $feed = $this->feeds->feed($blog, $page, $feedUrl, $next, $this->appUrl(), $this->media->map($blog, $page));
 
-        return CacheHeaders::apply($this->json($feed, 200, 'application/feed+json'), $page);
+        return CacheHeaders::apply($this->json($feed, 200, 'application/feed+json'));
     }
 
     /** @param array<string, string> $params */
@@ -64,7 +64,7 @@ final class FeedController extends Controller
         $self = $this->urls->generate('blog.feed.xml', ['handle' => $blog->handle], true);
         $xml = $this->rss->render($blog, $page, $self, $this->appUrl(), $this->media->map($blog, $page));
 
-        return CacheHeaders::apply(new Response(200, ['Content-Type' => 'application/rss+xml; charset=utf-8'], $xml), $page);
+        return CacheHeaders::apply(new Response(200, ['Content-Type' => 'application/rss+xml; charset=utf-8'], $xml));
     }
 
     private function blog(string $handle): Blog

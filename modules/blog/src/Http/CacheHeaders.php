@@ -4,26 +4,21 @@ declare(strict_types=1);
 
 namespace Xaraya\Module\Blog\Http;
 
-use DateTimeZone;
 use Psr\Http\Message\ResponseInterface;
-use Xaraya\Module\Blog\Post\Post;
 
+/**
+ * Headers for feeds and single items.
+ *
+ * Deliberately no Last-Modified: a time computed from one page's posts cannot reflect tombstones or
+ * blog metadata changes, so If-Modified-Since would yield stale 304s. The body-hash ETag added by the
+ * conditional middleware is always correct.
+ */
 final class CacheHeaders
 {
-    /** @param list<Post> $posts */
-    public static function apply(ResponseInterface $response, array $posts): ResponseInterface
+    public static function apply(ResponseInterface $response): ResponseInterface
     {
-        $latest = null;
-        foreach ($posts as $post) {
-            $time = $post->dateModified ?? $post->datePublished;
-            if ($latest === null || $time > $latest) {
-                $latest = $time;
-            }
-        }
-        $response = $response->withHeader('Cache-Control', 'public, max-age=60');
-
-        return $latest === null
-            ? $response
-            : $response->withHeader('Last-Modified', $latest->setTimezone(new DateTimeZone('UTC'))->format('D, d M Y H:i:s') . ' GMT');
+        return $response
+            ->withHeader('Cache-Control', 'public, max-age=60')
+            ->withHeader('X-Content-Type-Options', 'nosniff');
     }
 }

@@ -57,7 +57,8 @@ final class FeedHttpTest extends BlogTestCase
         self::assertSame('application/feed+json', $response->getHeaderLine('Content-Type'));
         self::assertSame('*', $response->getHeaderLine('Access-Control-Allow-Origin'));
         self::assertSame('public, max-age=60', $response->getHeaderLine('Cache-Control'));
-        self::assertSame('Thu, 01 Oct 2026 12:00:00 GMT', $response->getHeaderLine('Last-Modified'));
+        self::assertFalse($response->hasHeader('Last-Modified'));
+        self::assertSame('nosniff', $response->getHeaderLine('X-Content-Type-Options'));
 
         $feed = self::body($response);
         self::assertSame('https://jsonfeed.org/version/1.1', $feed['version']);
@@ -94,6 +95,23 @@ final class FeedHttpTest extends BlogTestCase
         self::assertSame('*', $preflight->getHeaderLine('Access-Control-Allow-Origin'));
     }
 
+    public function testIfModifiedSinceAloneNeverHidesATombstone(): void
+    {
+        $app = $this->seeded(3);
+        $newest = self::body($this->get($app, '/blog/src/feed.json'))['items'][0];
+        $blog = $this->blogs($app)->find('src');
+        self::assertNotNull($blog);
+        $app->container()->get(PostRepository::class)->tombstone($blog->id, [$newest['id']], $this->now());
+
+        $future = ['If-Modified-Since' => 'Fri, 01 Jan 2100 00:00:00 GMT'];
+        foreach (['/blog/src/feed.json', '/blog/src/feed.xml'] as $uri) {
+            $response = $this->get($app, $uri, $future);
+            self::assertSame(200, $response->getStatusCode(), $uri);
+            self::assertStringNotContainsString('Post 0', (string) $response->getBody(), $uri);
+            self::assertStringContainsString('Post 1', (string) $response->getBody(), $uri);
+        }
+    }
+
     public function testErrorsAreJsonWithCors(): void
     {
         $app = $this->seeded(3);
@@ -117,6 +135,9 @@ final class FeedHttpTest extends BlogTestCase
         $single = $this->get($app, "/s/{$id}.json");
         self::assertSame(200, $single->getStatusCode());
         self::assertSame('application/json', $single->getHeaderLine('Content-Type'));
+        self::assertSame('public, max-age=60', $single->getHeaderLine('Cache-Control'));
+        self::assertSame('nosniff', $single->getHeaderLine('X-Content-Type-Options'));
+        self::assertFalse($single->hasHeader('Last-Modified'));
         self::assertSame('*', $single->getHeaderLine('Access-Control-Allow-Origin'));
         self::assertEquals($first, self::body($single));
 
@@ -154,6 +175,9 @@ final class FeedHttpTest extends BlogTestCase
         $response = $this->get($app, '/blog/src/feed.xml');
         self::assertSame(200, $response->getStatusCode());
         self::assertSame('application/rss+xml; charset=utf-8', $response->getHeaderLine('Content-Type'));
+        self::assertSame('public, max-age=60', $response->getHeaderLine('Cache-Control'));
+        self::assertSame('nosniff', $response->getHeaderLine('X-Content-Type-Options'));
+        self::assertFalse($response->hasHeader('Last-Modified'));
         $rss = simplexml_load_string((string) $response->getBody());
         self::assertNotFalse($rss);
         self::assertCount(50, $rss->channel->item);

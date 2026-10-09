@@ -36,6 +36,6 @@ final class PostController extends Controller
         $blog = $this->blogs->findById($post->blogId) ?? throw new NotFound();
         $appUrl = rtrim((string) $this->config->get('app.url', ''), '/');
 
-        return CacheHeaders::apply($this->json($this->items->item($blog, $post, $appUrl, $this->media->map($blog, [$post])), 200, 'application/json'), [$post]);
+        return CacheHeaders::apply($this->json($this->items->item($blog, $post, $appUrl, $this->media->map($blog, [$post])), 200, 'application/json'));
     }
 }
