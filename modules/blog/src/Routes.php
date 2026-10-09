@@ -7,6 +7,7 @@ namespace Xaraya\Module\Blog;
 use Xaraya\Kernel\Routing\RouteCollector;
 use Xaraya\Kernel\Routing\RouteProvider;
 use Xaraya\Module\Blog\Http\FeedController;
+use Xaraya\Module\Blog\Http\MediaController;
 use Xaraya\Module\Blog\Http\PostController;
 
 final class Routes implements RouteProvider
@@ -19,5 +20,6 @@ final class Routes implements RouteProvider
             ->middleware('cors', 'conditional');
         $routes->get('/s/{id:[0-9a-hjkmnp-tv-z]{26}}.json', [PostController::class, 'show'], 'blog.post.json')
             ->middleware('cors', 'conditional');
+        $routes->get('/media/{id:[0-9a-hjkmnp-tv-z]{26}}.{ext:[a-z0-9]{2,5}}', [MediaController::class, 'show'], 'blog.media');
     }
 }

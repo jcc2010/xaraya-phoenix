@@ -59,6 +59,7 @@ final class SyncerTest extends BlogTestCase
             $c->get(EventDispatcher::class),
             $c->get(\Psr\Log\LoggerInterface::class),
             $c->get(SyncLock::class),
+            $c->get(\Xaraya\Module\Blog\Media\MediaLocalizer::class),
             $maxPages,
         );
     }

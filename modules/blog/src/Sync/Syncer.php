@@ -16,6 +16,7 @@ use Xaraya\Kernel\Events\ItemDeleted;
 use Xaraya\Kernel\Events\ItemUpdated;
 use Xaraya\Module\Blog\Blog;
 use Xaraya\Module\Blog\BlogRepository;
+use Xaraya\Module\Blog\Media\MediaLocalizer;
 use Xaraya\Module\Blog\Post\PostRecord;
 use Xaraya\Module\Blog\Post\PostRepository;
 use Xaraya\Module\Blog\Post\SaveResult;
@@ -36,6 +37,7 @@ final class Syncer
         private readonly EventDispatcher $events,
         private readonly LoggerInterface $logger,
         private readonly SyncLock $lock,
+        private readonly MediaLocalizer $media,
         private readonly int $maxPages = self::MAX_PAGES,
     ) {}
 
@@ -164,6 +166,14 @@ final class Syncer
             } else {
                 $report->updated++;
                 $this->events->dispatch(new ItemUpdated('blog', 'post', $result->id, $payload));
+            }
+        }
+
+        if ($blog->media === 'local') {
+            foreach ($results as $itemId => $result) {
+                if ($result->status !== SaveResult::UNCHANGED) {
+                    $this->media->localize($blog, $records[(string) $itemId], $now);
+                }
             }
         }
 

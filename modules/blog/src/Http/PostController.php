@@ -22,6 +22,7 @@ final class PostController extends Controller
         private readonly PostRepository $posts,
         private readonly ItemSerializer $items,
         private readonly Config $config,
+        private readonly MediaUrls $media,
     ) {}
 
     /** @param array<string, string> $params */
@@ -35,6 +36,6 @@ final class PostController extends Controller
         $blog = $this->blogs->findById($post->blogId) ?? throw new NotFound();
         $appUrl = rtrim((string) $this->config->get('app.url', ''), '/');
 
-        return CacheHeaders::apply($this->json($this->items->item($blog, $post, $appUrl), 200, 'application/json'), [$post]);
+        return CacheHeaders::apply($this->json($this->items->item($blog, $post, $appUrl, $this->media->map($blog, [$post])), 200, 'application/json'), [$post]);
     }
 }

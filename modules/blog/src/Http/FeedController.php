@@ -33,6 +33,7 @@ final class FeedController extends Controller
         private readonly RssRenderer $rss,
         private readonly UrlGenerator $urls,
         private readonly Config $config,
+        private readonly MediaUrls $media,
     ) {}
 
     /** @param array<string, string> $params */
@@ -50,7 +51,7 @@ final class FeedController extends Controller
             ], true);
         }
         $feedUrl = $this->urls->generate('blog.feed.json', ['handle' => $blog->handle], true);
-        $feed = $this->feeds->feed($blog, $page, $feedUrl, $next, $this->appUrl());
+        $feed = $this->feeds->feed($blog, $page, $feedUrl, $next, $this->appUrl(), $this->media->map($blog, $page));
 
         return CacheHeaders::apply($this->json($feed, 200, 'application/feed+json'), $page);
     }
@@ -61,7 +62,7 @@ final class FeedController extends Controller
         $blog = $this->blog($params['handle']);
         $page = $this->posts->page($blog->id, self::now(), null, self::PAGE_SIZE);
         $self = $this->urls->generate('blog.feed.xml', ['handle' => $blog->handle], true);
-        $xml = $this->rss->render($blog, $page, $self, $this->appUrl());
+        $xml = $this->rss->render($blog, $page, $self, $this->appUrl(), $this->media->map($blog, $page));
 
         return CacheHeaders::apply(new Response(200, ['Content-Type' => 'application/rss+xml; charset=utf-8'], $xml), $page);
     }
