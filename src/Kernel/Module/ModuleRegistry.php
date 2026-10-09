@@ -4,12 +4,16 @@ declare(strict_types=1);
 
 namespace Xaraya\Kernel\Module;
 
+use Closure;
 use DateTimeImmutable;
+use WeakReference;
 use Xaraya\Kernel\Db\Connection;
 use Xaraya\Kernel\Db\Migrations\Migrator;
 
 final class ModuleRegistry
 {
+    private ?Closure $autoloader = null;
+
     /** @var array<string, Manifest>|null */
     private ?array $discovered = null;
 
@@ -120,8 +124,15 @@ final class ModuleRegistry
 
     public function registerAutoloader(): void
     {
-        spl_autoload_register(function (string $class): void {
-            foreach ($this->discover() as $manifest) {
+        // Hold the registry weakly: a global autoloader that captured $this would keep this registry
+        // (and its database connection) alive for the rest of the process.
+        $self = WeakReference::create($this);
+        $autoloader = static function (string $class) use ($self): void {
+            $registry = $self->get();
+            if ($registry === null) {
+                return;
+            }
+            foreach ($registry->discover() as $manifest) {
                 $ns = $manifest->namespace();
                 if (!str_starts_with($class, $ns)) {
                     continue;
@@ -133,7 +144,16 @@ final class ModuleRegistry
                     return;
                 }
             }
-        });
+        };
+        spl_autoload_register($autoloader);
+        $this->autoloader = $autoloader;
+    }
+
+    public function __destruct()
+    {
+        if ($this->autoloader !== null) {
+            spl_autoload_unregister($this->autoloader);
+        }
     }
 
     /**

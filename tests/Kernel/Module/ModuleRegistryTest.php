@@ -136,7 +136,10 @@ final class ModuleRegistryTest extends DbTestCase
 
     public function testAutoloaderLoadsModuleClasses(): void
     {
-        $this->registry()->registerAutoloader();
+        // The autoloader holds the registry weakly, so keep it referenced while loading.
+        $registry = $this->registry();
+        $registry->registerAutoloader();
         self::assertSame('alpha', (new \Xaraya\Module\Alpha\Thing())->hello());
+        unset($registry);
     }
 }

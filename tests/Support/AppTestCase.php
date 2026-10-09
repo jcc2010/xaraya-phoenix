@@ -22,6 +22,20 @@ abstract class AppTestCase extends TestCase
 
     protected function tearDown(): void
     {
+        // PHPUnit keeps TestCase objects alive for the whole run; drop subclass state so Apps
+        // (and their PDO connections) can be collected instead of exhausting max_connections.
+        foreach ((new \ReflectionObject($this))->getProperties() as $property) {
+            $declaring = $property->getDeclaringClass();
+            if ($property->isStatic() || !$declaring->isSubclassOf(self::class) || !$property->isInitialized($this)) {
+                continue;
+            }
+            $name = $property->getName();
+            // Bind to the declaring class so private properties can be unset too.
+            \Closure::bind(static function (object $test) use ($name): void {
+                unset($test->{$name});
+            }, null, $declaring->getName())($this);
+        }
+        gc_collect_cycles();
         if (!$this->usesSqlite()) {
             DbTestCase::dropAll(DbTestCase::connect());
         }
