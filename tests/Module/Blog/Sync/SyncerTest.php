@@ -45,6 +45,24 @@ final class SyncerTest extends BlogTestCase
         return $app->container()->get(Syncer::class);
     }
 
+    private function cappedSyncer(FixtureFetcher $fetcher, int $maxPages): Syncer
+    {
+        $c = $this->app()->container();
+        $c->instance(HttpFetcher::class, $fetcher);
+
+        return new Syncer(
+            $c->get(\Xaraya\Kernel\Db\Connection::class),
+            $c->get(\Xaraya\Module\Blog\BlogRepository::class),
+            $c->get(PostRepository::class),
+            $c->get(\Xaraya\Module\Blog\Source\AdapterRegistry::class),
+            $fetcher,
+            $c->get(EventDispatcher::class),
+            $c->get(\Psr\Log\LoggerInterface::class),
+            $c->get(SyncLock::class),
+            $maxPages,
+        );
+    }
+
     private function blog(): Blog
     {
         return $this->blogs($this->app)->find('mirror') ?? throw new RuntimeException('blog missing');
@@ -139,26 +157,90 @@ final class SyncerTest extends BlogTestCase
         $items = FeedFactory::items(120);
         $this->syncer(FeedFactory::fetcher(FeedFactory::pages($items)))->sync($this->blog(), true, $this->now());
 
-        $report = $this->syncer(FeedFactory::fetcher(FeedFactory::pages(array_slice($items, 0, 50))))->sync($this->blog(), true, $this->now());
+        $before = $this->db($this->app)->fetchValue('SELECT last_full_sync_at FROM {blogs} WHERE handle = ?', ['mirror']);
+        $report = $this->syncer(FeedFactory::fetcher(FeedFactory::pages(array_slice($items, 0, 50))))->sync($this->blog(), true, $this->now()->modify('+1 hour'));
         self::assertTrue($report->valveTripped);
         self::assertFalse($report->ok());
         self::assertSame(0, $report->deleted);
         self::assertSame(120, $this->posts()->countLive($this->blog->id));
         self::assertStringContainsString('SAFETY VALVE', $report->summary());
+        self::assertSame($before, $this->db($this->app)->fetchValue('SELECT last_full_sync_at FROM {blogs} WHERE handle = ?', ['mirror']), 'a tripped valve is not a completed full sync');
     }
 
     public function testHttpErrorMidWalkKeepsEarlierPagesAndDeletesNothing(): void
     {
         $items = FeedFactory::items(120);
-        $pages = FeedFactory::pages($items);
-        $fetcher = FeedFactory::fetcher($pages)->on(self::SOURCE . '?page=2', new FetchResult(500, 'down'));
+        $this->syncer(FeedFactory::fetcher(FeedFactory::pages($items)))->sync($this->blog(), true, $this->now());
+        $items[0]['title'] = 'Changed on page one';
+        $fetcher = FeedFactory::fetcher(FeedFactory::pages($items))->on(self::SOURCE . '?page=2', new FetchResult(500, 'down'));
         try {
             $this->syncer($fetcher)->sync($this->blog(), true, $this->now());
             self::fail('expected failure');
         } catch (RuntimeException $e) {
             self::assertStringContainsString('HTTP 500', $e->getMessage());
         }
-        self::assertSame(50, $this->posts()->countLive($this->blog->id), 'page 1 was committed');
+        self::assertSame(120, $this->posts()->countLive($this->blog->id), 'nothing was tombstoned');
+        self::assertSame('Changed on page one', $this->posts()->find($this->posts()->page($this->blog->id, $this->now(), null, 1)[0]->id)?->title ?? null, 'page 1 was committed');
+    }
+
+    public function testLoopingNextUrlThrowsAndDeletesNothing(): void
+    {
+        $items = FeedFactory::items(150);
+        $this->syncer(FeedFactory::fetcher(FeedFactory::pages($items)))->sync($this->blog(), true, $this->now());
+        $pages = FeedFactory::pages($items);
+        $pages[self::SOURCE . '?page=3']['next_url'] = self::SOURCE;
+        try {
+            $this->syncer(FeedFactory::fetcher($pages))->sync($this->blog(), true, $this->now());
+            self::fail('expected failure');
+        } catch (RuntimeException $e) {
+            self::assertStringContainsString('loops back', $e->getMessage());
+        }
+        self::assertSame(150, $this->posts()->countLive($this->blog->id));
+    }
+
+    public function testPageCapThrowsAndDeletesNothing(): void
+    {
+        $items = FeedFactory::items(150);
+        $pages = FeedFactory::pages($items);
+        $this->syncer(FeedFactory::fetcher($pages))->sync($this->blog(), true, $this->now());
+        try {
+            $this->cappedSyncer(FeedFactory::fetcher($pages), 2)->sync($this->blog(), true, $this->now());
+            self::fail('expected failure');
+        } catch (RuntimeException $e) {
+            self::assertStringContainsString('exceeds 2 pages', $e->getMessage());
+        }
+        self::assertSame(150, $this->posts()->countLive($this->blog->id));
+        $lock = new SyncLock($this->tmp . '/locks');
+        self::assertTrue($lock->acquire('mirror'), 'lock was released');
+        $lock->release('mirror');
+    }
+
+    public function testEtagIsStoredOnlyAfterASuccessfulWalk(): void
+    {
+        $pages = FeedFactory::pages(FeedFactory::items(120));
+        $fetcher = (new FixtureFetcher())
+            ->on(self::SOURCE, FixtureFetcher::json($pages[self::SOURCE], '"e1"'))
+            ->on(self::SOURCE . '?page=2', new FetchResult(500, 'down'));
+        try {
+            $this->syncer($fetcher)->sync($this->blog(), false, $this->now());
+            self::fail('expected failure');
+        } catch (RuntimeException) {
+        }
+        self::assertNull($this->blog()->sourceEtag);
+        $retry = FeedFactory::fetcher($pages);
+        $this->syncer($retry)->sync($this->blog(), false, $this->now());
+        self::assertNull($retry->requests[0]['etag']);
+    }
+
+    public function testItemThatFailsConversionIsNotTombstoned(): void
+    {
+        $items = FeedFactory::items(10);
+        $this->syncer(FeedFactory::fetcher(FeedFactory::pages($items)))->sync($this->blog(), true, $this->now());
+        $items[3]['date_published'] = 'not-a-date';
+        $report = $this->syncer(FeedFactory::fetcher(FeedFactory::pages($items)))->sync($this->blog(), true, $this->now());
+        self::assertSame(1, $report->skipped);
+        self::assertSame(0, $report->deleted);
+        self::assertSame(10, $this->posts()->countLive($this->blog->id));
     }
 
     public function testMalformedItemsAreSkipped(): void
@@ -201,6 +283,23 @@ final class SyncerTest extends BlogTestCase
         });
         $app->container()->get(Syncer::class)->sync($this->blog(), true, $this->now());
         self::assertSame(['created:blog:post', 'created:blog:post', 'created:blog:post'], $seen);
+    }
+
+    public function testTombstoningDispatchesItemDeleted(): void
+    {
+        $items = FeedFactory::items(3);
+        $this->syncer(FeedFactory::fetcher(FeedFactory::pages($items)))->sync($this->blog(), true, $this->now());
+        array_pop($items);
+        $app = $this->app();
+        $app->container()->instance(HttpFetcher::class, FeedFactory::fetcher(FeedFactory::pages($items)));
+        $deleted = [];
+        $app->container()->get(EventDispatcher::class)->listen(ItemDeleted::class, function (ItemDeleted $e) use (&$deleted): void {
+            $deleted[] = [$e->id, $e->item];
+        });
+        $app->container()->get(Syncer::class)->sync($this->blog(), true, $this->now());
+        self::assertCount(1, $deleted);
+        self::assertSame(['blog' => 'mirror'], $deleted[0][1]);
+        self::assertSame(26, strlen($deleted[0][0]));
     }
 
     public function testNativeBlogCannotSync(): void

@@ -36,6 +36,7 @@ final class Syncer
         private readonly EventDispatcher $events,
         private readonly LoggerInterface $logger,
         private readonly SyncLock $lock,
+        private readonly int $maxPages = self::MAX_PAGES,
     ) {}
 
     public function sync(Blog $blog, bool $full, DateTimeImmutable $now): SyncReport
@@ -59,9 +60,10 @@ final class Syncer
 
                 return $report;
             }
-            /** @var array<string, true> $seen */
+            /** @var array<int|string, true> $seen */
             $seen = [];
             $visited = [];
+            $etag = null;
             while (true) {
                 if ($result->status !== 200) {
                     throw new RuntimeException("Fetching {$url} returned HTTP {$result->status}");
@@ -73,14 +75,21 @@ final class Syncer
                     throw new RuntimeException("{$url} is not a JSON Feed");
                 }
                 if ($report->pages === 0) {
-                    $blog = $this->blogs->update($blog, $adapter->feedMeta($feed) + ['source_etag' => $result->etag], $now);
+                    $blog = $this->blogs->update($blog, $adapter->feedMeta($feed), $now);
+                    $etag = $result->etag;
                 }
                 $changed = $this->syncPage($blog, $adapter, $items, $now, $report, $seen);
                 $report->pages++;
                 $visited[$url] = true;
                 $next = $feed['next_url'] ?? null;
-                if ((!$full && $changed === 0) || !is_string($next) || $next === '' || isset($visited[$next]) || $report->pages >= self::MAX_PAGES) {
+                if (!is_string($next) || $next === '' || (!$full && $changed === 0)) {
                     break;
+                }
+                if (isset($visited[$next])) {
+                    throw new RuntimeException("Feed {$url} loops back to {$next}");
+                }
+                if ($report->pages >= $this->maxPages) {
+                    throw new RuntimeException("Feed exceeds {$this->maxPages} pages");
                 }
                 $url = $next;
                 $result = $this->fetcher->get($url);
@@ -88,7 +97,8 @@ final class Syncer
             if ($full) {
                 $this->tombstoneMissing($blog, $seen, $now, $report);
             }
-            $this->blogs->update($blog, ['last_synced_at' => $now] + ($full ? ['last_full_sync_at' => $now] : []), $now);
+            $this->blogs->update($blog, ['last_synced_at' => $now, 'source_etag' => $etag]
+                + ($full && !$report->valveTripped ? ['last_full_sync_at' => $now] : []), $now);
 
             return $report;
         } finally {
@@ -98,7 +108,7 @@ final class Syncer
 
     /**
      * @param array<mixed> $items
-     * @param array<string, true> $seen
+     * @param array<int|string, true> $seen
      * @return int how many items were created or updated
      */
     private function syncPage(Blog $blog, SourceAdapter $adapter, array $items, DateTimeImmutable $now, SyncReport $report, array &$seen): int
@@ -115,6 +125,10 @@ final class Syncer
                 $record = $adapter->toRecord($item, $now);
             } catch (InvalidArgumentException $e) {
                 $report->skipped++;
+                $id = $item['id'] ?? null;
+                if (is_int($id) || (is_string($id) && $id !== '')) {
+                    $seen[(string) $id] = true;
+                }
                 $this->logger->warning('Skipping item {index} from {blog}: {reason}', ['index' => $index, 'blog' => $blog->handle, 'reason' => $e->getMessage()]);
                 continue;
             }
@@ -156,7 +170,7 @@ final class Syncer
         return $changed;
     }
 
-    /** @param array<string, true> $seen */
+    /** @param array<int|string, true> $seen */
     private function tombstoneMissing(Blog $blog, array $seen, DateTimeImmutable $now, SyncReport $report): void
     {
         $live = $this->posts->liveItemIds($blog->id);
