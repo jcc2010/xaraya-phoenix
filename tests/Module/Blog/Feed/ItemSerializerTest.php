@@ -132,4 +132,88 @@ final class ItemSerializerTest extends TestCase
         self::assertSame('http://xar.test/media/x.png', $item['image']);
         self::assertSame('http://xar.test/media/x.png', $item['_athenana']['images'][0]['url']);
     }
+
+    private const ULID = '01m3t19wn8reaww81zg1m47tjq';
+
+    /**
+     * @param array<string, mixed> $source
+     * @param array<string, string> $media
+     * @return array<string, mixed>
+     */
+    private static function roundTrip(array $source, array $media = []): array
+    {
+        $record = (new AthenaAdapter())->toRecord($source, new DateTimeImmutable());
+        $post = self::postFrom($record, self::ULID);
+
+        return (new ItemSerializer())->item(self::blog('https://www.wyome.com/blog/p/{id}'), $post, 'http://xar.test', $media);
+    }
+
+    /** @return array<string, mixed> */
+    private static function base(): array
+    {
+        return [
+            'id' => 'https://athenana.com/s/' . self::ULID,
+            'url' => 'https://www.wyome.com/blog/p/' . self::ULID,
+            'title' => 'T',
+            'date_published' => '2026-10-01T10:00:00+00:00',
+        ];
+    }
+
+    public function testPodcastAttachmentsRoundTripAndRewrite(): void
+    {
+        $audio = 'https://athenana.com/p/ep1.mp3';
+        $source = self::base() + [
+            'tags' => ['audio'],
+            'attachments' => [['url' => $audio, 'mime_type' => 'audio/mpeg', 'duration_in_seconds' => 4648, 'size_in_bytes' => 0]],
+            '_athenana' => ['kind' => 'note', 'podcast' => ['show' => 'S', 'episode' => 3], 'tags' => [['name' => 'audio', 'slug' => 'audio']]],
+        ];
+        $item = self::roundTrip($source);
+        self::assertEquals($source, $item);
+        $keys = array_keys($item);
+        self::assertSame('attachments', $keys[array_search('tags', $keys, true) + 1]);
+
+        $rewritten = self::roundTrip($source, [$audio => 'http://xar.test/media/ep1.mp3']);
+        self::assertSame('http://xar.test/media/ep1.mp3', $rewritten['attachments'][0]['url']);
+        self::assertSame(0, $rewritten['attachments'][0]['size_in_bytes']);
+    }
+
+    public function testFalseAndZeroSurvive(): void
+    {
+        $source = self::base() + [
+            '_x' => ['n' => 0, 'flag' => false],
+            '_athenana' => ['kind' => 'note', 'pinned' => false],
+        ];
+        $item = self::roundTrip($source);
+        self::assertEquals($source, $item);
+        self::assertFalse($item['_athenana']['pinned']);
+        self::assertSame(0, $item['_x']['n']);
+        self::assertFalse($item['_x']['flag']);
+    }
+
+    public function testDifferingTagsListRoundTrips(): void
+    {
+        $source = self::base() + [
+            'tags' => ['Foo Bar', 'x'],
+            '_athenana' => ['kind' => 'note', 'tags' => [['name' => 'foo bar', 'slug' => 'foo-bar']]],
+        ];
+        self::assertEquals($source, self::roundTrip($source));
+    }
+
+    public function testEmptyExtras(): void
+    {
+        $source = self::base() + [
+            'tags' => ['Foo'],
+            '_athenana' => ['kind' => 'note', 'tags' => [['name' => 'Foo', 'slug' => 'foo']]],
+        ];
+        $item = self::roundTrip($source);
+        self::assertEquals($source, $item);
+        self::assertSame(['kind', 'tags'], array_keys($item['_athenana']));
+
+        $empty = self::base() + ['tags' => [], '_athenana' => ['kind' => 'note', 'tags' => []]];
+        $item = self::roundTrip($empty);
+        self::assertArrayNotHasKey('tags', $item);
+        self::assertSame(['kind' => 'note'], $item['_athenana']);
+        $expected = self::base() + ['_athenana' => ['kind' => 'note']];
+        self::assertEquals($expected, $item);
+    }
 }
