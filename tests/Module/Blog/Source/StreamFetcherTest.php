@@ -52,9 +52,14 @@ final class StreamFetcherTest extends TestCase
         }
     }
 
+    private static function fetcher(): StreamFetcher
+    {
+        return new StreamFetcher(allowPrivateHosts: true);
+    }
+
     public function testFetchesJsonWithEtagAndUserAgent(): void
     {
-        $result = (new StreamFetcher('PhoenixTest/1'))->get(self::$base . '/feed.json');
+        $result = (new StreamFetcher('PhoenixTest/1', allowPrivateHosts: true))->get(self::$base . '/feed.json');
         self::assertSame(200, $result->status);
         self::assertSame('"v1"', $result->etag);
         self::assertSame('application/feed+json', $result->contentType);
@@ -63,35 +68,75 @@ final class StreamFetcherTest extends TestCase
 
     public function testConditionalRequestGets304(): void
     {
-        $result = (new StreamFetcher())->get(self::$base . '/feed.json', '"v1"');
+        $result = (self::fetcher())->get(self::$base . '/feed.json', '"v1"');
         self::assertSame(304, $result->status);
         self::assertSame('', $result->body);
     }
 
     public function testFollowsRedirectsAndReturnsErrorStatuses(): void
     {
-        self::assertSame('Fixture', (new StreamFetcher())->get(self::$base . '/moved')->json()['title']);
-        self::assertSame(500, (new StreamFetcher())->get(self::$base . '/boom')->status);
-        self::assertSame(404, (new StreamFetcher())->get(self::$base . '/missing')->status);
+        self::assertSame('Fixture', (self::fetcher())->get(self::$base . '/moved')->json()['title']);
+        self::assertSame(500, (self::fetcher())->get(self::$base . '/boom')->status);
+        self::assertSame(404, (self::fetcher())->get(self::$base . '/missing')->status);
+    }
+
+    public function testDefaultUserAgentCarriesTheModuleVersion(): void
+    {
+        $module = json_decode((string) file_get_contents(dirname(__DIR__, 4) . '/modules/blog/module.json'), true, 512, JSON_THROW_ON_ERROR);
+        self::assertSame(\Xaraya\Module\Blog\BlogServiceProvider::VERSION, $module['version']);
+        self::assertSame('XarayaPhoenix/' . $module['version'], self::fetcher()->get(self::$base . '/feed.json')->json()['ua']);
+    }
+
+    public function testRefusesRedirectsToNonHttpSchemes(): void
+    {
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Refusing to fetch file:///etc/passwd');
+        self::fetcher()->get(self::$base . '/to-file');
+    }
+
+    public function testStopsAfterFiveRedirects(): void
+    {
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Too many redirects');
+        self::fetcher()->get(self::$base . '/loop');
+    }
+
+    public function testDeadlineCoversTheWholeBody(): void
+    {
+        $start = microtime(true);
+        try {
+            (new StreamFetcher(deadline: 1.0, allowPrivateHosts: true))->get(self::$base . '/slow');
+            self::fail('slow body was read past the deadline');
+        } catch (RuntimeException $e) {
+            self::assertStringContainsString('exceeded the 1s deadline', $e->getMessage());
+        }
+        self::assertLessThan(2.0, microtime(true) - $start);
+    }
+
+    public function testRefusesLoopbackWhenPrivateHostsAreNotAllowed(): void
+    {
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Refusing to fetch ' . self::$base . '/feed.json');
+        (new StreamFetcher())->get(self::$base . '/feed.json');
     }
 
     public function testRejectsOversizedBodies(): void
     {
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('exceeds');
-        (new StreamFetcher(maxBytes: 1024))->get(self::$base . '/big');
+        (new StreamFetcher(maxBytes: 1024, allowPrivateHosts: true))->get(self::$base . '/big');
     }
 
     public function testRejectsNonHttpUrls(): void
     {
         $this->expectException(InvalidArgumentException::class);
-        (new StreamFetcher())->get('file:///etc/passwd');
+        (self::fetcher())->get('file:///etc/passwd');
     }
 
     public function testUnreachableHostThrows(): void
     {
         $this->expectException(RuntimeException::class);
-        (new StreamFetcher(timeout: 2.0))->get('http://127.0.0.1:1/feed.json');
+        (new StreamFetcher(timeout: 2.0, allowPrivateHosts: true))->get('http://127.0.0.1:1/feed.json');
     }
 
     public function testJsonRejectsNonObjects(): void

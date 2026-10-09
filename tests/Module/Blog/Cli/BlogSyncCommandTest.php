@@ -25,6 +25,15 @@ final class BlogSyncCommandTest extends BlogTestCase
         self::assertStringNotContainsString('mine', $out);
     }
 
+    public function testPrivateSourceIsRefusedAsAFailedSync(): void
+    {
+        $app = $this->enableBlog();
+        $this->xar(['blog:create', 'inside', '--mode=mirror', '--format=jsonfeed', '--source=http://127.0.0.1:9/feed.json'], $app);
+        [$code, , $err] = $this->xar(['blog:sync', 'inside'], $this->app());
+        self::assertSame(1, $code);
+        self::assertStringContainsString('inside: Refusing to fetch http://127.0.0.1:9/feed.json', $err);
+    }
+
     public function testErrors(): void
     {
         $app = $this->enableBlog();

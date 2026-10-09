@@ -25,6 +25,23 @@ switch ($path) {
         header('Location: /feed.json', true, 301);
 
         return true;
+    case '/to-file':
+        header('Location: file:///etc/passwd', true, 302);
+
+        return true;
+    case '/loop':
+        header('Location: /loop', true, 302);
+
+        return true;
+    case '/slow':
+        header('Content-Type: text/plain');
+        for ($i = 0; $i < 4; $i++) {
+            echo str_repeat('s', 16), "\n";
+            flush();
+            usleep(700_000);
+        }
+
+        return true;
     case '/boom':
         http_response_code(500);
         echo 'nope';
