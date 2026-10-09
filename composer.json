@@ -28,7 +28,10 @@
         "files": ["src/functions.php"]
     },
     "autoload-dev": {
-        "psr-4": { "Xaraya\\Tests\\": "tests/" }
+        "psr-4": {
+            "Xaraya\\Tests\\": "tests/",
+            "Xaraya\\Module\\Blog\\": "modules/blog/src/"
+        }
     },
     "scripts": {
         "test": "phpunit",

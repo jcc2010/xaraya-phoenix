@@ -1,0 +1,11 @@
+{
+  "name": "blog",
+  "version": "0.1.0",
+  "content": true,
+  "requires": { "kernel": "^0.1", "modules": {} },
+  "migrations": "migrations",
+  "commands": [
+    "Xaraya\\Module\\Blog\\Cli\\BlogCreateCommand",
+    "Xaraya\\Module\\Blog\\Cli\\BlogListCommand"
+  ]
+}
