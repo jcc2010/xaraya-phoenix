@@ -18,7 +18,7 @@ final class SyncLock
         if (!is_dir($this->directory) && !@mkdir($this->directory, 0775, true) && !is_dir($this->directory)) {
             throw new RuntimeException("Cannot create lock directory {$this->directory}");
         }
-        $handle = @fopen($this->directory . '/blog-' . $name . '.lock', 'c');
+        $handle = @fopen($this->path($name), 'c');
         if ($handle === false) {
             throw new RuntimeException("Cannot open lock file for '{$name}'");
         }
@@ -28,8 +28,23 @@ final class SyncLock
             return false;
         }
         $this->handles[$name] = $handle;
+        @touch($this->path($name)); // the mtime is the start time of the current holder
 
         return true;
+    }
+
+    /** When the current holder acquired the lock (lock file mtime), or null when there is no lock file. */
+    public function heldSince(string $name): ?int
+    {
+        clearstatcache(true, $this->path($name));
+        $mtime = @filemtime($this->path($name));
+
+        return $mtime === false ? null : $mtime;
+    }
+
+    public function path(string $name): string
+    {
+        return $this->directory . '/blog-' . $name . '.lock';
     }
 
     public function release(string $name): void

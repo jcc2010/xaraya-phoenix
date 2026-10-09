@@ -7,6 +7,7 @@ namespace Xaraya\Module\Blog\Cli;
 use DateTimeImmutable;
 use DateTimeZone;
 use InvalidArgumentException;
+use Psr\Log\LoggerInterface;
 use Throwable;
 use Xaraya\Kernel\Cli\Command;
 use Xaraya\Kernel\Cli\Input;
@@ -17,7 +18,11 @@ use Xaraya\Module\Blog\Sync\Syncer;
 
 final class BlogSyncCommand extends Command
 {
-    public function __construct(private readonly BlogRepository $blogs, private readonly Syncer $syncer) {}
+    public function __construct(
+        private readonly BlogRepository $blogs,
+        private readonly Syncer $syncer,
+        private readonly LoggerInterface $logger,
+    ) {}
 
     public function name(): string
     {
@@ -50,11 +55,15 @@ final class BlogSyncCommand extends Command
             try {
                 $report = $this->syncer->sync($blog, $input->flag('full'), new DateTimeImmutable('now', new DateTimeZone('UTC')));
                 $output->line($report->summary());
+                if ($report->valveTripped) {
+                    $this->logger->warning('blog:sync of {blog} tripped the safety valve; nothing was deleted', ['blog' => $blog->handle]);
+                }
                 if (!$report->ok()) {
                     $code = 1;
                 }
             } catch (Throwable $e) {
                 $output->error("{$blog->handle}: {$e->getMessage()}");
+                $this->logger->error('blog:sync of {blog} failed: {reason}', ['blog' => $blog->handle, 'reason' => $e->getMessage(), 'exception' => $e]);
                 $code = 1;
             }
         }

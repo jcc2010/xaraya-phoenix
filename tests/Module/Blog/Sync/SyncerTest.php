@@ -268,6 +268,28 @@ final class SyncerTest extends BlogTestCase
         $report = $this->syncer(FeedFactory::fetcher([]))->sync($this->blog(), true, $this->now());
         self::assertTrue($report->alreadyRunning);
         $lock->release('mirror');
+        self::assertStringNotContainsString('a previous run may be hung', $this->log());
+    }
+
+    public function testStaleLockIsReportedAsPossiblyHung(): void
+    {
+        $lock = new SyncLock($this->tmp . '/locks');
+        self::assertTrue($lock->acquire('mirror'));
+        $since = time() - 31 * 60;
+        touch($this->tmp . '/locks/blog-mirror.lock', $since);
+        clearstatcache();
+        $report = $this->syncer(FeedFactory::fetcher([]))->sync($this->blog(), true, $this->now());
+        self::assertTrue($report->alreadyRunning);
+        $lock->release('mirror');
+        self::assertStringContainsString(
+            'WARNING: sync lock for mirror held since ' . gmdate('Y-m-d H:i:s', $since) . ' UTC; a previous run may be hung',
+            $this->log(),
+        );
+    }
+
+    private function log(): string
+    {
+        return implode('', array_map('file_get_contents', glob($this->tmp . '/logs/*.log') ?: []));
     }
 
     public function testEventsAreDispatched(): void

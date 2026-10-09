@@ -56,11 +56,17 @@ Phoenix then serves the same feed shape as Athena, so a consumer only changes th
 Keep a mirror fresh with cron:
 
 ```
-*/10 * * * * cd /path/to/phoenix && bin/xar blog:sync --all
-15 3 * * *   cd /path/to/phoenix && bin/xar blog:sync --all --full
+*/10 * * * * cd /path/to/phoenix && timeout 20m bin/xar blog:sync --all
+15 3 * * *   cd /path/to/phoenix && timeout 2h bin/xar blog:sync --all --full
 ```
+
+A run that finds a blog still locked by an earlier run skips it, and logs a warning once the lock
+is over 30 minutes old (the earlier run may be hung).
 
 A quick sync stops at the first unchanged page. A full sync also catches edits to old posts and
 deletions, and refuses to delete anything if the source suddenly shows under half of the posts.
-Add `--media=local` at creation to download images and serve them from `/media/…`.
+Add `--media=local` at creation to download images and serve them from `/media/…`. This downloads
+third-party files referenced by the posts onto your server. Fetches only go to public hosts: loopback,
+private, link-local and other internal addresses are refused unless `blog.fetch_allow_private` is
+set to true in the config.
 `bin/xar blog:mode <handle> native` stops mirroring; post ids never change.

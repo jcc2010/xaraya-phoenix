@@ -32,6 +32,32 @@ final class BlogSyncCommandTest extends BlogTestCase
         [$code, , $err] = $this->xar(['blog:sync', 'inside'], $this->app());
         self::assertSame(1, $code);
         self::assertStringContainsString('inside: Refusing to fetch http://127.0.0.1:9/feed.json', $err);
+        $log = $this->log();
+        self::assertStringContainsString('ERROR: blog:sync of inside failed: Refusing to fetch http://127.0.0.1:9/feed.json', $log);
+        self::assertStringContainsString('RuntimeException in ', $log, 'the exception and its trace are logged');
+    }
+
+    public function testValveTripIsLoggedAsAWarning(): void
+    {
+        $this->enableBlog();
+        $app = $this->app();
+        $this->xar(['blog:create', 'src', '--mode=mirror', '--format=athena', '--source=https://src.test/blog/src/feed.json'], $app);
+        $items = FeedFactory::items(120);
+        $app = $this->app();
+        $app->container()->instance(HttpFetcher::class, FeedFactory::fetcher(FeedFactory::pages($items)));
+        self::assertSame(0, $this->xar(['blog:sync', 'src', '--full'], $app)[0]);
+
+        $app = $this->app();
+        $app->container()->instance(HttpFetcher::class, FeedFactory::fetcher(FeedFactory::pages(array_slice($items, 0, 50))));
+        [$code, $out] = $this->xar(['blog:sync', 'src', '--full'], $app);
+        self::assertSame(1, $code);
+        self::assertStringContainsString('SAFETY VALVE', $out);
+        self::assertStringContainsString('WARNING: blog:sync of src tripped the safety valve', $this->log());
+    }
+
+    private function log(): string
+    {
+        return implode('', array_map('file_get_contents', glob($this->tmp . '/logs/*.log') ?: []));
     }
 
     public function testErrors(): void

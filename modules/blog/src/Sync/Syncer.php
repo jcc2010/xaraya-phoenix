@@ -27,6 +27,8 @@ use Xaraya\Module\Blog\Source\SourceAdapter;
 final class Syncer
 {
     public const MAX_PAGES = 10_000;
+    /** A lock held longer than this is reported as possibly hung. */
+    public const STALE_LOCK_SECONDS = 30 * 60;
 
     public function __construct(
         private readonly Connection $db,
@@ -49,6 +51,12 @@ final class Syncer
         $report = new SyncReport($blog->handle, $full);
         if (!$this->lock->acquire($blog->handle)) {
             $report->alreadyRunning = true;
+            $since = $this->lock->heldSince($blog->handle);
+            if ($since !== null && $now->getTimestamp() - $since > self::STALE_LOCK_SECONDS) {
+                $this->logger->warning('sync lock for {blog} held since {time}; a previous run may be hung', [
+                    'blog' => $blog->handle, 'time' => gmdate('Y-m-d H:i:s', $since) . ' UTC',
+                ]);
+            }
 
             return $report;
         }
