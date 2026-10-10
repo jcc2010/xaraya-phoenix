@@ -11,6 +11,8 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Log\LoggerInterface;
+use Xaraya\Kernel\Auth\Access;
+use Xaraya\Kernel\Auth\GuestAccess;
 use Xaraya\Kernel\Cache\Cache;
 use Xaraya\Kernel\Config\Config;
 use Xaraya\Kernel\Config\Env;
@@ -38,9 +40,12 @@ use Xaraya\Kernel\Routing\RouteCollector;
 use Xaraya\Kernel\Routing\RouteProvider;
 use Xaraya\Kernel\Routing\Router;
 use Xaraya\Kernel\Routing\UrlGenerator;
+use Xaraya\Kernel\View\PhpEngine;
 use Xaraya\Kernel\View\TemplateLocator;
 use Xaraya\Kernel\View\ThemeRegistry;
 use Xaraya\Kernel\View\Translator;
+use Xaraya\Kernel\View\TwigEngine;
+use Xaraya\Kernel\View\View;
 use Xaraya\Kernel\View\ViewException;
 
 final class App
@@ -153,6 +158,19 @@ final class App
                 $engine === null || $engine === '' ? null : $engine,
             );
         });
+
+        $c->set(Access::class, fn(): Access => new GuestAccess());
+        $c->set(TwigEngine::class, fn(Container $c): TwigEngine => new TwigEngine(
+            $c->get(TemplateLocator::class),
+            $this->cacheDir() . '/twig',
+            $this->debug(),
+        ));
+        $c->set(View::class, fn(Container $c): View => new View(
+            $c->get(TemplateLocator::class),
+            new PhpEngine(),
+            $c->get(TwigEngine::class),
+            $c,
+        ));
 
         $this->bootModules();
     }
