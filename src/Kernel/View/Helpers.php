@@ -8,6 +8,7 @@ use InvalidArgumentException;
 use Psr\Http\Message\ServerRequestInterface;
 use Stringable;
 use Xaraya\Kernel\Auth\Access;
+use Xaraya\Kernel\Blocks\BlockRenderer;
 use Xaraya\Kernel\Config\Config;
 use Xaraya\Kernel\Container\Container;
 use Xaraya\Kernel\Hooks\DisplayHooks;
@@ -25,6 +26,7 @@ final class Helpers
         'asset' => false,
         'can' => false,
         'hooks' => true,
+        'blocks' => true,
         'csrf' => true,
         't' => false,
         'e' => true,
@@ -78,6 +80,12 @@ final class Helpers
     public function hooks(string $hook, array $item, array $input = []): string
     {
         return $this->container->get(DisplayHooks::class)->call($hook, $item, $input);
+    }
+
+    /** Renders the enabled, visible blocks of a theme region ('' when there are none). */
+    public function blocks(string $region): string
+    {
+        return $this->container->get(BlockRenderer::class)->region($region, $this);
     }
 
     /** The CSRF hidden field. A stub until Plan 3 adds sessions: it returns ''. */

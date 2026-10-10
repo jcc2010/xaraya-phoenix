@@ -13,6 +13,9 @@ use Psr\Http\Server\MiddlewareInterface;
 use Psr\Log\LoggerInterface;
 use Xaraya\Kernel\Auth\Access;
 use Xaraya\Kernel\Auth\GuestAccess;
+use Xaraya\Kernel\Blocks\BlockRenderer;
+use Xaraya\Kernel\Blocks\BlockRepository;
+use Xaraya\Kernel\Blocks\BlockTypes;
 use Xaraya\Kernel\Cache\Cache;
 use Xaraya\Kernel\Config\Config;
 use Xaraya\Kernel\Config\Env;
@@ -102,6 +105,9 @@ final class App
             );
             $registry->onEnable(static function (Manifest $manifest, bool $firstInstall) use ($c): void {
                 $c->get(HookBindings::class)->seed($manifest);
+                if ($firstInstall) {
+                    $c->get(BlockRepository::class)->seed($manifest);
+                }
             });
 
             return $registry;
@@ -170,6 +176,24 @@ final class App
             new PhpEngine(),
             $c->get(TwigEngine::class),
             $c,
+        ));
+
+        $c->set(BlockTypes::class, function (Container $c): BlockTypes {
+            $types = new BlockTypes($c);
+            foreach ($c->get(ModuleRegistry::class)->enabled() as $manifest) {
+                foreach ($manifest->blocks() as $type => $class) {
+                    $types->register($type, $class);
+                }
+            }
+
+            return $types;
+        });
+        $c->set(BlockRenderer::class, fn(Container $c): BlockRenderer => new BlockRenderer(
+            $c->get(BlockRepository::class),
+            $c->get(BlockTypes::class),
+            $c->get(Access::class),
+            $c->get(LoggerInterface::class),
+            $this->debug(),
         ));
 
         $this->bootModules();

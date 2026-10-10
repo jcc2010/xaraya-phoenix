@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Xaraya\Kernel\Module;
 
 use JsonException;
+use Xaraya\Kernel\Blocks\BlockInstance;
 use Xaraya\Kernel\Hooks\DisplayHook;
 use Xaraya\Kernel\Hooks\HookBindings;
 
@@ -117,6 +118,58 @@ final class Manifest
                 throw new ModuleException("{$this->name}: hookDefaults[{$i}] needs a string \"subject\" and an optional string \"itemtype\"");
             }
             $out[] = ['subject' => $subject, 'itemtype' => $itemtype];
+        }
+
+        return $out;
+    }
+
+    /** @return array<string, string> block type ("<module>.<name>") => class implementing Block */
+    public function blocks(): array
+    {
+        $out = [];
+        foreach ((array) ($this->data['blocks'] ?? []) as $type => $class) {
+            if (
+                !is_string($type)
+                || !str_starts_with($type, $this->name . '.')
+                || preg_match('/^[a-z][a-z0-9_-]*(?:\.[a-z0-9_-]+)+$/D', $type) !== 1
+                || !is_string($class)
+                || $class === ''
+            ) {
+                throw new ModuleException("{$this->name}: blocks must map \"{$this->name}.<name>\" types to class names");
+            }
+            $out[$type] = $class;
+        }
+
+        return $out;
+    }
+
+    /**
+     * Block instances created the first time this module is enabled.
+     *
+     * @return list<array{type: string, region: string, title: ?string, config: array<string, mixed>, visibility: array{routes?: list<string>, roles?: list<string>}, sort: int}>
+     */
+    public function blockDefaults(): array
+    {
+        $out = [];
+        foreach ((array) ($this->data['blockDefaults'] ?? []) as $i => $default) {
+            if (!is_array($default) || !is_string($default['type'] ?? null) || !is_string($default['region'] ?? null)) {
+                throw new ModuleException("{$this->name}: blockDefaults[{$i}] needs string \"type\" and \"region\"");
+            }
+            $title = $default['title'] ?? null;
+            $config = $default['config'] ?? [];
+            $visibility = $default['visibility'] ?? [];
+            if (($title !== null && !is_string($title)) || !is_array($config) || !is_array($visibility)) {
+                throw new ModuleException("{$this->name}: blockDefaults[{$i}] has an invalid title, config or visibility");
+            }
+            /** @var array<string, mixed> $config */
+            $out[] = [
+                'type' => $default['type'],
+                'region' => $default['region'],
+                'title' => $title,
+                'config' => $config,
+                'visibility' => BlockInstance::visibility($visibility),
+                'sort' => (int) ($default['sort'] ?? 0),
+            ];
         }
 
         return $out;

@@ -44,4 +44,41 @@ final class ManifestViewKeysTest extends AppTestCase
             }
         }
     }
+
+    public function testBlocksAndBlockDefaults(): void
+    {
+        $m = Manifest::fromDirectory(Fixtures::module($this->tmp, 'shop', [
+            'blocks' => ['shop.note' => 'S\\Note'],
+            'blockDefaults' => [
+                ['type' => 'shop.note', 'region' => 'sidebar', 'title' => 'Note', 'config' => ['text' => 'hi'], 'visibility' => ['routes' => ['shop.*'], 'extra' => true], 'sort' => 3],
+                ['type' => 'text', 'region' => 'footer'],
+            ],
+        ]));
+        self::assertSame(['shop.note' => 'S\\Note'], $m->blocks());
+        self::assertSame([
+            ['type' => 'shop.note', 'region' => 'sidebar', 'title' => 'Note', 'config' => ['text' => 'hi'], 'visibility' => ['routes' => ['shop.*']], 'sort' => 3],
+            ['type' => 'text', 'region' => 'footer', 'title' => null, 'config' => [], 'visibility' => [], 'sort' => 0],
+        ], $m->blockDefaults());
+    }
+
+    public function testBlockTypesMustBeNamespacedByTheModule(): void
+    {
+        $bad = [
+            ['blocks' => ['other.note' => 'X']],
+            ['blocks' => ['shop' => 'X']],
+            ['blocks' => ['S\\Note']],
+            ['blockDefaults' => [['region' => 'sidebar']]],
+            ['blockDefaults' => [['type' => 'text', 'region' => 'footer', 'config' => 'nope']]],
+        ];
+        foreach ($bad as $i => $json) {
+            $m = Manifest::fromDirectory(Fixtures::module($this->tmp . '/b' . $i, 'shop', $json));
+            try {
+                $m->blocks();
+                $m->blockDefaults();
+                self::fail('expected a ModuleException for ' . json_encode($json));
+            } catch (ModuleException) {
+                self::addToAssertionCount(1);
+            }
+        }
+    }
 }
