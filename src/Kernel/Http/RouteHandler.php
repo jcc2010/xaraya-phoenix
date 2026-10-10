@@ -12,6 +12,8 @@ use Psr\Http\Server\RequestHandlerInterface;
 use Xaraya\Kernel\Container\Container;
 use Xaraya\Kernel\Routing\RouteMatch;
 use Xaraya\Kernel\Routing\Router;
+use Xaraya\Kernel\View\Page;
+use Xaraya\Kernel\View\View;
 
 final class RouteHandler implements RequestHandlerInterface
 {
@@ -67,9 +69,17 @@ final class RouteHandler implements RequestHandlerInterface
         if ($result instanceof ResponseInterface) {
             return $result;
         }
+        if ($result instanceof Page) {
+            $response = Controller::htmlResponse($this->container->get(View::class)->page($result, $request), $result->status);
+            foreach ($result->headers as $name => $value) {
+                $response = $response->withHeader($name, $value);
+            }
+
+            return $response;
+        }
         if (is_string($result)) {
             return Controller::htmlResponse($result);
         }
-        throw new LogicException('Controllers must return a ResponseInterface or a string');
+        throw new LogicException('Controllers must return a ResponseInterface, a Page or a string');
     }
 }

@@ -5,8 +5,11 @@ declare(strict_types=1);
 namespace Xaraya\Kernel\View;
 
 use LogicException;
+use Throwable;
 use Twig\Environment;
+use Twig\Error\Error as TwigError;
 use Twig\TwigFunction;
+use Xaraya\Kernel\Http\Exception\HttpException;
 
 /** Twig templates (optional: needs twig/twig). Helpers are Twig functions of the same names. */
 final class TwigEngine implements Engine
@@ -33,6 +36,14 @@ final class TwigEngine implements Engine
         $this->current = $x;
         try {
             return $twig->render($name, $data);
+        } catch (TwigError $e) {
+            // Twig wraps whatever a helper or child render threw; give ErrorHandler the original type and status.
+            for ($cause = $e->getPrevious(); $cause instanceof Throwable; $cause = $cause->getPrevious()) {
+                if ($cause instanceof HttpException || $cause instanceof ViewException) {
+                    throw $cause;
+                }
+            }
+            throw $e;
         } finally {
             $this->current = $previous;
         }

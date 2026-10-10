@@ -7,6 +7,7 @@ namespace Xaraya\Kernel\Http;
 use Nyholm\Psr7\Response;
 use Psr\Http\Message\ResponseInterface;
 use Xaraya\Kernel\Http\Exception\NotFound;
+use Xaraya\Kernel\View\Page;
 
 abstract class Controller
 {
@@ -18,6 +19,12 @@ abstract class Controller
     protected function html(string $html, int $status = 200): ResponseInterface
     {
         return self::htmlResponse($html, $status);
+    }
+
+    /** @param array<string, mixed> $data */
+    protected function view(string $template, array $data = [], string $title = '', int $status = 200): Page
+    {
+        return new Page($template, $data, $title, status: $status);
     }
 
     protected function redirect(string $url, int $status = 302): ResponseInterface

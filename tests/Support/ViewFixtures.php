@@ -58,6 +58,9 @@ final class ViewFixtures
             'templates/mixed.twig' => '<i>{{ render(\'phponly\', {v: v}) }}</i>',
             'templates/phponly.php' => '<u><?= $x->e($v) ?></u>',
             'templates/boom.php' => '<p>before<?php throw new \RuntimeException(\'boom\'); ?></p>',
+            'templates/loop.php' => '<?= $x->render(\'loop\') ?>',
+            'templates/lost.php' => '<?php throw new \\Xaraya\\Kernel\\Http\\Exception\\NotFound(\'lost it\'); ?>',
+            'templates/lostwrap.twig' => '<p>{{ render(\'lost\') }}</p>',
             'templates/error/404.php' => '<h1>Missing: <?= $x->e($reason) ?></h1>',
             'templates/error/404.twig' => '<h1>Missing: {{ reason }}</h1>',
             'templates/error/default.php' => '<h1><?= $x->e($status) ?> <?= $x->e($reason) ?></h1><p><?= $x->e($message) ?></p>',
@@ -96,6 +99,7 @@ final class ViewFixtures
                     {
                         $routes->get('/shop', [ShopController::class, 'index'], 'shop.list');
                         $routes->get('/shop/boom', [ShopController::class, 'boom'], 'shop.boom');
+                        $routes->get('/shop/lost', [ShopController::class, 'lost'], 'shop.lost');
                         $routes->get('/shop/{id:\d+}', [ShopController::class, 'item'], 'shop.item');
                         $routes->get('/shop/{id:\d+}/gone', [ShopController::class, 'gone'], 'shop.gone');
                     }
@@ -136,6 +140,12 @@ final class ViewFixtures
                     public function gone(ServerRequestInterface $request, array $params): Page
                     {
                         return $this->view('shop::item', ['id' => $params['id']], 'Gone', 410);
+                    }
+
+                    /** @param array<string, string> $params */
+                    public function lost(ServerRequestInterface $request, array $params): Page
+                    {
+                        return $this->view('lostwrap');
                     }
 
                     /** @param array<string, string> $params */
