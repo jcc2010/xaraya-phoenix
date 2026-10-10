@@ -7,6 +7,7 @@ namespace Xaraya\Kernel\Cli;
 use LogicException;
 use Throwable;
 use Xaraya\Kernel\App;
+use Xaraya\Kernel\Cli\Commands\AssetPublishCommand;
 use Xaraya\Kernel\Cli\Commands\CacheClearCommand;
 use Xaraya\Kernel\Cli\Commands\HookDisableCommand;
 use Xaraya\Kernel\Cli\Commands\HookEnableCommand;
@@ -32,6 +33,7 @@ final class Application
         CacheClearCommand::class,
         HookEnableCommand::class,
         HookDisableCommand::class,
+        AssetPublishCommand::class,
     ];
 
     /** @var array<string, Command> */

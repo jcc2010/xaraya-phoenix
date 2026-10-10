@@ -48,7 +48,7 @@ final class ApplicationTest extends AppTestCase
     public function testHelpListsCommands(): void
     {
         self::assertSame(0, $this->xar(['help']));
-        foreach (['migrate', 'migrate:rollback', 'migrate:status', 'module:list', 'module:enable', 'module:disable', 'serve', 'cache:clear', 'hook:enable', 'hook:disable'] as $name) {
+        foreach (['migrate', 'migrate:rollback', 'migrate:status', 'module:list', 'module:enable', 'module:disable', 'serve', 'cache:clear', 'hook:enable', 'hook:disable', 'asset:publish'] as $name) {
             self::assertStringContainsString($name, $this->stdout());
         }
     }

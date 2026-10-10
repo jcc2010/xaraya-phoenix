@@ -34,6 +34,11 @@ return [
         // "twig" or "php" overrides the active theme's engine preference; unset keeps the theme's choice.
         'engine' => env('VIEW_ENGINE'),
     ],
+    'assets' => [
+        // Where `xar asset:publish` links module and theme assets, and the URL they are served from.
+        'path' => $root . '/public/assets',
+        'url' => env('ASSET_URL', '/assets'),
+    ],
     'log' => [
         'path' => $root . '/var/logs',
         'level' => env('LOG_LEVEL', 'info'),

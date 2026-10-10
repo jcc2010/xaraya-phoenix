@@ -11,6 +11,7 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Log\LoggerInterface;
+use Xaraya\Kernel\Assets\AssetPublisher;
 use Xaraya\Kernel\Auth\Access;
 use Xaraya\Kernel\Auth\GuestAccess;
 use Xaraya\Kernel\Blocks\BlockRenderer;
@@ -218,6 +219,11 @@ final class App
             $this->debug(),
         ));
 
+        $c->set(AssetPublisher::class, fn(Container $c): AssetPublisher => new AssetPublisher(
+            $c->get(ModuleRegistry::class),
+            $c->get(ThemeRegistry::class),
+            $this->path((string) $config->get('assets.path', 'public/assets')),
+        ));
         $this->bootModules();
     }
 
