@@ -42,7 +42,9 @@ class HttpException extends RuntimeException
             422 => 'Unprocessable Content',
             429 => 'Too Many Requests',
             500 => 'Server Error',
+            502 => 'Bad Gateway',
             503 => 'Service Unavailable',
+            504 => 'Gateway Timeout',
             default => 'Error',
         };
     }

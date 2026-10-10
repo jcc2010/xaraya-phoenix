@@ -34,6 +34,7 @@ use Xaraya\Kernel\Http\Emitter;
 use Xaraya\Kernel\Http\Middleware\ConditionalGet;
 use Xaraya\Kernel\Http\Middleware\Cors;
 use Xaraya\Kernel\Http\Middleware\ErrorHandler;
+use Xaraya\Kernel\Http\Middleware\SecureHtml;
 use Xaraya\Kernel\Http\MiddlewareRegistry;
 use Xaraya\Kernel\Http\Pipeline;
 use Xaraya\Kernel\Http\RouteHandler;
@@ -46,6 +47,7 @@ use Xaraya\Kernel\Routing\RouteCollector;
 use Xaraya\Kernel\Routing\RouteProvider;
 use Xaraya\Kernel\Routing\Router;
 use Xaraya\Kernel\Routing\UrlGenerator;
+use Xaraya\Kernel\View\ErrorPages;
 use Xaraya\Kernel\View\PhpEngine;
 use Xaraya\Kernel\View\TemplateLocator;
 use Xaraya\Kernel\View\ThemeRegistry;
@@ -120,6 +122,7 @@ final class App
             $registry = new MiddlewareRegistry($c);
             $registry->register('cors', Cors::class);
             $registry->register('conditional', ConditionalGet::class);
+            $registry->register('secureHtml', SecureHtml::class);
             $registry->registerMarker('csrf');
 
             return $registry;
@@ -129,7 +132,13 @@ final class App
             $c->get(Router::class)->routes(),
             (string) $config->get('app.url', ''),
         ));
-        $c->set(ErrorHandler::class, fn(Container $c): ErrorHandler => new ErrorHandler($c->get(LoggerInterface::class), $this->debug()));
+        $c->set(ErrorPages::class, fn(Container $c): ErrorPages => new ErrorPages($c->get(View::class), $this->debug()));
+        $c->set(ErrorHandler::class, fn(Container $c): ErrorHandler => new ErrorHandler(
+            $c->get(LoggerInterface::class),
+            $this->debug(),
+            // Built lazily: the view (theme, database for blocks and settings) is only touched for an HTML error.
+            static fn(int $status, string $message, ServerRequestInterface $request): ?string => $c->get(ErrorPages::class)->render($status, $message, $request),
+        ));
 
         $c->set(Cache::class, fn(): Cache => new Cache($this->cacheDir() . '/data'));
 

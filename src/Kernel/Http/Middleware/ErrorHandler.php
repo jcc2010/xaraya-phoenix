@@ -74,7 +74,8 @@ final class ErrorHandler implements MiddlewareInterface
             if ($this->renderHtml !== null) {
                 try {
                     $html = ($this->renderHtml)($status, $message, $request);
-                } catch (Throwable) {
+                } catch (Throwable $renderError) {
+                    $this->log($renderError);
                     $html = null;
                 }
             }
@@ -89,7 +90,7 @@ final class ErrorHandler implements MiddlewareInterface
 
     private function wantsJson(ServerRequestInterface $request): bool
     {
-        if (str_ends_with($request->getUri()->getPath(), '.json')) {
+        if (str_ends_with(strtolower($request->getUri()->getPath()), '.json')) {
             return true;
         }
         $accept = $request->getHeaderLine('Accept');

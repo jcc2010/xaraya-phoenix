@@ -143,4 +143,27 @@ final class ErrorHandlerTest extends TestCase
         $debug = $this->send(new ErrorHandler(new MemoryLogger(), debug: true), new ServerRequest('GET', '/x.json'), $e);
         self::assertSame('feed db exploded', json_decode((string) $debug->getBody(), true)['error']['message']);
     }
+
+    public function testRendererFailureIsLogged(): void
+    {
+        $logger = new MemoryLogger();
+        $eh = new ErrorHandler($logger, false, function (): never {
+            throw new \RuntimeException('theme broke');
+        });
+        $response = $this->send($eh, new ServerRequest('GET', '/x'), new NotFound());
+        self::assertSame(404, $response->getStatusCode());
+        self::assertSame(['error: theme broke'], $logger->lines);
+    }
+
+    public function testJsonPathMatchIsCaseInsensitive(): void
+    {
+        $response = $this->send(new ErrorHandler(new MemoryLogger()), new ServerRequest('GET', '/x/FEED.JSON'), new NotFound());
+        self::assertStringContainsString('application/json', $response->getHeaderLine('Content-Type'));
+    }
+
+    public function testGatewayReasons(): void
+    {
+        self::assertSame('Bad Gateway', HttpException::reason(502));
+        self::assertSame('Gateway Timeout', HttpException::reason(504));
+    }
 }
