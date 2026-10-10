@@ -181,7 +181,13 @@ final class App
         $c->set(BlockTypes::class, function (Container $c): BlockTypes {
             $types = new BlockTypes($c);
             foreach ($c->get(ModuleRegistry::class)->enabled() as $manifest) {
-                foreach ($manifest->blocks() as $type => $class) {
+                try {
+                    $blocks = $manifest->blocks();
+                } catch (\Throwable $e) {
+                    $c->get(LoggerInterface::class)->error("Ignoring the blocks of module '{$manifest->name}': {$e->getMessage()}", ['exception' => $e]);
+                    continue;
+                }
+                foreach ($blocks as $type => $class) {
                     $types->register($type, $class);
                 }
             }

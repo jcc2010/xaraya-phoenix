@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace Xaraya\Kernel\Blocks;
 
-/** One row of xar_blocks. */
+use InvalidArgumentException;
+
+/** One row of the blocks table. */
 final class BlockInstance
 {
     /**
@@ -25,6 +27,19 @@ final class BlockInstance
     /** @param array<string, mixed> $row */
     public static function fromRow(array $row): self
     {
+        // Fail closed: visibility that cannot be decoded or has the wrong shape hides the block.
+        $enabled = (bool) $row['enabled'];
+        $decoded = is_string($row['visibility'] ?? null) ? json_decode($row['visibility'], true) : null;
+        try {
+            if (!is_array($decoded)) {
+                throw new InvalidArgumentException('visibility is not a JSON object');
+            }
+            $visibility = self::checkedVisibility($decoded);
+        } catch (InvalidArgumentException) {
+            $visibility = [];
+            $enabled = false;
+        }
+
         return new self(
             (int) $row['id'],
             (string) $row['type'],
@@ -32,9 +47,49 @@ final class BlockInstance
             $row['title'] === null ? null : (string) $row['title'],
             self::json($row['config']),
             (int) $row['sort'],
-            self::visibility(self::json($row['visibility'])),
-            (bool) $row['enabled'],
+            $visibility,
+            $enabled,
         );
+    }
+
+    public static function isValidType(string $type): bool
+    {
+        return strlen($type) <= 128 && preg_match('/^[a-z][a-z0-9_-]*(?:\.[a-z0-9_-]+)*$/D', $type) === 1;
+    }
+
+    public static function isValidRegion(string $region): bool
+    {
+        return strlen($region) <= 64 && preg_match('/^[a-z][a-z0-9_-]*$/D', $region) === 1;
+    }
+
+    /**
+     * Validates a visibility array: a present "routes" or "roles" must be a list of non-empty strings.
+     * Unknown keys are dropped.
+     *
+     * @param array<mixed> $value
+     * @return array{routes?: list<string>, roles?: list<string>}
+     * @throws InvalidArgumentException
+     */
+    public static function checkedVisibility(array $value): array
+    {
+        $out = [];
+        foreach (['routes', 'roles'] as $key) {
+            if (!array_key_exists($key, $value)) {
+                continue;
+            }
+            $rule = $value[$key];
+            if (!is_array($rule) || !array_is_list($rule)) {
+                throw new InvalidArgumentException("Block visibility \"{$key}\" must be a list of strings");
+            }
+            foreach ($rule as $item) {
+                if (!is_string($item) || $item === '') {
+                    throw new InvalidArgumentException("Block visibility \"{$key}\" must be a list of non-empty strings");
+                }
+            }
+            $out[$key] = $rule;
+        }
+
+        return $out;
     }
 
     /**

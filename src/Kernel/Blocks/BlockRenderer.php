@@ -29,7 +29,7 @@ final class BlockRenderer
         $roles = $this->access->roles();
         $html = '';
         foreach ($this->blocks->forRegion($region) as $block) {
-            if (!$this->types->has($block->type) || !$block->visibleFor($routeName, $roles)) {
+            if (!$block->enabled || !$this->types->has($block->type) || !$block->visibleFor($routeName, $roles)) {
                 continue;
             }
             try {

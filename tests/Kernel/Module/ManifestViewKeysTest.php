@@ -69,6 +69,10 @@ final class ManifestViewKeysTest extends AppTestCase
             ['blocks' => ['S\\Note']],
             ['blockDefaults' => [['region' => 'sidebar']]],
             ['blockDefaults' => [['type' => 'text', 'region' => 'footer', 'config' => 'nope']]],
+            ['blockDefaults' => [['type' => 'text', 'region' => 'footer', 'visibility' => ['roles' => 'Admin']]]],
+            ['blockDefaults' => [['type' => 'text', 'region' => 'Bad Region']]],
+            ['blockDefaults' => [['type' => 'Bad Type', 'region' => 'footer']]],
+            ['blockDefaults' => [['type' => 'shop.undeclared', 'region' => 'footer']]],
         ];
         foreach ($bad as $i => $json) {
             $m = Manifest::fromDirectory(Fixtures::module($this->tmp . '/b' . $i, 'shop', $json));

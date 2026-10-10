@@ -126,4 +126,85 @@ final class BlocksTest extends AppTestCase
         self::assertFalse($block->visibleFor(null, []), 'error pages have no route');
         self::assertTrue((new BlockInstance(2, 'text', 'sidebar', null, [], 0, [], true))->visibleFor(null, []));
     }
+
+    public function testMalformedVisibilityIsRejectedAtCreate(): void
+    {
+        foreach ([['roles' => 'Admin'], ['routes' => [1]], ['roles' => ['']], ['routes' => ['a' => 'b']]] as $bad) {
+            try {
+                /** @phpstan-ignore argument.type */
+                $this->blocks()->create('shop.note', 'sidebar', null, [], $bad);
+                self::fail('expected InvalidArgumentException');
+            } catch (\InvalidArgumentException) {
+                self::addToAssertionCount(1);
+            }
+        }
+    }
+
+    public function testCorruptVisibilityRowsFailClosed(): void
+    {
+        $db = $this->app()->container()->get(Connection::class);
+        foreach (['{"roles":"Admin"}', '"x"', '{"routes":[1]}'] as $i => $json) {
+            $db->insert('blocks', ['type' => 'shop.note', 'region' => 'sidebar', 'title' => null, 'config' => ['text' => 'corrupt' . $i], 'sort' => 0, 'visibility' => $json, 'enabled' => true]);
+        }
+        $html = $this->page('/shop');
+        self::assertStringNotContainsString('note:corrupt', $html);
+        // Undecodable JSON cannot be stored in a MySQL JSON column, so check the row mapping directly.
+        $row = ['id' => 1, 'type' => 'text', 'region' => 'sidebar', 'title' => null, 'config' => '{}', 'sort' => 0, 'visibility' => 'not json', 'enabled' => 1];
+        self::assertFalse(BlockInstance::fromRow($row)->enabled);
+    }
+
+    public function testBlockOfADisabledModuleDoesNotRender(): void
+    {
+        $this->blocks()->create('shop.note', 'sidebar', null, ['text' => 'orphan']);
+        $this->app()->container()->get(ModuleRegistry::class)->disable('shop');
+        self::assertStringNotContainsString('note:orphan', $this->page('/'));
+    }
+
+    public function testEnableFailsOnBadBlockDefaultsAndStaysDisabled(): void
+    {
+        $this->app()->container()->get(ModuleRegistry::class)->disable('shop');
+        $file = $this->tmp . '/modules/shop/module.json';
+        $json = json_decode((string) file_get_contents($file), true);
+        self::assertIsArray($json);
+        $json['blockDefaults'] = [['type' => 'shop.note', 'region' => 'Bad Region']];
+        file_put_contents($file, json_encode($json));
+        $registry = $this->app()->container()->get(ModuleRegistry::class);
+        try {
+            $registry->enable('shop');
+            self::fail('expected ModuleException');
+        } catch (\Xaraya\Kernel\Module\ModuleException) {
+            self::addToAssertionCount(1);
+        }
+        self::assertFalse($registry->isEnabled('shop'));
+    }
+
+    public function testCorruptBlocksMapOfAnEnabledModuleIsLoggedNotFatal(): void
+    {
+        $this->blocks()->create('text', 'sidebar', null, []);
+        $file = $this->tmp . '/modules/shop/module.json';
+        $json = json_decode((string) file_get_contents($file), true);
+        self::assertIsArray($json);
+        $json['blocks'] = ['other.note' => 'X'];
+        file_put_contents($file, json_encode($json));
+        $response = $this->app(['app.debug' => false])->handle(new ServerRequest('GET', '/shop'));
+        self::assertSame(200, $response->getStatusCode());
+        $log = implode('', array_map('file_get_contents', glob($this->tmp . '/logs/*') ?: []));
+        self::assertStringContainsString("Ignoring the blocks of module 'shop'", $log);
+    }
+
+    public function testSeedIsAtomic(): void
+    {
+        $defaults = [
+            ['type' => 'text', 'region' => 'sidebar', 'title' => null, 'config' => [], 'visibility' => [], 'sort' => 0],
+            ['type' => 'text', 'region' => 'Bad Region', 'title' => null, 'config' => [], 'visibility' => [], 'sort' => 0],
+        ];
+        $before = $this->app()->container()->get(Connection::class)->select('blocks')->count();
+        try {
+            $this->blocks()->seedDefaults($defaults);
+            self::fail('expected InvalidArgumentException');
+        } catch (\InvalidArgumentException) {
+            self::addToAssertionCount(1);
+        }
+        self::assertSame($before, $this->app()->container()->get(Connection::class)->select('blocks')->count());
+    }
 }

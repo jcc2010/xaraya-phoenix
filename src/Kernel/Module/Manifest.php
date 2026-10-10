@@ -151,6 +151,7 @@ final class Manifest
     public function blockDefaults(): array
     {
         $out = [];
+        $declared = $this->blocks();
         foreach ((array) ($this->data['blockDefaults'] ?? []) as $i => $default) {
             if (!is_array($default) || !is_string($default['type'] ?? null) || !is_string($default['region'] ?? null)) {
                 throw new ModuleException("{$this->name}: blockDefaults[{$i}] needs string \"type\" and \"region\"");
@@ -161,13 +162,25 @@ final class Manifest
             if (($title !== null && !is_string($title)) || !is_array($config) || !is_array($visibility)) {
                 throw new ModuleException("{$this->name}: blockDefaults[{$i}] has an invalid title, config or visibility");
             }
+            if (!BlockInstance::isValidType($default['type']) || !BlockInstance::isValidRegion($default['region'])) {
+                throw new ModuleException("{$this->name}: blockDefaults[{$i}] has an invalid type or region");
+            }
+            // A type in this module's namespace must be one this module declares; other types (built-ins, other modules) are checked at render.
+            if (str_starts_with($default['type'], $this->name . '.') && !isset($declared[$default['type']])) {
+                throw new ModuleException("{$this->name}: blockDefaults[{$i}] uses undeclared block type '{$default['type']}'");
+            }
+            try {
+                $visibility = BlockInstance::checkedVisibility($visibility);
+            } catch (\InvalidArgumentException $e) {
+                throw new ModuleException("{$this->name}: blockDefaults[{$i}]: {$e->getMessage()}", 0, $e);
+            }
             /** @var array<string, mixed> $config */
             $out[] = [
                 'type' => $default['type'],
                 'region' => $default['region'],
                 'title' => $title,
                 'config' => $config,
-                'visibility' => BlockInstance::visibility($visibility),
+                'visibility' => $visibility,
                 'sort' => (int) ($default['sort'] ?? 0),
             ];
         }

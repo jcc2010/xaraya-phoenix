@@ -10,7 +10,7 @@ use Xaraya\Kernel\Module\Manifest;
 
 final class BlockRepository
 {
-    private ?bool $ready = null;
+    private ?bool $ready = null; // cached only once true, so a later migration is noticed
 
     public function __construct(private readonly Connection $db) {}
 
@@ -27,12 +27,13 @@ final class BlockRepository
         int $sort = 0,
         bool $enabled = true,
     ): int {
-        if (strlen($type) > 128 || preg_match('/^[a-z][a-z0-9_-]*(?:\.[a-z0-9_-]+)*$/D', $type) !== 1) {
+        if (!BlockInstance::isValidType($type)) {
             throw new InvalidArgumentException("Invalid block type '{$type}'");
         }
-        if (strlen($region) > 64 || preg_match('/^[a-z][a-z0-9_-]*$/D', $region) !== 1) {
+        if (!BlockInstance::isValidRegion($region)) {
             throw new InvalidArgumentException("Invalid block region '{$region}'");
         }
+        $visibility = BlockInstance::checkedVisibility($visibility);
         $this->db->insert('blocks', [
             'type' => $type,
             'region' => $region,
@@ -57,8 +58,11 @@ final class BlockRepository
     /** @return list<BlockInstance> the region's enabled blocks, by sort then id */
     public function forRegion(string $region): array
     {
-        if (!($this->ready ??= $this->db->hasTable('blocks'))) {
-            return [];
+        if ($this->ready !== true) {
+            if (!$this->db->hasTable('blocks')) {
+                return [];
+            }
+            $this->ready = true;
         }
         $rows = $this->db->select('blocks')
             ->where('region', '=', $region)
@@ -78,8 +82,20 @@ final class BlockRepository
     /** Creates the manifest's blockDefaults; called once, on the module's first install. */
     public function seed(Manifest $manifest): void
     {
-        foreach ($manifest->blockDefaults() as $default) {
-            $this->create($default['type'], $default['region'], $default['title'], $default['config'], $default['visibility'], $default['sort']);
-        }
+        $this->seedDefaults($manifest->blockDefaults());
+    }
+
+    /**
+     * Creates all the defaults or none of them.
+     *
+     * @param list<array{type: string, region: string, title: ?string, config: array<string, mixed>, visibility: array{routes?: list<string>, roles?: list<string>}, sort: int}> $defaults
+     */
+    public function seedDefaults(array $defaults): void
+    {
+        $this->db->transaction(function () use ($defaults): void {
+            foreach ($defaults as $default) {
+                $this->create($default['type'], $default['region'], $default['title'], $default['config'], $default['visibility'], $default['sort']);
+            }
+        });
     }
 }

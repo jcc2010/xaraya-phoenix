@@ -111,6 +111,8 @@ final class ModuleRegistry
         // Validate the manifest's hook keys before any state changes, so a malformed one never half-enables.
         $manifest->displayHooks();
         $manifest->hookDefaults();
+        $manifest->blocks();
+        $manifest->blockDefaults();
         // Kernel and module migrations run as separate batches so a rollback
         // of the module never takes the kernel tables with it.
         $this->migrator->migrate(['kernel' => $this->kernelMigrations]);
