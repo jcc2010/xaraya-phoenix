@@ -14,7 +14,7 @@ final class HookBindings
     /** @var array<string, list<string>> */
     private array $memo = [];
 
-    private ?bool $ready = null;
+    private bool $ready = false;
 
     public function __construct(private readonly Connection $db) {}
 
@@ -33,7 +33,7 @@ final class HookBindings
             }
         }
         $this->memo = [];
-        $this->ready = null;
+        $this->ready = false;
     }
 
     public function set(string $observer, string $subject, string $itemtype, bool $enabled): void
@@ -48,7 +48,7 @@ final class HookBindings
             'enabled' => $enabled,
         ], ['observer_module', 'subject_module', 'itemtype']);
         $this->memo = [];
-        $this->ready = null;
+        $this->ready = false;
     }
 
     /** @return list<string> enabled observer module names bound to $subject for $itemtype (exact or '*'), sorted */
@@ -58,24 +58,39 @@ final class HookBindings
         if (isset($this->memo[$key])) {
             return $this->memo[$key];
         }
-        if (!($this->ready ??= $this->db->hasTable('hooks'))) {
+        if (!$this->ready && !($this->ready = $this->db->hasTable('hooks'))) {
             return [];
         }
         $rows = $this->db->select('hooks')
-            ->columns('observer_module')
+            ->columns('observer_module', 'itemtype', 'enabled')
             ->where('subject_module', '=', $subject)
             ->whereIn('itemtype', array_values(array_unique([$itemtype, '*'])))
-            ->where('enabled', '=', true)
             ->all();
-        $names = array_values(array_unique(array_map(static fn(array $row): string => (string) $row['observer_module'], $rows)));
-        sort($names);
+        // The most specific binding wins per observer: an exact itemtype row overrides the '*' row.
+        $decided = [];
+        foreach ([false, true] as $exactPass) {
+            foreach ($rows as $row) {
+                if (((string) $row['itemtype'] === $itemtype) === $exactPass) {
+                    $decided[(string) $row['observer_module']] = (bool) $row['enabled'];
+                }
+            }
+        }
+        $names = array_keys(array_filter($decided));
+        $names = array_map('strval', $names);
+        sort($names, SORT_STRING);
 
         return $this->memo[$key] = $names;
     }
 
+    /** Whether $value is a valid module name or itemtype for a binding ('*' allowed for itemtypes). */
+    public static function isValidPart(string $value, bool $wildcard = false): bool
+    {
+        return ($wildcard && $value === '*') || preg_match('/^[a-z][a-z0-9_.-]{0,63}$/D', $value) === 1;
+    }
+
     private static function check(string $value, bool $wildcard = false): void
     {
-        if (($wildcard && $value === '*') || preg_match('/^[a-z][a-z0-9_.-]{0,63}$/D', $value) === 1) {
+        if (self::isValidPart($value, $wildcard)) {
             return;
         }
         throw new InvalidArgumentException("Invalid hook binding part '{$value}'");

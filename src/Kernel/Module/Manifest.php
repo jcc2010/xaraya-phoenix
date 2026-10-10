@@ -6,6 +6,7 @@ namespace Xaraya\Kernel\Module;
 
 use JsonException;
 use Xaraya\Kernel\Hooks\DisplayHook;
+use Xaraya\Kernel\Hooks\HookBindings;
 
 final class Manifest
 {
@@ -112,7 +113,7 @@ final class Manifest
         foreach ((array) ($this->data['hookDefaults'] ?? []) as $i => $default) {
             $subject = is_array($default) ? ($default['subject'] ?? null) : null;
             $itemtype = is_array($default) ? ($default['itemtype'] ?? '*') : null;
-            if (!is_string($subject) || $subject === '' || !is_string($itemtype) || $itemtype === '') {
+            if (!is_string($subject) || !HookBindings::isValidPart($subject) || !is_string($itemtype) || !HookBindings::isValidPart($itemtype, true)) {
                 throw new ModuleException("{$this->name}: hookDefaults[{$i}] needs a string \"subject\" and an optional string \"itemtype\"");
             }
             $out[] = ['subject' => $subject, 'itemtype' => $itemtype];

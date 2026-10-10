@@ -6,6 +6,8 @@ namespace Xaraya\Kernel\Hooks;
 
 use InvalidArgumentException;
 use LogicException;
+use Psr\Log\LoggerInterface;
+use Throwable;
 use Xaraya\Kernel\Container\Container;
 use Xaraya\Kernel\Module\ModuleRegistry;
 
@@ -16,6 +18,7 @@ final class DisplayHooks
         private readonly ModuleRegistry $modules,
         private readonly HookBindings $bindings,
         private readonly Container $container,
+        private readonly LoggerInterface $logger,
     ) {}
 
     /**
@@ -39,11 +42,22 @@ final class DisplayHooks
             if ($class === null) {
                 continue;
             }
-            $handler = $this->container->get($class);
-            if (!$handler instanceof DisplayHook) {
-                throw new LogicException("{$observer}: {$class} must implement DisplayHook");
+            try {
+                $handler = $this->container->get($class);
+                if (!$handler instanceof DisplayHook) {
+                    throw new LogicException("{$observer}: {$class} must implement DisplayHook");
+                }
+                $html .= $handler->handle($hook, $item, $input);
+            } catch (Throwable $e) {
+                if ($hook === 'item.form.save') {
+                    throw $e; // a failed save must never be silent
+                }
+                $this->logger->error("Display hook {$hook} of module {$observer} failed: " . $e->getMessage(), [
+                    'module' => $observer,
+                    'hook' => $hook,
+                    'exception' => $e,
+                ]);
             }
-            $html .= $handler->handle($hook, $item, $input);
         }
 
         return $hook === 'item.form.save' ? '' : $html;
