@@ -20,7 +20,7 @@ final class CacheClearCommand extends Command
 
     public function description(): string
     {
-        return 'Delete cached config and routes';
+        return 'Delete cached config, routes, compiled templates and cache entries';
     }
 
     public function run(Input $input, Output $output): int

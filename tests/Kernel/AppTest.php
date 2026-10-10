@@ -11,6 +11,7 @@ use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use Psr\Log\LoggerInterface;
 use Xaraya\Kernel\App;
+use Xaraya\Kernel\Cache\Cache;
 use Xaraya\Kernel\Config\Config;
 use Xaraya\Kernel\Db\Connection;
 use Xaraya\Kernel\Events\EventDispatcher;
@@ -21,6 +22,21 @@ use Xaraya\Tests\Support\AppTestCase;
 
 final class AppTest extends AppTestCase
 {
+    public function testClearCacheAlsoEmptiesCacheEntriesAndCompiledTemplates(): void
+    {
+        $app = $this->boot();
+        $cache = $app->container()->get(Cache::class);
+        $cache->set('sanitized/abc', '<p>x</p>');
+        mkdir($this->tmp . '/cache/twig/ab', 0775, true);
+        file_put_contents($this->tmp . '/cache/twig/ab/compiled.php', '<?php');
+        file_put_contents($this->tmp . '/cache/keep.txt', 'x');
+
+        self::assertGreaterThanOrEqual(2, $app->clearCache());
+        self::assertFalse($cache->has('sanitized/abc'));
+        self::assertDirectoryDoesNotExist($this->tmp . '/cache/twig');
+        self::assertFileExists($this->tmp . '/cache/keep.txt');
+    }
+
     public function testBootWiresCoreServices(): void
     {
         $app = $this->boot();

@@ -11,6 +11,7 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Log\LoggerInterface;
+use Xaraya\Kernel\Cache\Cache;
 use Xaraya\Kernel\Config\Config;
 use Xaraya\Kernel\Config\Env;
 use Xaraya\Kernel\Container\Container;
@@ -102,6 +103,8 @@ final class App
             (string) $config->get('app.url', ''),
         ));
         $c->set(ErrorHandler::class, fn(Container $c): ErrorHandler => new ErrorHandler($c->get(LoggerInterface::class), $this->debug()));
+
+        $c->set(Cache::class, fn(): Cache => new Cache($this->cacheDir() . '/data'));
 
         $this->bootModules();
     }
@@ -197,7 +200,7 @@ final class App
 
     public function clearCache(): int
     {
-        $removed = 0;
+        $removed = Cache::removeTree($this->cacheDir() . '/data') + Cache::removeTree($this->cacheDir() . '/twig');
         foreach ([...(glob($this->cacheDir() . '/*.php') ?: []), ...(glob($this->configCachePath()) ?: [])] as $file) {
             if (is_file($file) && unlink($file)) {
                 $removed++;
