@@ -13,57 +13,72 @@ final class Settings
     /** @var array<string, array<string, mixed>> */
     private array $loaded = [];
 
-    private ?bool $ready = null;
+    private bool $ready = false;
 
     public function __construct(private readonly Connection $db) {}
 
     public function get(string $scope, string $key, mixed $default = null): mixed
     {
+        self::check($key, 'key', 191);
         $values = $this->all($scope);
 
         return array_key_exists($key, $values) ? $values[$key] : $default;
     }
 
-    /** @return array<string, mixed> */
+    /**
+     * Numeric-looking keys such as "123" come back as int array keys (PHP's rule); get() is unaffected.
+     *
+     * @return array<array-key, mixed>
+     */
     public function all(string $scope): array
     {
         self::check($scope, 'scope', 64);
         if (isset($this->loaded[$scope])) {
             return $this->loaded[$scope];
         }
-        $values = [];
-        if ($this->ready()) {
-            foreach ($this->db->select('settings')->where('scope', '=', $scope)->orderBy('key')->all() as $row) {
-                $values[(string) $row['key']] = json_decode((string) $row['value'], true, 512, JSON_THROW_ON_ERROR);
-            }
+        if (!$this->ready()) {
+            return [];
         }
+        $values = [];
+        foreach ($this->db->select('settings')->where('scope', '=', $scope)->all() as $row) {
+            $values[(string) $row['key']] = json_decode((string) $row['value'], true, 512, JSON_THROW_ON_ERROR);
+        }
+        // Sorted in PHP: database collations (Postgres locales) disagree on order.
+        ksort($values, SORT_STRING);
 
         return $this->loaded[$scope] = $values;
     }
 
     public function set(string $scope, string $key, mixed $value): void
     {
-        self::check($scope, 'scope', 64);
-        self::check($key, 'key', 191);
-        $json = json_encode($value, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PRESERVE_ZERO_FRACTION | JSON_THROW_ON_ERROR);
-        $this->db->upsert('settings', ['scope' => $scope, 'key' => $key, 'value' => $json], ['scope', 'key']);
-        unset($this->loaded[$scope]);
-        $this->ready = null;
+        try {
+            self::check($scope, 'scope', 64);
+            self::check($key, 'key', 191);
+            $json = json_encode($value, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PRESERVE_ZERO_FRACTION | JSON_THROW_ON_ERROR);
+            $this->db->upsert('settings', ['scope' => $scope, 'key' => $key, 'value' => $json], ['scope', 'key']);
+        } finally {
+            unset($this->loaded[$scope]);
+            $this->ready = false;
+        }
     }
 
     public function forget(string $scope, string $key): void
     {
-        self::check($scope, 'scope', 64);
-        self::check($key, 'key', 191);
-        if ($this->ready()) {
-            $this->db->delete('settings', ['scope' => $scope, 'key' => $key]);
+        try {
+            self::check($scope, 'scope', 64);
+            self::check($key, 'key', 191);
+            if ($this->ready()) {
+                $this->db->delete('settings', ['scope' => $scope, 'key' => $key]);
+            }
+        } finally {
+            unset($this->loaded[$scope]);
         }
-        unset($this->loaded[$scope]);
     }
 
+    /** Only a positive probe is remembered, so a table created later is noticed. */
     private function ready(): bool
     {
-        return $this->ready ??= $this->db->hasTable('settings');
+        return $this->ready === true || ($this->ready = $this->db->hasTable('settings'));
     }
 
     private static function check(string $value, string $what, int $max): void

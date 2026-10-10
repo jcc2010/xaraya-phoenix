@@ -52,6 +52,48 @@ final class SettingsTest extends DbTestCase
         self::assertNull($settings->get('demo', 'k'));
     }
 
+    public function testSeesTheTableOnceItIsCreated(): void
+    {
+        $settings = new Settings($this->db);
+        self::assertSame('d', $settings->get('demo', 'k', 'd'));
+
+        (new Migrator($this->db))->migrate(['kernel' => dirname(__DIR__, 3) . '/src/Kernel/migrations']);
+        (new Settings($this->db))->set('demo', 'k', 'now');
+
+        self::assertSame('now', $settings->get('demo', 'k', 'd'));
+    }
+
+    public function testOrdersKeysBytewise(): void
+    {
+        $settings = $this->settings();
+        foreach (['Zeta', 'alpha', 'a_b', 'ab', '123'] as $key) {
+            $settings->set('demo', $key, 1);
+        }
+        $fresh = new Settings($this->db);
+        self::assertSame(['123', 'Zeta', 'a_b', 'ab', 'alpha'], array_map('strval', array_keys($fresh->all('demo'))));
+        self::assertSame(1, $fresh->get('demo', '123'));
+    }
+
+    public function testReadsAndForgetRejectBadScopesAndKeys(): void
+    {
+        $settings = $this->settings();
+        $calls = [
+            fn() => $settings->get('demo', ''),
+            fn() => $settings->get('has space', 'k'),
+            fn() => $settings->all(''),
+            fn() => $settings->forget('', 'k'),
+            fn() => $settings->forget('demo', 'bad key'),
+        ];
+        foreach ($calls as $call) {
+            try {
+                $call();
+                self::fail('should be rejected');
+            } catch (\InvalidArgumentException) {
+                self::addToAssertionCount(1);
+            }
+        }
+    }
+
     public function testRejectsBadScopesAndKeys(): void
     {
         $settings = $this->settings();
