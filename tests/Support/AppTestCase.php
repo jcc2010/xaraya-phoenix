@@ -6,6 +6,7 @@ namespace Xaraya\Tests\Support;
 
 use PHPUnit\Framework\TestCase;
 use Xaraya\Kernel\App;
+use Xaraya\Kernel\Db\Migrations\Migrator;
 
 abstract class AppTestCase extends TestCase
 {
@@ -40,6 +41,11 @@ abstract class AppTestCase extends TestCase
             DbTestCase::dropAll(DbTestCase::connect());
         }
         self::rmdir($this->tmp);
+    }
+
+    protected function migrateKernel(App $app): void
+    {
+        $app->container()->get(Migrator::class)->migrate(['kernel' => dirname(__DIR__, 2) . '/src/Kernel/migrations']);
     }
 
     /**
