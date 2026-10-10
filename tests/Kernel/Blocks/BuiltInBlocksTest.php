@@ -122,6 +122,24 @@ final class BuiltInBlocksTest extends AppTestCase
         }
     }
 
+    public function testRecentItemsStillFillTheLimitWhenANewerItemIsFilteredOut(): void
+    {
+        $app = $this->app();
+        $app->container()->get(EventDispatcher::class)->listen(RecentItemsQuery::class, function (RecentItemsQuery $query): void {
+            $query->add(new RecentItem('shop', 'Evil', 'javascript:alert(1)', new DateTimeImmutable('2026-10-03T00:00:00Z')));
+            $query->add(new RecentItem('blog', 'Other', '/b/1', new DateTimeImmutable('2026-10-02T00:00:00Z')));
+            $query->add(new RecentItem('shop', 'Second', '/shop/2', new DateTimeImmutable('2026-10-01T00:00:00Z')));
+            $query->add(new RecentItem('shop', 'First', '/shop/1', new DateTimeImmutable('2026-09-01T00:00:00Z')));
+            $query->add(new RecentItem('shop', 'Oldest', '/shop/0', new DateTimeImmutable('2026-01-01T00:00:00Z')));
+        });
+        $this->repo()->create('recent-items', 'footer', null, ['module' => 'shop', 'limit' => 2]);
+        $html = $this->footer($app);
+        self::assertSame(2, substr_count($html, '<li>'));
+        self::assertStringContainsString('Second', $html);
+        self::assertStringContainsString('First', $html);
+        self::assertStringNotContainsString('Oldest', $html);
+    }
+
     public function testRecentItemsAskModulesThroughAnEvent(): void
     {
         $app = $this->app();

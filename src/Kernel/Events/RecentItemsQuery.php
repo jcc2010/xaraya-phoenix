@@ -26,10 +26,13 @@ final class RecentItemsQuery extends Event
         $this->items[] = $item;
     }
 
-    /** @return list<RecentItem> newest first, undated last, at most $limit */
-    public function items(): array
+    /**
+     * @param (\Closure(RecentItem): bool)|null $keep applied before the limit, so dropped items free their slots
+     * @return list<RecentItem> newest first, undated last, at most $limit
+     */
+    public function items(?\Closure $keep = null): array
     {
-        $items = $this->items;
+        $items = $keep === null ? $this->items : array_values(array_filter($this->items, $keep));
         usort($items, static fn(RecentItem $a, RecentItem $b): int => ($b->date?->getTimestamp() ?? PHP_INT_MIN) <=> ($a->date?->getTimestamp() ?? PHP_INT_MIN));
 
         return array_slice($items, 0, max(0, $this->limit));
