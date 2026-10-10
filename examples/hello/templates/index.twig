@@ -1,0 +1,10 @@
+<h1>{{ t('Greetings') }}</h1>
+{% if greetings is empty %}
+<p>{{ t('Nobody has been greeted yet.') }}</p>
+{% else %}
+<ul class="greetings">
+{% for greeting in greetings %}
+{% include 'hello::partials/greeting' with {greeting: greeting} only %}
+{% endfor %}
+</ul>
+{% endif %}

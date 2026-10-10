@@ -6,5 +6,9 @@
   "migrations": "migrations",
   "subscribers": [
     { "event": "Xaraya\\Kernel\\Events\\ItemCreated", "listener": "Xaraya\\Module\\Hello\\CountGreetings", "priority": 0 }
+  ],
+  "blocks": { "hello.count": "Xaraya\\Module\\Hello\\GreetingCountBlock" },
+  "blockDefaults": [
+    { "type": "hello.count", "region": "sidebar", "title": "Greetings", "visibility": { "routes": ["hello.index"] } }
   ]
 }

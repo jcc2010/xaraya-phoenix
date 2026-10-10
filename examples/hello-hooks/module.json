@@ -1,0 +1,11 @@
+{
+  "name": "hello-hooks",
+  "version": "0.1.0",
+  "requires": { "kernel": "^0.1", "modules": {} },
+  "displayHooks": {
+    "item.display": "Xaraya\\Module\\HelloHooks\\NoteHook",
+    "item.form": "Xaraya\\Module\\HelloHooks\\NoteHook",
+    "item.form.save": "Xaraya\\Module\\HelloHooks\\NoteHook"
+  },
+  "hookDefaults": [ { "subject": "hello", "itemtype": "greeting" } ]
+}
