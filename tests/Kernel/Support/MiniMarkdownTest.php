@@ -65,6 +65,25 @@ final class MiniMarkdownTest extends TestCase
         self::assertSame('<p>[x](&amp;#106;avascript:alert(1))</p>', MiniMarkdown::toHtml('[x](&#106;avascript:alert(1))'));
     }
 
+    public function testEmphasisIsLinearTimeAndInputIsCapped(): void
+    {
+        foreach (['*a ', '**a '] as $unit) {
+            $start = microtime(true);
+            MiniMarkdown::toHtml(str_repeat($unit, 50000));
+            self::assertLessThan(1.0, microtime(true) - $start, $unit);
+        }
+        self::assertSame('<p><strong>a <em>b</em> c</strong> <em>a <strong>b</strong> c</em></p>', MiniMarkdown::toHtml('**a *b* c** *a **b** c*'));
+        $html = MiniMarkdown::toHtml(str_repeat('x', 100000) . 'TAIL');
+        self::assertStringNotContainsString('TAIL', $html);
+        self::assertSame(100000 + 7, strlen($html));
+    }
+
+    public function testControlCharactersNeverFormLinks(): void
+    {
+        self::assertStringNotContainsString('<a ', MiniMarkdown::toHtml("[x](/\x00/evil)"));
+        self::assertStringNotContainsString('<a ', MiniMarkdown::toHtml("[x](/a\x7fb)"));
+    }
+
     public function testCodeProtectsEmphasis(): void
     {
         self::assertSame('<p><code>**x**</code> and <em>y</em> and 2 * 3 * 4</p>', MiniMarkdown::toHtml('`**x**` and *y* and 2 * 3 * 4'));

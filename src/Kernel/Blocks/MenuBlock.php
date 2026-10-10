@@ -4,9 +4,15 @@ declare(strict_types=1);
 
 namespace Xaraya\Kernel\Blocks;
 
+use Psr\Log\LoggerInterface;
+use Throwable;
+use Xaraya\Kernel\Support\SafeUrl;
+
 /** Links from the block config: {"links": [{"label", "route", "params"} or {"label", "url"}]}. */
 final class MenuBlock implements Block
 {
+    public function __construct(private readonly ?LoggerInterface $logger = null) {}
+
     public function render(array $config, BlockContext $context): string
     {
         $x = $context->helpers;
@@ -23,8 +29,13 @@ final class MenuBlock implements Block
                         $params[$key] = $value;
                     }
                 }
-                $href = $x->url($link['route'], $params);
-            } elseif (is_string($link['url'] ?? null) && preg_match('#^(?:https?://|/(?![/\\\\])|\#)[^\s\\\\\x00-\x1f\x7f]*$#', $link['url']) === 1) {
+                try {
+                    $href = $x->url($link['route'], $params);
+                } catch (Throwable $e) {
+                    $this->logger?->warning("Menu link '{$link['label']}' skipped: {$e->getMessage()}");
+                    continue;
+                }
+            } elseif (is_string($link['url'] ?? null) && SafeUrl::isSafe($link['url'])) {
                 $href = $link['url'];
             } else {
                 continue;

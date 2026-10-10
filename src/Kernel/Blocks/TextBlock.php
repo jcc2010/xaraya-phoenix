@@ -7,7 +7,10 @@ namespace Xaraya\Kernel\Blocks;
 use InvalidArgumentException;
 use Xaraya\Kernel\Support\MiniMarkdown;
 
-/** Admin-written text. "html" bodies are trusted and output as-is; "markdown" bodies use MiniMarkdown. */
+/**
+ * Admin-written text. NOTE: `format` defaults to "html", which is trusted and output RAW, unescaped.
+ * Use `"format": "markdown"` for the safe format: MiniMarkdown escapes everything and allows only safe links.
+ */
 final class TextBlock implements Block
 {
     public function render(array $config, BlockContext $context): string

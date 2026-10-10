@@ -6,6 +6,7 @@ namespace Xaraya\Kernel\Blocks;
 
 use Xaraya\Kernel\Events\EventDispatcher;
 use Xaraya\Kernel\Events\RecentItemsQuery;
+use Xaraya\Kernel\Support\SafeUrl;
 
 /** The newest items of whichever modules answer a RecentItemsQuery: {"limit", "module", "itemtype"}. */
 final class RecentItemsBlock implements Block
@@ -18,6 +19,7 @@ final class RecentItemsBlock implements Block
         $module = is_string($config['module'] ?? null) ? $config['module'] : null;
         $itemtype = is_string($config['itemtype'] ?? null) ? $config['itemtype'] : null;
         $items = $this->events->dispatch(new RecentItemsQuery($limit, $module, $itemtype))->items();
+        $items = array_values(array_filter($items, static fn($item): bool => SafeUrl::isSafe($item->url) && ($module === null || $item->module === $module)));
         if ($items === []) {
             return '';
         }

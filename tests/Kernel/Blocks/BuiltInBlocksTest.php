@@ -94,6 +94,34 @@ final class BuiltInBlocksTest extends AppTestCase
         );
     }
 
+    public function testMenuRejectsATrailingNewlineAndSkipsUnknownRoutes(): void
+    {
+        $this->repo()->create('menu', 'footer', 'M', ['links' => [
+            ['label' => 'nl', 'url' => "/a\n"],
+            ['label' => 'gone', 'route' => 'nope.nothing'],
+            ['label' => 'ok', 'url' => '/ok'],
+        ]]);
+        $html = $this->footer($this->app());
+        self::assertStringContainsString('<ul class="menu"><li><a href="/ok">ok</a></li></ul>', $html);
+    }
+
+    public function testRecentItemsSkipUnsafeUrlsAndOtherModules(): void
+    {
+        $app = $this->app();
+        $app->container()->get(EventDispatcher::class)->listen(RecentItemsQuery::class, function (RecentItemsQuery $query): void {
+            $query->add(new RecentItem('shop', 'Good', '/shop/1'));
+            $query->add(new RecentItem('shop', 'Evil', 'javascript:alert(1)'));
+            $query->add(new RecentItem('shop', 'Rel', '//evil.test'));
+            $query->add(new RecentItem('blog', 'Other', '/b/1'));
+        });
+        $this->repo()->create('recent-items', 'footer', null, ['module' => 'shop']);
+        $html = $this->footer($app);
+        self::assertStringContainsString('Good', $html);
+        foreach (['Evil', 'Rel', 'Other', 'javascript'] as $bad) {
+            self::assertStringNotContainsString($bad, $html);
+        }
+    }
+
     public function testRecentItemsAskModulesThroughAnEvent(): void
     {
         $app = $this->app();

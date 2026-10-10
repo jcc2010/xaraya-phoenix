@@ -11,9 +11,11 @@ namespace Xaraya\Kernel\Support;
  */
 final class MiniMarkdown
 {
+    public const MAX_BYTES = 100000;
+
     public static function toHtml(string $markdown): string
     {
-        $text = trim(str_replace(["\r\n", "\r"], "\n", $markdown));
+        $text = trim(str_replace(["\r\n", "\r"], "\n", substr($markdown, 0, self::MAX_BYTES)));
         if ($text === '') {
             return '';
         }
@@ -41,9 +43,9 @@ final class MiniMarkdown
                 $out .= '<code>' . substr($part, 1, -1) . '</code>';
                 continue;
             }
-            $part = preg_replace('/\[([^\]]+)\]\(((?:https?:\/\/|mailto:|#|\/(?![\/\\\\]))[^\s()*\\\\]*)\)/', '<a href="$2">$1</a>', $part) ?? $part;
-            $part = preg_replace('/\*\*(?=\S)(.+?)(?<=\S)\*\*/', '<strong>$1</strong>', $part) ?? $part;
-            $part = preg_replace('/\*(?=\S)(.+?)(?<=\S)\*/', '<em>$1</em>', $part) ?? $part;
+            $part = preg_replace('/\[([^\]]+)\]\(((?:https?:\/\/|mailto:|#|\/(?![\/\\\\]))[^\s()*\\\\\x00-\x1f\x7f]*)\)/', '<a href="$2">$1</a>', $part) ?? $part;
+            $part = preg_replace('/\*\*(?=\S)((?:[^*]|\*(?!\*))+?)(?<=\S)\*\*/', '<strong>$1</strong>', $part) ?? $part;
+            $part = preg_replace('/\*(?=[^\s*])([^*]+?)(?<=\S)\*/', '<em>$1</em>', $part) ?? $part;
             $out .= $part;
         }
 
