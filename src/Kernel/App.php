@@ -38,6 +38,7 @@ use Xaraya\Kernel\Routing\RouteCollector;
 use Xaraya\Kernel\Routing\RouteProvider;
 use Xaraya\Kernel\Routing\Router;
 use Xaraya\Kernel\Routing\UrlGenerator;
+use Xaraya\Kernel\View\TemplateLocator;
 use Xaraya\Kernel\View\ThemeRegistry;
 use Xaraya\Kernel\View\Translator;
 use Xaraya\Kernel\View\ViewException;
@@ -138,6 +139,19 @@ final class App
             }
 
             return new Translator((string) $config->get('app.locale', 'en'), $dirs);
+        });
+
+        $c->set(TemplateLocator::class, function (Container $c) use ($config): TemplateLocator {
+            $engine = $config->get('view.engine');
+            if ($engine !== null && $engine !== '' && !is_string($engine)) {
+                throw new ViewException('view.engine must be "php", "twig" or empty');
+            }
+
+            return new TemplateLocator(
+                $c->get(ThemeRegistry::class),
+                $c->get(ModuleRegistry::class),
+                $engine === null || $engine === '' ? null : $engine,
+            );
         });
 
         $this->bootModules();
