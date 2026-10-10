@@ -36,6 +36,7 @@ use Xaraya\Kernel\Routing\RouteCollector;
 use Xaraya\Kernel\Routing\RouteProvider;
 use Xaraya\Kernel\Routing\Router;
 use Xaraya\Kernel\Routing\UrlGenerator;
+use Xaraya\Kernel\View\ThemeRegistry;
 
 final class App
 {
@@ -105,6 +106,11 @@ final class App
         $c->set(ErrorHandler::class, fn(Container $c): ErrorHandler => new ErrorHandler($c->get(LoggerInterface::class), $this->debug()));
 
         $c->set(Cache::class, fn(): Cache => new Cache($this->cacheDir() . '/data'));
+
+        $c->set(ThemeRegistry::class, fn(): ThemeRegistry => new ThemeRegistry(
+            array_values(array_map(fn(mixed $p): string => $this->path((string) $p), (array) $config->get('themes.paths', ['themes']))),
+            (string) $config->get('app.theme', 'phoenix'),
+        ));
 
         $this->bootModules();
     }

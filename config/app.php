@@ -26,6 +26,14 @@ return [
         // MODULE_PATHS is a comma-separated list of directories, relative to the project root.
         'paths' => array_values(array_filter(array_map('trim', explode(',', (string) env('MODULE_PATHS', 'modules'))))),
     ],
+    'themes' => [
+        // THEME_PATHS is a comma-separated list of directories, relative to the project root.
+        'paths' => array_values(array_filter(array_map('trim', explode(',', (string) env('THEME_PATHS', 'themes'))))),
+    ],
+    'view' => [
+        // "twig" or "php" overrides the active theme's engine preference; unset keeps the theme's choice.
+        'engine' => env('VIEW_ENGINE'),
+    ],
     'log' => [
         'path' => $root . '/var/logs',
         'level' => env('LOG_LEVEL', 'info'),
