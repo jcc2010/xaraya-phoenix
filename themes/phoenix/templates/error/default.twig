@@ -1,0 +1,5 @@
+<h1>{{ status }} {{ reason }}</h1>
+{% if message != reason %}
+<p>{{ message }}</p>
+{% endif %}
+<p><a href="/">{{ t('Go to the home page') }}</a></p>

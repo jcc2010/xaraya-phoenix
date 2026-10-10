@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="{{ lang }}">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{ title }}</title>
+{% for name, value in meta %}
+<meta {{ name starts with 'og:' ? 'property' : 'name' }}="{{ name }}" content="{{ value }}">
+{% endfor %}
+{% if canonical %}
+<link rel="canonical" href="{{ canonical }}">
+{% endif %}
+{% for feed in feeds %}
+<link rel="alternate" type="{{ feed.type }}" title="{{ feed.title }}" href="{{ feed.href }}">
+{% endfor %}
+<link rel="stylesheet" href="{{ asset('theme/phoenix/phoenix.css') }}">
+{% for href in styles %}
+<link rel="stylesheet" href="{{ href }}">
+{% endfor %}
+</head>
+<body>
+<a class="skip-link" href="#main">{{ t('Skip to content') }}</a>
+<header class="site-header">
+<p class="site-title"><a href="/" rel="home">{{ site }}</a></p>
+{% if settings.tagline|default('') %}
+<p class="site-tagline">{{ settings.tagline }}</p>
+{% endif %}
+{{ blocks('header') }}
+</header>
+<div class="site-body">
+<main id="main" class="site-main" tabindex="-1">
+{{ content|raw }}
+</main>
+{% set sidebar = blocks('sidebar') %}
+{% if sidebar != '' %}
+<aside class="site-sidebar" aria-label="{{ t('Sidebar') }}">
+{{ sidebar|raw }}
+</aside>
+{% endif %}
+</div>
+<footer class="site-footer">
+{{ blocks('footer') }}
+<p class="site-credit">{{ t('Powered by {name}', {name: 'Xaraya Phoenix'}) }}</p>
+</footer>
+</body>
+</html>

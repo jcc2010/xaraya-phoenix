@@ -1,0 +1,64 @@
+/* Phoenix: a small, neutral theme. No web fonts, no JavaScript, no third-party URLs. */
+:root {
+  color-scheme: light dark;
+  --bg: #ffffff;
+  --fg: #1b1b1f;
+  --muted: #5c5c66;
+  --accent: #0b57d0;
+  --border: #d9d9e0;
+  --focus: #ff9e1b;
+  --max: 72rem;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #121216;
+    --fg: #ececf1;
+    --muted: #a3a3ad;
+    --accent: #8ab4f8;
+    --border: #2e2e36;
+  }
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--fg); font: 1.0625rem/1.6 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+a { color: var(--accent); text-underline-offset: 0.15em; }
+a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible, summary:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 2px;
+}
+main:focus { outline: none; }
+
+.skip-link { position: absolute; left: 1rem; top: -3rem; z-index: 10; padding: 0.5rem 1rem; background: var(--fg); color: var(--bg); }
+.skip-link:focus { top: 1rem; }
+
+.site-header, .site-body, .site-footer { max-width: var(--max); margin: 0 auto; padding: 1rem; }
+.site-header { border-bottom: 1px solid var(--border); }
+.site-title { margin: 0; font-size: 1.375rem; font-weight: 700; }
+.site-title a { color: inherit; text-decoration: none; }
+.site-tagline { margin: 0.25rem 0 0; color: var(--muted); }
+.site-body { display: grid; gap: 2rem; }
+@media (min-width: 60rem) {
+  .site-body { grid-template-columns: minmax(0, 1fr) 18rem; }
+}
+.site-main { min-width: 0; }
+.site-footer { border-top: 1px solid var(--border); color: var(--muted); font-size: 0.9375rem; }
+
+.block { margin: 0 0 1.5rem; }
+.block-title { margin: 0 0 0.5rem; font-size: 0.875rem; letter-spacing: 0.04em; text-transform: uppercase; color: var(--muted); }
+.menu, .recent-items { margin: 0; padding: 0; list-style: none; }
+.menu li, .recent-items li { margin: 0.25rem 0; }
+[aria-current="page"] { font-weight: 700; }
+
+img, video, audio { max-width: 100%; height: auto; }
+pre, code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+pre { overflow-x: auto; padding: 1rem; border: 1px solid var(--border); }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

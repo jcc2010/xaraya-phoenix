@@ -48,6 +48,7 @@ final class AppTest extends AppTestCase
         self::assertInstanceOf(EventDispatcher::class, $c->get(EventDispatcher::class));
         self::assertSame([], $c->get(ModuleRegistry::class)->enabled());
         self::assertFalse($c->get(UrlGenerator::class)->has('anything'));
+        self::assertTrue($c->get(UrlGenerator::class)->has('home'));
         self::assertTrue($app->debug());
         self::assertSame(dirname(__DIR__, 2) . '/public', $app->path('public'));
         self::assertSame('/abs', $app->path('/abs'));
@@ -56,7 +57,7 @@ final class AppTest extends AppTestCase
     public function testUnknownRoutesGiveHtmlOrJson404(): void
     {
         $app = $this->boot();
-        $html = $app->handle(new ServerRequest('GET', '/'));
+        $html = $app->handle(new ServerRequest('GET', '/nope'));
         self::assertSame(404, $html->getStatusCode());
         self::assertStringContainsString('text/html', $html->getHeaderLine('Content-Type'));
 

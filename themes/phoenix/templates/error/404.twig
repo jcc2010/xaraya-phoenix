@@ -1,0 +1,6 @@
+<h1>{{ t('Page not found') }}</h1>
+{% if message != reason %}
+<p>{{ message }}</p>
+{% endif %}
+<p>{{ t('Sorry, there is nothing at this address.') }}</p>
+<p><a href="/">{{ t('Go to the home page') }}</a></p>

@@ -32,6 +32,7 @@ use Xaraya\Kernel\Events\EventDispatcher;
 use Xaraya\Kernel\Hooks\HookBindings;
 use Xaraya\Kernel\Http\CallableHandler;
 use Xaraya\Kernel\Http\Emitter;
+use Xaraya\Kernel\Http\HomeController;
 use Xaraya\Kernel\Http\Middleware\ConditionalGet;
 use Xaraya\Kernel\Http\Middleware\Cors;
 use Xaraya\Kernel\Http\Middleware\ErrorHandler;
@@ -276,6 +277,14 @@ final class App
                 throw new ModuleException("{$manifest->name}: routes class {$class} must implement RouteProvider");
             }
             $provider->routes($collector);
+        }
+
+        $claimed = false;
+        foreach ($collector->routes() as $route) {
+            $claimed = $claimed || $route->name === 'home' || ($route->path === '/' && in_array('GET', $route->methods, true));
+        }
+        if (!$claimed) {
+            $collector->get('/', HomeController::class, 'home')->middleware('secureHtml', 'conditional');
         }
 
         return $this->routes = $collector->routes();

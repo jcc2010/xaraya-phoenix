@@ -1,0 +1,9 @@
+{
+  "name": "phoenix",
+  "version": "0.1.0",
+  "engine": "php",
+  "regions": ["header", "sidebar", "footer"],
+  "settings": {
+    "tagline": { "type": "string", "label": "Tagline", "default": "" }
+  }
+}

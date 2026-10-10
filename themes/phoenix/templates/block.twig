@@ -1,0 +1,6 @@
+<section class="block {{ typeClass }}"{% if title %} aria-labelledby="block-{{ id }}-title"{% endif %}>
+{% if title %}
+<h2 class="block-title" id="block-{{ id }}-title">{{ title }}</h2>
+{% endif %}
+{{ content|raw }}
+</section>
