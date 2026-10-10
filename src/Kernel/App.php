@@ -37,6 +37,8 @@ use Xaraya\Kernel\Routing\RouteProvider;
 use Xaraya\Kernel\Routing\Router;
 use Xaraya\Kernel\Routing\UrlGenerator;
 use Xaraya\Kernel\View\ThemeRegistry;
+use Xaraya\Kernel\View\Translator;
+use Xaraya\Kernel\View\ViewException;
 
 final class App
 {
@@ -111,6 +113,23 @@ final class App
             array_values(array_map(fn(mixed $p): string => $this->path((string) $p), (array) $config->get('themes.paths', ['themes']))),
             (string) $config->get('app.theme', 'phoenix'),
         ));
+
+        $c->set(Translator::class, function (Container $c) use ($config): Translator {
+            $dirs = [];
+            foreach ($c->get(ModuleRegistry::class)->enabled() as $manifest) {
+                $dirs[] = $manifest->path . '/lang';
+            }
+            try {
+                $themes = array_reverse($c->get(ThemeRegistry::class)->chain());
+            } catch (ViewException) {
+                $themes = [];
+            }
+            foreach ($themes as $theme) {
+                $dirs[] = $theme->path . '/lang';
+            }
+
+            return new Translator((string) $config->get('app.locale', 'en'), $dirs);
+        });
 
         $this->bootModules();
     }
