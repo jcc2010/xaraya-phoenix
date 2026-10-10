@@ -8,6 +8,8 @@ use LogicException;
 use Throwable;
 use Xaraya\Kernel\App;
 use Xaraya\Kernel\Cli\Commands\CacheClearCommand;
+use Xaraya\Kernel\Cli\Commands\HookDisableCommand;
+use Xaraya\Kernel\Cli\Commands\HookEnableCommand;
 use Xaraya\Kernel\Cli\Commands\MigrateCommand;
 use Xaraya\Kernel\Cli\Commands\MigrateRollbackCommand;
 use Xaraya\Kernel\Cli\Commands\MigrateStatusCommand;
@@ -28,6 +30,8 @@ final class Application
         ModuleDisableCommand::class,
         ServeCommand::class,
         CacheClearCommand::class,
+        HookEnableCommand::class,
+        HookDisableCommand::class,
     ];
 
     /** @var array<string, Command> */

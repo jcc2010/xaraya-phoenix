@@ -17,6 +17,12 @@ final class ModuleRegistry
     /** @var array<string, Manifest>|null */
     private ?array $discovered = null;
 
+    /** @var array<string, Manifest>|null */
+    private ?array $enabledCache = null;
+
+    /** @var list<Closure(Manifest, bool): void> */
+    private array $enableListeners = [];
+
     /** @param list<string> $paths directories that contain module folders */
     public function __construct(
         private readonly Connection $db,
@@ -51,11 +57,14 @@ final class ModuleRegistry
         return $this->discover()[$name] ?? throw new ModuleException("Unknown module '{$name}'");
     }
 
-    /** @return array<string, Manifest> */
+    /** @return array<string, Manifest> memoised until enable(), disable() or refresh() */
     public function enabled(): array
     {
+        if ($this->enabledCache !== null) {
+            return $this->enabledCache;
+        }
         if (!$this->db->hasTable('modules')) {
-            return [];
+            return $this->enabledCache = [];
         }
         $discovered = $this->discover();
         $enabled = [];
@@ -66,7 +75,24 @@ final class ModuleRegistry
             }
         }
 
-        return $this->sortByDependencies($enabled);
+        return $this->enabledCache = $this->sortByDependencies($enabled);
+    }
+
+    /** Forgets the memoised enabled() list, after xar_modules was changed by other code. */
+    public function refresh(): void
+    {
+        $this->enabledCache = null;
+    }
+
+    /**
+     * Registers a callback that runs after enable() has migrated and recorded a module. $firstInstall is true
+     * when xar_modules had no row for the module before, so seeds that must run once can check it.
+     *
+     * @param Closure(Manifest, bool): void $listener
+     */
+    public function onEnable(Closure $listener): void
+    {
+        $this->enableListeners[] = $listener;
     }
 
     public function isEnabled(string $name): bool
@@ -88,12 +114,17 @@ final class ModuleRegistry
         if ($manifest->migrationsPath() !== null) {
             $this->migrator->migrate([$name => $manifest->migrationsPath()]);
         }
+        $firstInstall = $this->db->select('modules')->where('name', '=', $name)->first() === null;
         $this->db->upsert('modules', [
             'name' => $name,
             'version' => $manifest->version,
             'enabled' => true,
             'installed_at' => new DateTimeImmutable(),
         ], ['name']);
+        $this->enabledCache = null;
+        foreach ($this->enableListeners as $listener) {
+            $listener($manifest, $firstInstall);
+        }
     }
 
     public function disable(string $name): void
@@ -107,6 +138,7 @@ final class ModuleRegistry
         if ($this->db->hasTable('modules')) {
             $this->db->update('modules', ['enabled' => false], ['name' => $name]);
         }
+        $this->enabledCache = null;
     }
 
     /** @return array<string, string> */

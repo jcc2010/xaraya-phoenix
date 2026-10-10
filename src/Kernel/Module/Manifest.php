@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Xaraya\Kernel\Module;
 
 use JsonException;
+use Xaraya\Kernel\Hooks\DisplayHook;
 
 final class Manifest
 {
@@ -88,6 +89,36 @@ final class Manifest
     public function commands(): array
     {
         return array_values(array_filter((array) ($this->data['commands'] ?? []), 'is_string'));
+    }
+
+    /** @return array<string, string> display hook name => class implementing DisplayHook */
+    public function displayHooks(): array
+    {
+        $out = [];
+        foreach ((array) ($this->data['displayHooks'] ?? []) as $hook => $class) {
+            if (!is_string($hook) || !in_array($hook, DisplayHook::HOOKS, true) || !is_string($class) || $class === '') {
+                throw new ModuleException("{$this->name}: displayHooks must map " . implode(', ', DisplayHook::HOOKS) . ' to class names');
+            }
+            $out[$hook] = $class;
+        }
+
+        return $out;
+    }
+
+    /** @return list<array{subject: string, itemtype: string}> bindings seeded when this (observer) module is enabled */
+    public function hookDefaults(): array
+    {
+        $out = [];
+        foreach ((array) ($this->data['hookDefaults'] ?? []) as $i => $default) {
+            $subject = is_array($default) ? ($default['subject'] ?? null) : null;
+            $itemtype = is_array($default) ? ($default['itemtype'] ?? '*') : null;
+            if (!is_string($subject) || $subject === '' || !is_string($itemtype) || $itemtype === '') {
+                throw new ModuleException("{$this->name}: hookDefaults[{$i}] needs a string \"subject\" and an optional string \"itemtype\"");
+            }
+            $out[] = ['subject' => $subject, 'itemtype' => $itemtype];
+        }
+
+        return $out;
     }
 
     /** @return array<string, string> */

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Xaraya\Tests\Kernel\Module;
 
 use Xaraya\Kernel\Db\Migrations\Migrator;
+use Xaraya\Kernel\Module\Manifest;
 use Xaraya\Kernel\Module\ModuleException;
 use Xaraya\Kernel\Module\ModuleRegistry;
 use Xaraya\Tests\Support\DbTestCase;
@@ -153,5 +154,32 @@ final class ModuleRegistryTest extends DbTestCase
         self::assertSame($before + 1, count(spl_autoload_functions()));
         unset($registry);
         self::assertSame($before, count(spl_autoload_functions()), 'released with the registry');
+    }
+
+    public function testOnEnableListenersSeeTheFirstInstallOnlyOnce(): void
+    {
+        $r = $this->registry();
+        $calls = [];
+        $r->onEnable(function (Manifest $manifest, bool $firstInstall) use (&$calls): void {
+            $calls[] = [$manifest->name, $firstInstall];
+        });
+        $r->enable('alpha');
+        $r->enable('alpha');
+        self::assertSame([['alpha', true], ['alpha', false]], $calls);
+    }
+
+    public function testEnabledIsCachedUntilEnableDisableOrRefresh(): void
+    {
+        $r = $this->registry();
+        $r->enable('alpha');
+        self::assertSame(['alpha'], array_keys($r->enabled()));
+        $this->db->update('modules', ['enabled' => false], ['name' => 'alpha']);
+        self::assertSame(['alpha'], array_keys($r->enabled()), 'still cached');
+        $r->refresh();
+        self::assertSame([], $r->enabled());
+        $r->enable('alpha');
+        self::assertSame(['alpha'], array_keys($r->enabled()));
+        $r->disable('alpha');
+        self::assertSame([], $r->enabled());
     }
 }

@@ -20,6 +20,7 @@ use Xaraya\Kernel\Db\Connection;
 use Xaraya\Kernel\Db\ConnectionFactory;
 use Xaraya\Kernel\Db\Migrations\Migrator;
 use Xaraya\Kernel\Events\EventDispatcher;
+use Xaraya\Kernel\Hooks\HookBindings;
 use Xaraya\Kernel\Http\CallableHandler;
 use Xaraya\Kernel\Http\Emitter;
 use Xaraya\Kernel\Http\Middleware\ConditionalGet;
@@ -29,6 +30,7 @@ use Xaraya\Kernel\Http\MiddlewareRegistry;
 use Xaraya\Kernel\Http\Pipeline;
 use Xaraya\Kernel\Http\RouteHandler;
 use Xaraya\Kernel\Log\FileLogger;
+use Xaraya\Kernel\Module\Manifest;
 use Xaraya\Kernel\Module\ModuleException;
 use Xaraya\Kernel\Module\ModuleRegistry;
 use Xaraya\Kernel\Routing\Route;
@@ -85,12 +87,19 @@ final class App
             (string) $config->get('log.level', 'info'),
         ));
         $c->set(Migrator::class, fn(Container $c): Migrator => new Migrator($c->get(Connection::class)));
-        $c->set(ModuleRegistry::class, fn(Container $c): ModuleRegistry => new ModuleRegistry(
-            $c->get(Connection::class),
-            $c->get(Migrator::class),
-            array_values(array_map(fn(mixed $p): string => $this->path((string) $p), (array) $config->get('modules.paths', ['modules']))),
-            __DIR__ . '/migrations',
-        ));
+        $c->set(ModuleRegistry::class, function (Container $c) use ($config): ModuleRegistry {
+            $registry = new ModuleRegistry(
+                $c->get(Connection::class),
+                $c->get(Migrator::class),
+                array_values(array_map(fn(mixed $p): string => $this->path((string) $p), (array) $config->get('modules.paths', ['modules']))),
+                __DIR__ . '/migrations',
+            );
+            $registry->onEnable(static function (Manifest $manifest, bool $firstInstall) use ($c): void {
+                $c->get(HookBindings::class)->seed($manifest);
+            });
+
+            return $registry;
+        });
         $c->set(EventDispatcher::class, fn(Container $c): EventDispatcher => new EventDispatcher($c));
         $c->set(MiddlewareRegistry::class, function (Container $c): MiddlewareRegistry {
             $registry = new MiddlewareRegistry($c);
