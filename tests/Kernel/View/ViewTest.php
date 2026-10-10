@@ -13,6 +13,7 @@ use Xaraya\Kernel\View\TwigEngine;
 use Xaraya\Kernel\View\View;
 use Xaraya\Kernel\View\ViewException;
 use Xaraya\Tests\Support\AppTestCase;
+use Xaraya\Tests\Support\Fixtures;
 use Xaraya\Tests\Support\ViewFixtures;
 
 final class ViewTest extends AppTestCase
@@ -57,6 +58,19 @@ final class ViewTest extends AppTestCase
             self::assertSame('<div><b>v</b></div>', trim($this->view($engine)->render('page', ['v' => 'v'])), $engine);
         }
         self::assertSame('<i><u>x</u></i>', trim($this->view()->render('mixed', ['v' => 'x'])));
+    }
+
+    public function testRenderPicksUpAThemeOverrideFromTheOtherEngineButIncludeDoesNot(): void
+    {
+        Fixtures::theme($this->tmp . '/themes', 'over', ['parent' => 'plain', 'engine' => 'php'], [
+            'templates/modules/shop/item.php' => '<p>PHP override <?= $x->e($id) ?></p>',
+            'templates/modules/shop/list.twig' => '<ul>Twig override</ul>',
+            'templates/fromtwig.twig' => '{{ render(\'shop::item\', {id: id}) }}|{% include \'shop::item\' %}',
+            'templates/fromphp.php' => '<?= $x->render(\'shop::list\', [\'ids\' => [1]]) ?>|<?= $x->include(\'shop::list\', [\'ids\' => [1]]) ?>',
+        ]);
+        $view = $this->app(['app.theme' => 'over'])->container()->get(View::class);
+        self::assertSame('<p>PHP override 3</p>|<p>Item 3</p>', trim($view->render('fromtwig', ['id' => 3])));
+        self::assertSame('<ul>Twig override</ul>|<ul><li>1</li></ul>', trim($view->render('fromphp')));
     }
 
     public function testModuleTemplatesRender(): void

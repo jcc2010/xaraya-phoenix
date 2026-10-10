@@ -24,7 +24,8 @@ bin/xar serve
 
 Set `MODULE_PATHS` in `.env` to keep the example module discoverable. With `APP_DEBUG=false`
 (production), config and routes are cached under `var/cache`; config is rebuilt when
-`config/app.php` or `.env` changes, and `bin/xar cache:clear` clears both caches.
+`config/app.php` or `.env` changes. `bin/xar cache:clear` removes the config and route caches, the file
+cache entries (`var/cache/data`) and the compiled Twig templates (`var/cache/twig`).
 
 ## Themes, templates and blocks
 
@@ -34,6 +35,10 @@ Templates exist as `.php` or `.twig` (Twig is optional: `composer require twig/t
 
 - `module::name` is a module template: `themes/<theme>/templates/modules/<module>/<name>.*` overrides
   `modules/<module>/templates/<name>.*`. Plain names (`layout`, `block`, `home`, `error/404`) are theme templates.
+- Overrides and engines: `$x->render()` / Twig `render()` find an override in either engine, but `$x->include()`
+  sees only `.php` files and Twig `{% include %}` only `.twig` files, so an override written in the other engine is
+  silently skipped. A partial that themes may override should be pulled with `render()`, or every override of it
+  must ship both `.php` and `.twig`.
 - PHP templates get variables directly and helpers as `$x`: `$x->e()` (escape: always use it), `$x->t()`,
   `$x->url()`, `$x->asset()`, `$x->blocks('sidebar')`, `$x->hooks('item.display', $item)`, `$x->render()`.
   Twig has the same helpers as functions and escapes automatically.
@@ -44,6 +49,9 @@ Templates exist as `.php` or `.twig` (Twig is optional: `composer require twig/t
 - Display hooks: a module's `"displayHooks"` add HTML to other modules' items, bound in `xar_hooks`.
   Toggle a binding with `bin/xar hook:disable <observer> <subject> [itemtype]` / `hook:enable`.
 - `bin/xar asset:publish` links `modules/*/assets` and `themes/*/assets` into `public/assets`.
+  `ASSET_URL` (default `/assets`) sets their base URL. `secureHtml` pages send `style-src 'self'` and
+  `script-src 'self'`, so an off-origin `ASSET_URL` (a CDN) leaves those pages unstyled unless the route
+  sends its own `Content-Security-Policy`.
 
 Try it with the examples: `MODULE_PATHS=modules,examples bin/xar module:enable hello`, then
 `module:enable hello-hooks`, and open `/hello`.
