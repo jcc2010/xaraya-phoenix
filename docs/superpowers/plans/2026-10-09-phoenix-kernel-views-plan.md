@@ -6550,5 +6550,4 @@ Do not push. The controller pushes and checks CI (Postgres runs only there).
 **4. Known limits, recorded rather than built:**
 - Twig helpers take positional arguments only.
 - `Html::normalize()` also collapses whitespace inside text, not only between tags, which keeps parity tests stable.
-- Error responses for router-level 404 and 405 do not carry `secureHtml` headers, because no route middleware runs. Pages and errors thrown inside `secureHtml` routes do carry them.
 - `text` blocks with `format: html` are trusted admin HTML.

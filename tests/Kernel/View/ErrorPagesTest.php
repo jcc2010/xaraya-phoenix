@@ -111,6 +111,42 @@ final class ErrorPagesTest extends AppTestCase
         self::assertStringContainsString('layout exploded', $this->log());
     }
 
+    private static function assertSecureHeaders(\Psr\Http\Message\ResponseInterface $response): void
+    {
+        self::assertSame(SecureHtml::HEADERS['Content-Security-Policy'], $response->getHeaderLine('Content-Security-Policy'));
+        self::assertSame('nosniff', $response->getHeaderLine('X-Content-Type-Options'));
+    }
+
+    public function testRouterNotFoundHtmlCarriesTheSecureHtmlHeaders(): void
+    {
+        $response = $this->app()->handle(new ServerRequest('GET', '/nope'));
+        self::assertSame(404, $response->getStatusCode());
+        self::assertSecureHeaders($response);
+    }
+
+    public function testRouterMethodNotAllowedHtmlCarriesTheSecureHtmlHeadersAndKeepsAllow(): void
+    {
+        $response = $this->app()->handle(new ServerRequest('DELETE', '/shop'));
+        self::assertSame(405, $response->getStatusCode());
+        self::assertSame('GET', $response->getHeaderLine('Allow'));
+        self::assertSecureHeaders($response);
+    }
+
+    public function testBuiltInFallbackPageCarriesTheSecureHtmlHeaders(): void
+    {
+        $response = $this->app(['app.theme' => 'brokenerr'])->handle(new ServerRequest('GET', '/nope'));
+        self::assertSame(404, $response->getStatusCode());
+        self::assertStringContainsString('<h1>404 Not Found</h1>', (string) $response->getBody());
+        self::assertSecureHeaders($response);
+    }
+
+    public function testJsonErrorsGetNoContentSecurityPolicy(): void
+    {
+        $response = $this->app()->handle((new ServerRequest('GET', '/nope'))->withHeader('Accept', 'application/json'));
+        self::assertSame(404, $response->getStatusCode());
+        self::assertFalse($response->hasHeader('Content-Security-Policy'));
+    }
+
     public function testSecureHtmlAliasIsRegistered(): void
     {
         self::assertInstanceOf(SecureHtml::class, $this->app()->container()->get(MiddlewareRegistry::class)->resolve('secureHtml'));

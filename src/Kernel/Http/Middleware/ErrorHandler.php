@@ -80,6 +80,8 @@ final class ErrorHandler implements MiddlewareInterface
                 }
             }
             $response = Controller::htmlResponse($html ?? $this->fallback($status, $message, $trace), $status);
+            // Every HTML error page gets the secureHtml headers; a route's own (CSP, Allow, ...) still win.
+            $headers = [...SecureHtml::HEADERS, ...$headers];
         }
         foreach ($headers as $name => $value) {
             $response = $response->withHeader($name, $value);
