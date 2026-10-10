@@ -16,6 +16,9 @@ use Xaraya\Kernel\Auth\GuestAccess;
 use Xaraya\Kernel\Blocks\BlockRenderer;
 use Xaraya\Kernel\Blocks\BlockRepository;
 use Xaraya\Kernel\Blocks\BlockTypes;
+use Xaraya\Kernel\Blocks\MenuBlock;
+use Xaraya\Kernel\Blocks\RecentItemsBlock;
+use Xaraya\Kernel\Blocks\TextBlock;
 use Xaraya\Kernel\Cache\Cache;
 use Xaraya\Kernel\Config\Config;
 use Xaraya\Kernel\Config\Env;
@@ -179,7 +182,11 @@ final class App
         ));
 
         $c->set(BlockTypes::class, function (Container $c): BlockTypes {
-            $types = new BlockTypes($c);
+            $types = new BlockTypes($c, [
+                'text' => TextBlock::class,
+                'menu' => MenuBlock::class,
+                'recent-items' => RecentItemsBlock::class,
+            ]);
             foreach ($c->get(ModuleRegistry::class)->enabled() as $manifest) {
                 try {
                     $blocks = $manifest->blocks();
