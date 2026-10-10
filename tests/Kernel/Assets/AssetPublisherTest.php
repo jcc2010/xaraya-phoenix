@@ -8,6 +8,8 @@ use Xaraya\Kernel\App;
 use Xaraya\Kernel\Assets\AssetPublisher;
 use Xaraya\Kernel\Cli\Application;
 use Xaraya\Kernel\Cli\Output;
+use Xaraya\Kernel\Module\ModuleRegistry;
+use Xaraya\Kernel\View\ThemeRegistry;
 use Xaraya\Kernel\View\View;
 use Xaraya\Tests\Support\AppTestCase;
 use Xaraya\Tests\Support\Fixtures;
@@ -67,6 +69,42 @@ final class AssetPublisherTest extends AppTestCase
         $this->app()->container()->get(AssetPublisher::class)->publish(copy: true);
         self::assertSame([], array_values(array_diff((array) scandir($this->tmp . '/outside'), ['.', '..'])));
         self::assertFileExists($this->tmp . '/public/assets/module/shop/shop.css');
+    }
+
+    public function testHyphenatedNamesArePublished(): void
+    {
+        Fixtures::module($this->tmp . '/modules', 'my-shop', [], ['assets/a.css' => 'a{}']);
+        $done = $this->app()->container()->get(AssetPublisher::class)->publish();
+        self::assertContains('my-shop', array_column($done, 'name'));
+        self::assertSame('a{}', file_get_contents($this->tmp . '/public/assets/module/my-shop/a.css'));
+    }
+
+    public function testFailingLinkerFallsBackToCopy(): void
+    {
+        $c = $this->app()->container();
+        $publisher = new AssetPublisher($c->get(ModuleRegistry::class), $c->get(ThemeRegistry::class), $this->tmp . '/public/assets', fn(string $from, string $to): bool => false);
+        $done = $publisher->publish();
+        self::assertSame(['copy', 'copy'], array_column($done, 'method'));
+        self::assertFalse(is_link($this->tmp . '/public/assets/module/shop'));
+        self::assertSame('shop{}', file_get_contents($this->tmp . '/public/assets/module/shop/shop.css'));
+    }
+
+    public function testThrowsWhenTheOldTargetCannotBeRemoved(): void
+    {
+        if (DIRECTORY_SEPARATOR === '\\' || (function_exists('posix_geteuid') && posix_geteuid() === 0)) {
+            self::markTestSkipped('Needs a POSIX non-root user to make a directory read-only.');
+        }
+        $c = $this->app()->container();
+        $publisher = $c->get(AssetPublisher::class);
+        $publisher->publish(copy: true);
+        chmod($this->tmp . '/public/assets/module', 0555);
+        try {
+            $this->expectException(\RuntimeException::class);
+            $this->expectExceptionMessage('Cannot replace');
+            $publisher->publish();
+        } finally {
+            chmod($this->tmp . '/public/assets/module', 0775);
+        }
     }
 
     public function testCommandPrintsWhatItPublished(): void

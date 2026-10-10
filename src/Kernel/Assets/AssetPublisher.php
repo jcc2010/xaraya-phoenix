@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace Xaraya\Kernel\Assets;
 
+use Closure;
 use FilesystemIterator;
+use Psr\Log\LoggerInterface;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
 use RuntimeException;
@@ -20,6 +22,8 @@ final class AssetPublisher
         private readonly ModuleRegistry $modules,
         private readonly ThemeRegistry $themes,
         private readonly string $target,
+        private readonly ?Closure $linker = null,
+        private readonly ?LoggerInterface $logger = null,
     ) {}
 
     /** @return list<array{kind: string, name: string, source: string, target: string, method: string}> */
@@ -34,20 +38,36 @@ final class AssetPublisher
         }
         $done = [];
         foreach ($sources as [$kind, $name, $source]) {
-            if (!is_dir($source) || preg_match('/^[A-Za-z_][A-Za-z0-9_]*$/D', $name) !== 1) {
+            if (!is_dir($source)) {
                 continue;
             }
-            // A link planted at {target}/{kind} could point outside the target: replace it with a real directory.
-            if (is_link($this->target . '/' . $kind)) {
-                @unlink($this->target . '/' . $kind);
+            // Same pattern as Manifest and Theme; anything else could escape the target directory.
+            if (preg_match('/^[a-z][a-z0-9_-]*$/D', $name) !== 1) {
+                throw new RuntimeException("Invalid {$kind} name '{$name}'");
             }
-            $target = $this->target . '/' . $kind . '/' . $name;
+            // {target}/{kind} must be a real directory. If it is a link (planted, or left by an older layout),
+            // writing through it could land outside the target, so the link itself is removed and recreated.
+            $kindDir = $this->target . '/' . $kind;
+            if (is_link($kindDir)) {
+                $this->logger?->warning("asset:publish removed the link '{$kindDir}' so it cannot redirect writes outside the target");
+                if (!@unlink($kindDir) && !@rmdir($kindDir)) {
+                    throw new RuntimeException("Cannot replace {$kindDir}");
+                }
+            }
+            $target = $kindDir . '/' . $name;
             Cache::removeTree($target);
+            if (is_link($target)) {
+                @rmdir($target); // Windows directory junctions need rmdir
+            }
+            if (is_link($target) || file_exists($target)) {
+                throw new RuntimeException("Cannot replace {$target}");
+            }
             $parent = dirname($target);
             if (!is_dir($parent) && !@mkdir($parent, 0775, true) && !is_dir($parent)) {
                 throw new RuntimeException("Cannot create directory '{$parent}'");
             }
-            $method = !$copy && @symlink($source, $target) ? 'symlink' : self::copyTree($source, $target);
+            $link = $this->linker ?? static fn(string $from, string $to): bool => @symlink($from, $to);
+            $method = !$copy && $link($source, $target) ? 'symlink' : self::copyTree($source, $target);
             $done[] = ['kind' => $kind, 'name' => $name, 'source' => $source, 'target' => $target, 'method' => $method];
         }
 

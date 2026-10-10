@@ -223,6 +223,8 @@ final class App
             $c->get(ModuleRegistry::class),
             $c->get(ThemeRegistry::class),
             $this->path((string) $config->get('assets.path', 'public/assets')),
+            null,
+            $c->get(LoggerInterface::class),
         ));
         $this->bootModules();
     }
