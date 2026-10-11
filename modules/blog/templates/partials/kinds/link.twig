@@ -1,0 +1,15 @@
+{% set href = post.externalUrl ?? post.url %}
+{% if full %}
+<h1 class="post-title"><a href="{{ href }}"{% if post.externalUrl is not null %} rel="nofollow noopener"{% endif %}>{{ post.title }}</a></h1>
+{% else %}
+<h2 class="post-title"><a href="{{ href }}"{% if post.externalUrl is not null %} rel="nofollow noopener"{% endif %}>{{ post.title }}</a></h2>
+{% endif %}
+{% if post.source is not null %}
+<p class="post-via">{{ t('via') }} {% if post.source.url is not null %}<a href="{{ post.source.url }}" rel="nofollow noopener">{{ post.source.name }}</a>{% else %}{{ post.source.name }}{% endif %}</p>
+{% endif %}
+{% if post.commentHtml is not null %}
+<div class="post-comment">{{ post.commentHtml|raw }}</div>
+{% endif %}
+{% if post.contentHtml != '' %}
+<div class="post-content">{{ post.contentHtml|raw }}</div>
+{% endif %}

@@ -1,0 +1,17 @@
+<div class="post-podcast">
+{% if podcast.cover is not null %}
+<img class="podcast-cover" src="{{ podcast.cover }}" alt="" loading="lazy">
+{% endif %}
+{% if podcast.show is not null %}
+<p class="podcast-show">{{ podcast.show }}</p>
+{% endif %}
+{% if podcast.episode is not null %}
+<p class="podcast-episode">{{ podcast.episode }}</p>
+{% endif %}
+{% if podcast.audioUrl is not null %}
+<audio controls preload="none" src="{{ podcast.audioUrl }}"></audio>
+{% endif %}
+{% if podcast.durationDisplay is not null %}
+<p class="podcast-duration">{{ podcast.durationDisplay }}</p>
+{% endif %}
+</div>

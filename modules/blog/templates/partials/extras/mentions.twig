@@ -1,0 +1,8 @@
+<section class="post-mentions">
+<h2>{{ t('Mentions') }}</h2>
+<ul>
+{% for mention in mentions %}
+<li><a href="{{ mention.source }}" rel="nofollow noopener ugc">{{ mention.title }}</a>{% if mention.date is not null %} <span class="mention-date">{{ mention.date }}</span>{% endif %}</li>
+{% endfor %}
+</ul>
+</section>

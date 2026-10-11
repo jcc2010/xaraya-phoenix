@@ -1,0 +1,5 @@
+<div class="gallery">
+{% for image in images %}
+<img src="{{ image.url }}" alt="" loading="lazy"{% if image.width is not null and image.height is not null %} width="{{ image.width }}" height="{{ image.height }}"{% endif %}>
+{% endfor %}
+</div>

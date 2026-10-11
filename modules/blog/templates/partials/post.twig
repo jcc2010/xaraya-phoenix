@@ -1,0 +1,31 @@
+<article class="post post-{{ post.kind }}{{ post.pinned ? ' post-pinned' : '' }}">
+{% if post.pinned %}
+<p class="post-pinned-label">{{ t('Pinned') }}</p>
+{% endif %}
+{% if post.kind != 'link' %}
+{% if full %}
+<h1 class="post-title">{{ post.title }}</h1>
+{% else %}
+<h2 class="post-title"><a href="{{ post.url }}">{{ post.title }}</a></h2>
+{% endif %}
+{% endif %}
+{{ render('blog::partials/kinds/' ~ post.kind, {post: post, full: full}) }}
+{% if post.video is not null %}
+{{ render('blog::partials/extras/video', {video: post.video}) }}
+{% endif %}
+{% if post.podcast is not null %}
+{{ render('blog::partials/extras/podcast', {podcast: post.podcast}) }}
+{% endif %}
+{% if post.song is not null %}
+{{ render('blog::partials/extras/song', {song: post.song}) }}
+{% endif %}
+<footer class="post-footer">
+<p class="post-meta"><a class="post-permalink" href="{{ post.url }}"><time datetime="{{ post.publishedIso }}">{{ post.publishedDisplay }}</time></a></p>
+{% if post.tags is not empty %}
+{{ render('blog::partials/extras/tags', {tags: post.tags}) }}
+{% endif %}
+</footer>
+{% if full and post.mentions is not empty %}
+{{ render('blog::partials/extras/mentions', {mentions: post.mentions}) }}
+{% endif %}
+</article>

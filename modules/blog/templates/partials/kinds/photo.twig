@@ -1,0 +1,11 @@
+{% if post.images|length > 1 %}
+{{ render('blog::partials/extras/gallery', {images: post.images}) }}
+{% elseif post.images is not empty %}
+{% set photo = post.images|first %}
+<figure class="post-photo"><img src="{{ photo.url }}" alt=""{% if photo.width is not null and photo.height is not null %} width="{{ photo.width }}" height="{{ photo.height }}"{% endif %}></figure>
+{% elseif post.image is not null %}
+<figure class="post-photo"><img src="{{ post.image }}" alt=""></figure>
+{% endif %}
+{% if post.contentHtml != '' %}
+<div class="post-content">{{ post.contentHtml|raw }}</div>
+{% endif %}

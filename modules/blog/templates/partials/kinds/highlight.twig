@@ -1,0 +1,11 @@
+{% if post.quote is not null %}
+<blockquote class="post-quote"{% if post.source is not null and post.source.url is not null %} cite="{{ post.source.url }}"{% endif %}><p>{{ post.quote }}</p></blockquote>
+{% elseif post.contentHtml != '' %}
+<div class="post-content">{{ post.contentHtml|raw }}</div>
+{% endif %}
+{% if post.source is not null %}
+<p class="post-source">— {% if post.source.url is not null %}<a href="{{ post.source.url }}" rel="nofollow noopener">{{ post.source.name }}</a>{% else %}{{ post.source.name }}{% endif %}</p>
+{% endif %}
+{% if post.commentHtml is not null %}
+<div class="post-comment">{{ post.commentHtml|raw }}</div>
+{% endif %}

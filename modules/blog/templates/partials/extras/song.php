@@ -1,0 +1,1 @@
+<p class="post-song"><?php if ($song['channel'] !== null): ?><span class="song-channel"><?= $x->e($song['channel']) ?></span><?php endif ?><?php if ($song['durationDisplay'] !== null): ?><span class="song-duration"><?= $x->e($song['durationDisplay']) ?></span><?php endif ?></p>
