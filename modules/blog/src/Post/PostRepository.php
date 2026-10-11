@@ -6,6 +6,7 @@ namespace Xaraya\Module\Blog\Post;
 
 use DateTimeImmutable;
 use Xaraya\Kernel\Db\Connection;
+use Xaraya\Kernel\Db\Select;
 use Xaraya\Kernel\Support\Ulid;
 
 /**
@@ -84,6 +85,47 @@ final class PostRepository
         }
 
         return $this->hydrate($query->orderBy('date_published', 'desc')->orderBy('id', 'desc')->limit($limit)->all());
+    }
+
+    /**
+     * The live posts just before (older) and just after (newer) $post in its blog, by (date_published, id).
+     *
+     * @return array{0: ?Post, 1: ?Post}
+     */
+    public function neighbours(Post $post, DateTimeImmutable $now): array
+    {
+        $live = fn(): Select => $this->db->select('posts')
+            ->where('blog_id', '=', $post->blogId)
+            ->where('status', '=', 'published')
+            ->where('date_published', '<=', $now);
+        $at = ['date_published' => $post->datePublished, 'id' => $post->id];
+        $older = $live()->cursor($at, '<')->orderBy('date_published', 'desc')->orderBy('id', 'desc')->first();
+        $newer = $live()->cursor($at, '>')->orderBy('date_published')->orderBy('id')->first();
+
+        return [
+            $older === null ? null : $this->hydrate([$older])[0],
+            $newer === null ? null : $this->hydrate([$newer])[0],
+        ];
+    }
+
+    /**
+     * A blog's live posts carrying the tag $slug (compared exactly), newest first, keyset-paged like page().
+     *
+     * @param array{0: DateTimeImmutable, 1: string}|null $before
+     * @return list<Post>
+     */
+    public function pageByTag(int $blogId, string $slug, DateTimeImmutable $now, ?array $before, int $limit): array
+    {
+        $sql = 'SELECT p.* FROM {posts} p JOIN {post_tags} t ON t.post_id = p.id'
+            . ' WHERE t.blog_id = ? AND t.slug = ? AND p.blog_id = ? AND p.status = ? AND p.date_published <= ?';
+        $params = [$blogId, $slug, $blogId, 'published', $now];
+        if ($before !== null) {
+            $sql .= ' AND (p.date_published < ? OR (p.date_published = ? AND p.id < ?))';
+            array_push($params, $before[0], $before[0], $before[1]);
+        }
+        $sql .= ' ORDER BY p.date_published DESC, p.id DESC LIMIT ' . max(0, $limit);
+
+        return $this->hydrate($this->db->fetchAll($sql, $params));
     }
 
     /**

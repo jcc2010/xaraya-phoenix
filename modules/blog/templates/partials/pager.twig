@@ -1,0 +1,10 @@
+{% if pager.prev is not null or pager.next is not null %}
+<nav class="pager" aria-label="{{ t('Pages') }}">
+{% if pager.prev is not null %}
+<a class="pager-prev" href="{{ pager.prev }}">{{ t(pager.prevLabel) }}</a>
+{% endif %}
+{% if pager.next is not null %}
+<a class="pager-next" rel="next" href="{{ pager.next }}">{{ t(pager.nextLabel) }}</a>
+{% endif %}
+</nav>
+{% endif %}

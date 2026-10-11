@@ -1,0 +1,11 @@
+{{ render('blog::partials/post', {post: post, full: true}) }}
+{% if newer is not null or older is not null %}
+<nav class="post-nav" aria-label="{{ t('More posts') }}">
+{% if newer is not null %}
+<p class="post-nav-newer">{{ t('Newer:') }} <a href="{{ newer.url }}">{{ newer.title }}</a></p>
+{% endif %}
+{% if older is not null %}
+<p class="post-nav-older">{{ t('Older:') }} <a href="{{ older.url }}">{{ older.title }}</a></p>
+{% endif %}
+</nav>
+{% endif %}

@@ -1,0 +1,14 @@
+<header class="blog-header">
+<p class="blog-name">{{ blog.title }}</p>
+<h1 class="blog-title">{{ t('Tagged “{tag}”', {tag: tag.name}) }}</h1>
+</header>
+{% if posts is empty %}
+<p class="blog-empty">{{ t('No more posts.') }}</p>
+{% else %}
+<div class="post-list">
+{% for post in posts %}
+{{ render('blog::partials/post', {post: post, full: false}) }}
+{% endfor %}
+</div>
+{% endif %}
+{{ render('blog::partials/pager', {pager: pager}) }}
