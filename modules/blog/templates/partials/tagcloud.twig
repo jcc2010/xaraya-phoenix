@@ -1,0 +1,5 @@
+<ul class="tag-cloud">
+{% for tag in tags %}
+<li class="tag-step-{{ tag.step }}"><a href="{{ tag.url }}" rel="tag">{{ tag.name }}</a> <span class="tag-count">{{ tag.count }}</span></li>
+{% endfor %}
+</ul>

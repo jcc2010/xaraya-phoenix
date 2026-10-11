@@ -142,6 +142,26 @@ final class PostRepository
     }
 
     /**
+     * Tags with at least one live post, most used first, then by slug. A slug's name is its smallest stored name.
+     *
+     * @return list<array{name: string, slug: string, count: int}>
+     */
+    public function tagCounts(int $blogId, DateTimeImmutable $now, ?int $limit = null): array
+    {
+        $sql = 'SELECT t.slug AS slug, MIN(t.name) AS name, COUNT(*) AS uses FROM {post_tags} t JOIN {posts} p ON p.id = t.post_id'
+            . ' WHERE t.blog_id = ? AND p.blog_id = ? AND p.status = ? AND p.date_published <= ?'
+            . ' GROUP BY t.slug ORDER BY uses DESC, t.slug ASC'
+            . ($limit === null ? '' : ' LIMIT ' . max(0, $limit));
+        $rows = $this->db->fetchAll($sql, [$blogId, $blogId, 'published', $now]);
+
+        return array_map(static fn(array $row): array => [
+            'name' => (string) $row['name'],
+            'slug' => (string) $row['slug'],
+            'count' => (int) $row['uses'],
+        ], $rows);
+    }
+
+    /**
      * Published posts of a blog, scheduled ones included, in id order after $afterId: the chunks blog:reindex walks.
      *
      * @return list<Post>

@@ -11,6 +11,7 @@ use Xaraya\Module\Blog\Http\FeedController;
 use Xaraya\Module\Blog\Http\MediaController;
 use Xaraya\Module\Blog\Http\PostController;
 use Xaraya\Module\Blog\Http\PostPageController;
+use Xaraya\Module\Blog\Http\TagsController;
 
 final class Routes implements RouteProvider
 {
@@ -26,6 +27,8 @@ final class Routes implements RouteProvider
 
         // HTML pages.
         $routes->get('/blog/{handle:[a-z0-9_-]{2,32}}', [BlogPagesController::class, 'home'], 'blog.home')
+            ->middleware('secureHtml', 'conditional');
+        $routes->get('/blog/{handle:[a-z0-9_-]{2,32}}/tags', [TagsController::class, 'tags'], 'blog.tags')
             ->middleware('secureHtml', 'conditional');
         $routes->get('/blog/{handle:[a-z0-9_-]{2,32}}/tag/{slug:[^/]{1,128}}', [BlogPagesController::class, 'tag'], 'blog.tag')
             ->middleware('secureHtml', 'conditional');

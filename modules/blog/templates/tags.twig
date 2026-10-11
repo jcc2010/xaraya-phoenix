@@ -1,0 +1,9 @@
+<header class="blog-header">
+<p class="blog-name">{{ blog.title }}</p>
+<h1 class="blog-title">{{ t('Tags') }}</h1>
+</header>
+{% if tags is empty %}
+<p class="blog-empty">{{ t('No tags yet.') }}</p>
+{% else %}
+{{ render('blog::partials/tagcloud', {tags: tags}) }}
+{% endif %}
