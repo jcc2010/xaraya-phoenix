@@ -50,6 +50,7 @@ use Xaraya\Kernel\Routing\RouteCollector;
 use Xaraya\Kernel\Routing\RouteProvider;
 use Xaraya\Kernel\Routing\Router;
 use Xaraya\Kernel\Routing\UrlGenerator;
+use Xaraya\Kernel\Support\HtmlSanitizer;
 use Xaraya\Kernel\View\ErrorPages;
 use Xaraya\Kernel\View\PhpEngine;
 use Xaraya\Kernel\View\TemplateLocator;
@@ -144,6 +145,11 @@ final class App
         ));
 
         $c->set(Cache::class, fn(): Cache => new Cache($this->cacheDir() . '/data'));
+        $c->set(HtmlSanitizer::class, static function () use ($config): HtmlSanitizer {
+            $host = parse_url((string) $config->get('app.url', ''), PHP_URL_HOST);
+
+            return new HtmlSanitizer(is_string($host) && $host !== '' ? $host : null);
+        });
 
         $c->set(ThemeRegistry::class, fn(): ThemeRegistry => new ThemeRegistry(
             array_values(array_map(fn(mixed $p): string => $this->path((string) $p), (array) $config->get('themes.paths', ['themes']))),
