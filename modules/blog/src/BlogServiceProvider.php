@@ -6,16 +6,21 @@ namespace Xaraya\Module\Blog;
 
 use Psr\Log\LoggerInterface;
 use Xaraya\Kernel\App;
+use Xaraya\Kernel\Cache\Cache;
 use Xaraya\Kernel\Config\Config;
 use Xaraya\Kernel\Container\Container;
 use Xaraya\Kernel\Container\ServiceProvider;
 use Xaraya\Kernel\Db\Connection;
+use Xaraya\Kernel\Routing\UrlGenerator;
+use Xaraya\Kernel\Support\HtmlSanitizer;
+use Xaraya\Module\Blog\Feed\ItemSerializer;
 use Xaraya\Module\Blog\Media\MediaStore;
 use Xaraya\Module\Blog\Search\LikeSearchIndex;
 use Xaraya\Module\Blog\Search\SearchIndex;
 use Xaraya\Module\Blog\Source\HttpFetcher;
 use Xaraya\Module\Blog\Source\StreamFetcher;
 use Xaraya\Module\Blog\Sync\SyncLock;
+use Xaraya\Module\Blog\View\PostViewFactory;
 
 final class BlogServiceProvider implements ServiceProvider
 {
@@ -37,5 +42,12 @@ final class BlogServiceProvider implements ServiceProvider
             (string) $c->get(Config::class)->get('blog.uploads', $c->get(App::class)->path('var/uploads')),
         ));
         $container->set(SearchIndex::class, static fn(Container $c): SearchIndex => $c->get(LikeSearchIndex::class));
+        $container->set(PostViewFactory::class, static fn(Container $c): PostViewFactory => new PostViewFactory(
+            $c->get(HtmlSanitizer::class),
+            $c->get(Cache::class),
+            $c->get(UrlGenerator::class),
+            $c->get(ItemSerializer::class),
+            rtrim((string) $c->get(Config::class)->get('app.url', ''), '/'),
+        ));
     }
 }

@@ -28,6 +28,7 @@ final class Post
         public readonly string $status,
         public readonly array $doc,
         public readonly array $tags,
+        public readonly ?DateTimeImmutable $updatedAt = null,
     ) {}
 
     /**
@@ -40,6 +41,7 @@ final class Post
         $s = static fn(string $key): ?string => isset($row[$key]) && $row[$key] !== '' ? (string) $row[$key] : null;
         $doc = is_string($row['doc'] ?? null) ? json_decode($row['doc'], true) : null;
         $modified = $s('date_modified');
+        $updated = $s('updated_at');
 
         return new self(
             (string) $row['id'],
@@ -56,6 +58,7 @@ final class Post
             (string) $row['status'],
             is_array($doc) ? $doc : [],
             $tags,
+            $updated === null ? null : new DateTimeImmutable($updated, $utc),
         );
     }
 }
