@@ -218,8 +218,9 @@ final class PostViewFactoryTest extends AppTestCase
     {
         $post = self::post();
         $cache = new Cache($this->tmp . '/cache');
-        $key = PostViewFactory::cacheKey($post, 'content', (string) $post->contentHtml);
-        self::assertStringStartsWith('sanitized/' . self::ID . '-20261002100000-content-', $key);
+        $key = PostViewFactory::cacheKey($post, 'content', (string) $post->contentHtml, 'xar.test');
+        $prefix = 'sanitized/v' . HtmlSanitizer::VERSION . '-' . substr(sha1('xar.test'), 0, 8) . '/';
+        self::assertStringStartsWith($prefix . self::ID . '-20261002100000-content-', $key);
         self::assertFalse($cache->has($key));
         $this->factory()->make(self::blog(), $post);
         self::assertSame('<p>Hello <b>world</b></p>', $cache->get($key));
@@ -228,6 +229,16 @@ final class PostViewFactoryTest extends AppTestCase
         self::assertSame('<p>from the cache</p>', $this->factory()->make(self::blog(), $post)->contentHtml);
         $edited = self::post(['content_html' => '<p>Edited</p>']);
         self::assertSame('<p>Edited</p>', $this->factory()->make(self::blog(), $edited)->contentHtml, 'new content, new key');
+    }
+
+    public function testTheCacheKeyChangesWithTheSanitiserVersionAndSiteHost(): void
+    {
+        $post = self::post();
+        $key = PostViewFactory::cacheKey($post, 'content', 'x', 'xar.test');
+        self::assertSame($key, PostViewFactory::cacheKey($post, 'content', 'x', 'XAR.test'), 'hosts compare case-insensitively');
+        self::assertNotSame($key, PostViewFactory::cacheKey($post, 'content', 'x', 'other.test'), 'target=_blank depends on the host');
+        self::assertNotSame($key, PostViewFactory::cacheKey($post, 'content', 'x', null));
+        self::assertNotSame($key, PostViewFactory::cacheKey($post, 'content', 'x', 'xar.test', HtmlSanitizer::VERSION + 1), 'a new sanitiser version misses old entries');
     }
 
     public function testGarbledContentStillGivesValidUtf8(): void

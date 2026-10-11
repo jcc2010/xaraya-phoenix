@@ -12,11 +12,21 @@ use DOMText;
 
 /**
  * Allowlist HTML sanitiser for untrusted fragments (blog posts, descriptions). Parses with DOMDocument as UTF-8,
- * keeps only the allowed elements and attributes, checks every URL, and serialises again. Idempotent:
- * clean(clean($x)) === clean($x).
+ * keeps only the allowed elements and attributes, checks every URL, and serialises again. Every link gets a forced
+ * rel (and target=_blank when it leaves the site host); every image gets a forced referrerpolicy="no-referrer",
+ * because some hosts (Athena) refuse hotlinked media sent with a cross-origin Referer. The source cannot choose its
+ * own rel, target or referrerpolicy. Idempotent: clean(clean($x)) === clean($x).
  */
 final class HtmlSanitizer
 {
+    /**
+     * The output format's version. Bump it whenever clean() would produce different HTML for the same input:
+     * cached sanitised HTML is keyed by it and never expires.
+     */
+    public const VERSION = 2;
+
+    public const IMG_REFERRER_POLICY = 'no-referrer';
+
     /** Elements nested deeper than this are dropped with their content. */
     public const MAX_DEPTH = 64;
 
@@ -41,6 +51,12 @@ final class HtmlSanitizer
 
     /** @param ?string $siteHost links to any other host open in a new tab */
     public function __construct(private readonly ?string $siteHost = null) {}
+
+    /** The host whose links stay in the same tab; part of the output, so callers fold it into cache keys. */
+    public function siteHost(): ?string
+    {
+        return $this->siteHost;
+    }
 
     public function clean(string $html): string
     {
@@ -142,6 +158,8 @@ final class HtmlSanitizer
         $this->attributes($node, self::ALLOWED[$name]);
         if ($name === 'img' && trim($node->getAttribute('src')) === '') {
             $parent->removeChild($node);
+        } elseif ($name === 'img') {
+            $node->setAttribute('referrerpolicy', self::IMG_REFERRER_POLICY);
         } elseif ($name === 'a') {
             $this->link($node);
         }

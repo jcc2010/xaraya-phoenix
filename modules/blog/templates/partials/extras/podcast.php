@@ -1,6 +1,6 @@
 <div class="post-podcast">
 <?php if ($podcast['cover'] !== null): ?>
-<img class="podcast-cover" src="<?= $x->e($podcast['cover']) ?>" alt="" loading="lazy">
+<img class="podcast-cover" src="<?= $x->e($podcast['cover']) ?>" alt="" loading="lazy" referrerpolicy="no-referrer">
 <?php endif ?>
 <?php if ($podcast['show'] !== null): ?>
 <p class="podcast-show"><?= $x->e($podcast['show']) ?></p>

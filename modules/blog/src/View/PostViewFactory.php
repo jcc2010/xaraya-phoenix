@@ -101,10 +101,14 @@ final class PostViewFactory
         return $this->urls->generate('blog.post', ['id' => $post->id]);
     }
 
-    public static function cacheKey(Post $post, string $field, string $html): string
+    /**
+     * Cache entries never expire, so the key carries everything the output depends on: the sanitiser's version and
+     * site host (target=_blank), the post's update time and the input itself.
+     */
+    public static function cacheKey(Post $post, string $field, string $html, ?string $siteHost, int $version = HtmlSanitizer::VERSION): string
     {
         // updated_at has one-second resolution, so the input's hash keeps two writes in one second apart.
-        return 'sanitized/' . $post->id . '-' . ($post->updatedAt?->format('YmdHis') ?? '0') . '-' . $field . '-' . substr(sha1($html), 0, 12);
+        return 'sanitized/v' . $version . '-' . substr(sha1(strtolower($siteHost ?? '')), 0, 8) . '/' . $post->id . '-' . ($post->updatedAt?->format('YmdHis') ?? '0') . '-' . $field . '-' . substr(sha1($html), 0, 12);
     }
 
     public static function display(DateTimeImmutable $date): string
@@ -132,7 +136,7 @@ final class PostViewFactory
         if (trim($html) === '') {
             return '';
         }
-        $key = self::cacheKey($post, $field, $html);
+        $key = self::cacheKey($post, $field, $html, $this->sanitizer->siteHost());
         $cached = $this->cache->get($key);
         if (is_string($cached)) {
             return $cached;

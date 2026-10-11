@@ -74,7 +74,7 @@ final class PostTemplatesTest extends BlogTestCase
             '<article class="post post-link"><h2 class="post-title"><a href="https://example.test/story?a=1&amp;b=2" rel="nofollow noopener">A &lt;title&gt;</a></h2>'
             . '<p class="post-via">via<a href="https://example.test/" rel="nofollow noopener">example.test</a></p>'
             . '<div class="post-comment"><p>My take.</p></div><div class="post-content"><p>The description.</p></div>'
-            . '<p class="post-video"><a class="video-link" href="https://www.youtube.com/watch?v=dQw4w9WgXcQ" rel="nofollow noopener"><img src="https://cdn.test/t.jpg" alt="" loading="lazy"><span class="video-play" aria-hidden="true">▶</span><span class="visually-hidden">Watch the video</span></a></p>',
+            . '<p class="post-video"><a class="video-link" href="https://www.youtube.com/watch?v=dQw4w9WgXcQ" rel="nofollow noopener"><img src="https://cdn.test/t.jpg" alt="" loading="lazy" referrerpolicy="no-referrer"><span class="video-play" aria-hidden="true">▶</span><span class="visually-hidden">Watch the video</span></a></p>',
             $link,
         );
         self::assertStringContainsString('<h1 class="post-title"><a href="https://example.test/story?a=1&amp;b=2"', $this->both($posts['link'], true));
@@ -83,21 +83,35 @@ final class PostTemplatesTest extends BlogTestCase
         self::assertStringContainsString(
             '<h1 class="post-title">A &lt;title&gt;</h1><blockquote class="post-quote"><p>To be &lt;or&gt; not</p></blockquote>'
             . '<p class="post-source">— Someone</p><div class="post-comment"><p>Indeed.</p></div>'
-            . '<div class="post-podcast"><img class="podcast-cover" src="https://cdn.test/c.jpg" alt="" loading="lazy"><p class="podcast-show">Show</p>'
+            . '<div class="post-podcast"><img class="podcast-cover" src="https://cdn.test/c.jpg" alt="" loading="lazy" referrerpolicy="no-referrer"><p class="podcast-show">Show</p>'
             . '<p class="podcast-episode">Ep 1</p><audio controls preload="none" src="https://cdn.test/ep.mp3"></audio><p class="podcast-duration">1:02:05</p></div>',
             $highlight,
         );
 
         $photo = $this->both($posts['photo'], false);
         self::assertStringContainsString(
-            '<div class="gallery"><img src="https://cdn.test/a.jpg" alt="" loading="lazy" width="800" height="600"><img src="https://cdn.test/b.jpg" alt="" loading="lazy"></div>',
+            '<div class="gallery"><img src="https://cdn.test/a.jpg" alt="" loading="lazy" referrerpolicy="no-referrer" width="800" height="600"><img src="https://cdn.test/b.jpg" alt="" loading="lazy" referrerpolicy="no-referrer"></div>',
             $photo,
         );
         self::assertStringNotContainsString('post-content', $photo);
         $single = $this->both(PostViews::make(['kind' => 'photo', 'images' => [['url' => 'https://cdn.test/a.jpg', 'width' => 8, 'height' => 6]]]), false);
-        self::assertStringContainsString('<figure class="post-photo"><img src="https://cdn.test/a.jpg" alt="" width="8" height="6"></figure>', $single);
+        self::assertStringContainsString('<figure class="post-photo"><img src="https://cdn.test/a.jpg" alt="" loading="lazy" referrerpolicy="no-referrer" width="8" height="6"></figure>', $single);
         $fallback = $this->both(PostViews::make(['kind' => 'photo', 'image' => 'https://cdn.test/only.jpg']), false);
-        self::assertStringContainsString('<figure class="post-photo"><img src="https://cdn.test/only.jpg" alt=""></figure>', $fallback);
+        self::assertStringContainsString('<figure class="post-photo"><img src="https://cdn.test/only.jpg" alt="" loading="lazy" referrerpolicy="no-referrer"></figure>', $fallback);
+
+        $withImages = $posts + ['single photo' => PostViews::make(['kind' => 'photo', 'images' => [['url' => 'https://cdn.test/a.jpg', 'width' => 8, 'height' => 6]]]),
+            'fallback photo' => PostViews::make(['kind' => 'photo', 'image' => 'https://cdn.test/only.jpg'])];
+        $images = 0;
+        foreach ($withImages as $kind => $post) {
+            foreach ([true, false] as $full) {
+                foreach (['php', 'twig'] as $engine) {
+                    $html = Html::normalize($this->view($engine)->render('blog::partials/post', ['post' => $post, 'full' => $full]));
+                    $images += substr_count($html, '<img');
+                    self::assertSame(substr_count($html, '<img'), substr_count($html, ' referrerpolicy="no-referrer"'), "{$kind} ({$engine}): every image is fetched with no Referer");
+                }
+            }
+        }
+        self::assertGreaterThan(0, $images);
 
         foreach ($posts as $kind => $post) {
             foreach ([true, false] as $full) {

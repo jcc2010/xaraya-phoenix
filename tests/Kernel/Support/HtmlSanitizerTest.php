@@ -20,7 +20,9 @@ final class HtmlSanitizerTest extends AppTestCase
     {
         return [
             'script' => ['<script>alert(1)</script><p>ok</p>', '<p>ok</p>'],
-            'img onerror' => ['<img src="/x.png" onerror="alert(1)">', '<img src="/x.png">'],
+            'img onerror' => ['<img src="/x.png" onerror="alert(1)">', '<img src="/x.png" referrerpolicy="no-referrer">'],
+            'img referrerpolicy forced' => ['<img src="/x.png" referrerpolicy="unsafe-url">', '<img src="/x.png" referrerpolicy="no-referrer">'],
+            'img referrerpolicy first' => ['<img referrerpolicy="origin" src="/x.png" alt="a">', '<img src="/x.png" alt="a" referrerpolicy="no-referrer">'],
             'javascript href' => ['<a href="javascript:alert(1)">x</a>', '<a rel="nofollow noopener ugc">x</a>'],
             'entity-encoded javascript' => ['<a href="&#106;avascript:alert(1)">x</a>', '<a rel="nofollow noopener ugc">x</a>'],
             'tab-split javascript' => ['<a href="java&#x09;script:alert(1)">x</a>', '<a rel="nofollow noopener ugc">x</a>'],
@@ -40,7 +42,7 @@ final class HtmlSanitizerTest extends AppTestCase
             'unknown unwrapped' => ['<custom-el><b>kept</b></custom-el><table><tr><td>cell</td></tr></table>', '<b>kept</b>cell'],
             'allowed attributes' => [
                 '<img src="/x.png" width="10" height="20px" alt="a" title="t"><q cite="https://c.test">q</q>',
-                '<img src="/x.png" width="10" alt="a"><q cite="https://c.test">q</q>',
+                '<img src="/x.png" width="10" alt="a" referrerpolicy="no-referrer"><q cite="https://c.test">q</q>',
             ],
             'escaped text stays escaped' => ['<p>a &lt;b&gt; &amp; c</p>', '<p>a &lt;b&gt; &amp; c</p>'],
             'query string ampersand' => ['<a href="/s?a=1&amp;b=2">q</a>', '<a href="/s?a=1&amp;b=2" rel="nofollow noopener ugc">q</a>'],
@@ -68,7 +70,7 @@ final class HtmlSanitizerTest extends AppTestCase
             . '<a href="https://XAR.test/x" rel="nofollow noopener ugc">s</a>',
             $this->clean('<a href="https://ext.test/a" target="_self" rel="me">e</a><a href="/local">l</a><a href="mailto:a@b.test">m</a><a href="https://XAR.test/x">s</a>'),
         );
-        self::assertSame('<img src="/x.png">', $this->clean('<img src="/x.png" href="mailto:a@b.test">'));
+        self::assertSame('<img src="/x.png" referrerpolicy="no-referrer">', $this->clean('<img src="/x.png" href="mailto:a@b.test">'));
         self::assertSame('<blockquote>q</blockquote>', $this->clean('<blockquote cite="mailto:a@b.test">q</blockquote>'), 'mailto: is for href only');
         self::assertSame(
             '<a href="https://xar.test/" rel="nofollow noopener ugc" target="_blank">a</a>',
@@ -124,6 +126,12 @@ final class HtmlSanitizerTest extends AppTestCase
         foreach (["javascript:alert(1)\xff", "javascript:alert(1)\xc0", "\xffjavascript:x"] as $url) {
             self::assertFalse(HtmlSanitizer::isSafeUrl($url), bin2hex($url));
         }
+    }
+
+    public function testTheSiteHostIsExposedForCacheKeys(): void
+    {
+        self::assertSame('xar.test', (new HtmlSanitizer('xar.test'))->siteHost());
+        self::assertNull((new HtmlSanitizer())->siteHost());
     }
 
     public function testTheAppBindsItWithTheSiteHost(): void
