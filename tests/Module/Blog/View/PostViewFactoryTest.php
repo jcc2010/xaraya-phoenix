@@ -253,4 +253,30 @@ final class PostViewFactoryTest extends AppTestCase
         self::assertNull(PostViewFactory::duration(0));
         self::assertNull(PostViewFactory::duration('60'));
     }
+
+    public function testAnUnsafeFeedUrlFallsBackToTheLocalCanonical(): void
+    {
+        $mirror = self::blog(['mode' => 'mirror', 'source_url' => 'https://src.test/feed.json', 'source_format' => 'athena']);
+        $view = $this->factory()->make($mirror, self::post(['url' => 'javascript:alert(1)']));
+        self::assertSame('http://xar.test/s/' . self::ID, $view->canonicalUrl);
+        $ok = $this->factory()->make($mirror, self::post(['url' => 'https://src.test/p/1']));
+        self::assertSame('https://src.test/p/1', $ok->canonicalUrl);
+    }
+
+    public function testMentionDatesMustBeTimestamps(): void
+    {
+        $mentions = [];
+        foreach (['now', '+1 week', 'tomorrow', '2026-10-03T08:00:00Z', '2026-10-03T08:00:00.5+02:00'] as $i => $date) {
+            $mentions[] = ['source' => 'https://other.test/' . $i, 'date' => $date];
+        }
+        $view = $this->factory()->make(self::blog(), self::post([], ['_athenana' => ['mentions' => $mentions]]));
+        self::assertSame([null, null, null, '3 Oct 2026', '3 Oct 2026'], array_column($view->mentions, 'date'));
+    }
+
+    public function testOverlongTagSlugsAreNotLinked(): void
+    {
+        $slug = str_repeat('a', 129);
+        $view = $this->factory()->make(self::blog(), self::post([], [], [['name' => 'Long', 'slug' => $slug], ['name' => 'Ok', 'slug' => str_repeat('a', 128)]]));
+        self::assertSame(['Ok'], array_column($view->tags, 'name'));
+    }
 }

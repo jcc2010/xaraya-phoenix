@@ -60,7 +60,7 @@ final class PostViewFactory
             kind: in_array($post->kind, JsonFeedAdapter::KINDS, true) ? $post->kind : 'note',
             title: $post->title,
             url: $this->link($blog, $post),
-            canonicalUrl: $this->items->url($blog, $post, $this->appUrl),
+            canonicalUrl: self::safe($this->items->url($blog, $post, $this->appUrl)) ?? $this->appUrl . '/s/' . $post->id,
             externalUrl: self::safe($post->externalUrl),
             contentHtml: $contentHtml,
             excerpt: mb_substr($plain, 0, self::EXCERPT_LENGTH),
@@ -149,8 +149,8 @@ final class PostViewFactory
     {
         $out = [];
         foreach ($post->tags as $tag) {
-            if ($tag['slug'] === '' || str_contains($tag['slug'], '/')) {
-                continue; // no tag route can match it
+            if ($tag['slug'] === '' || str_contains($tag['slug'], '/') || strlen($tag['slug']) > 128) {
+                continue; // no tag route can match it (the route allows 1-128 bytes, no "/")
             }
             $out[] = [
                 'name' => $tag['name'],
@@ -246,7 +246,7 @@ final class PostViewFactory
             }
             $date = null;
             $when = self::str($mention, 'date');
-            if ($when !== null) {
+            if ($when !== null && preg_match('/^\d{4}-\d{2}-\d{2}(?:[T ]\d{2}:\d{2}(?::\d{2}(?:\.\d+)?)?(?:Z|[+-]\d{2}:?\d{2})?)?$/D', $when) === 1) {
                 try {
                     $date = self::display(new DateTimeImmutable($when));
                 } catch (Exception) {
