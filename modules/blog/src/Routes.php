@@ -6,6 +6,7 @@ namespace Xaraya\Module\Blog;
 
 use Xaraya\Kernel\Routing\RouteCollector;
 use Xaraya\Kernel\Routing\RouteProvider;
+use Xaraya\Module\Blog\Http\AboutController;
 use Xaraya\Module\Blog\Http\BlogPagesController;
 use Xaraya\Module\Blog\Http\FeedController;
 use Xaraya\Module\Blog\Http\MediaController;
@@ -27,6 +28,8 @@ final class Routes implements RouteProvider
 
         // HTML pages.
         $routes->get('/blog/{handle:[a-z0-9_-]{2,32}}', [BlogPagesController::class, 'home'], 'blog.home')
+            ->middleware('secureHtml', 'conditional');
+        $routes->get('/blog/{handle:[a-z0-9_-]{2,32}}/about', [AboutController::class, 'about'], 'blog.about')
             ->middleware('secureHtml', 'conditional');
         $routes->get('/blog/{handle:[a-z0-9_-]{2,32}}/tags', [TagsController::class, 'tags'], 'blog.tags')
             ->middleware('secureHtml', 'conditional');

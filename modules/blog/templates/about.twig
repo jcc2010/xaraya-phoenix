@@ -1,0 +1,15 @@
+<article class="blog-about">
+<h1 class="blog-title">{{ blog.title }}</h1>
+{% if descriptionHtml != '' %}
+<div class="blog-description">{{ descriptionHtml|raw }}</div>
+{% endif %}
+<p class="blog-author">{{ t('By') }} {% if authorUrl is not null %}<a href="{{ authorUrl }}" rel="author">{{ authorName }}</a>{% else %}{{ authorName }}{% endif %}</p>
+<h2>{{ t('Follow') }}</h2>
+<ul class="blog-feeds">
+<li><a href="{{ feeds.json }}" type="application/feed+json">{{ t('JSON Feed') }}</a></li>
+<li><a href="{{ feeds.rss }}" type="application/rss+xml">{{ t('RSS') }}</a></li>
+{% if subscribeUrl is not null %}
+<li><a href="{{ subscribeUrl }}">{{ t('Subscribe by email') }}</a></li>
+{% endif %}
+</ul>
+</article>
