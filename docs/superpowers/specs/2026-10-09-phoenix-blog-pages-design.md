@@ -134,7 +134,7 @@ How each kind and extra renders:
 
 **Allowed attributes:**
 - `a[href title]`
-- `img[src alt width height]`
+- `img[src alt width height]`, plus a forced `referrerpolicy="no-referrer"` on every kept `img` (any incoming `referrerpolicy` is dropped first), so hotlink-protected hosts such as Athena serve the image. `HtmlSanitizer::VERSION` is bumped whenever the output changes; the sanitised-HTML cache key includes it and the site host.
 - `q[cite]`, `blockquote[cite]`
 - No `class`, `id` or `style` on any element.
 

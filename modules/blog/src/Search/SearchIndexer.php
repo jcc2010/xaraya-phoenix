@@ -12,7 +12,11 @@ use Xaraya\Kernel\Events\ItemEvent;
 use Xaraya\Kernel\Events\ItemUpdated;
 use Xaraya\Module\Blog\Post\PostRepository;
 
-/** Keeps the search index current: subscribed to ItemCreated, ItemUpdated and ItemDeleted (module.json). */
+/**
+ * Keeps the search index current: subscribed to ItemCreated, ItemUpdated and ItemDeleted (module.json).
+ * Dispatch item events outside any open transaction (Syncer does): on Postgres a swallowed index failure would
+ * still abort the outer transaction.
+ */
 final class SearchIndexer
 {
     public function __construct(

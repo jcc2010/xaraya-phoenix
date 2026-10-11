@@ -107,11 +107,14 @@ Every blog also has HTML pages in the active theme (`phoenix` by default):
 - `/blog/{handle}`: posts, newest first, 20 a page. The pinned post sits in its own section above page 1 (the pinned badge appears only there)
 - `/blog/{handle}/tag/{slug}` and `/blog/{handle}/tags` (the tag cloud). A tag slug over 128 bytes, or containing `/`, is not linked and is left out of the cloud
 - `/blog/{handle}/about` and `/blog/{handle}/search?q=`
-- `/s/{id}`: one post. A mirror with `--post-url` links its cards to that canonical address instead. The canonical URL must pass `SafeUrl`; otherwise the card falls back to `/s/{id}`. Mention dates must be strict ISO 8601.
+- `/s/{id}`: one post. A mirror with `--post-url` links its cards to that canonical address instead. The page's `<link rel="canonical">` and `og:url` use the item's URL when it passes `SafeUrl`, otherwise `{app.url}/s/{id}`. A mention whose date is not ISO 8601 is shown without a date.
 
 Run `bin/xar asset:publish` once so `/assets/module/blog/blog.css` exists. Post HTML is sanitised when it
 is rendered (and cached under `var/cache/data`); stored posts and the JSON/RSS feeds are never changed. Pages
 send a strict `Content-Security-Policy` and load no scripts or iframes: a video is a link to YouTube.
+Images (in post HTML, photos, galleries, video thumbnails and podcast covers) are requested with no `Referer`
+(`referrerpolicy="no-referrer"`), because some hosts such as Athena block hotlinking. A podcast's `<audio>` cannot carry
+that policy. The sanitiser cache key is versioned, so upgrading needs no `cache:clear`.
 
 New installs get four sidebar blocks (search, about, recent posts, tags) on every `blog.*` page. An install
 that enabled the blog module before they existed creates them with `bin/xar blog:blocks`.
