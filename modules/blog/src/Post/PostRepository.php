@@ -87,6 +87,28 @@ final class PostRepository
         return $this->hydrate($query->orderBy('date_published', 'desc')->orderBy('id', 'desc')->limit($limit)->all());
     }
 
+    /**
+     * @param list<string> $ids
+     * @return list<Post> in the order of $ids; unknown ids are skipped
+     */
+    public function findMany(array $ids): array
+    {
+        $byId = [];
+        foreach (array_chunk($ids, self::CHUNK) as $chunk) {
+            foreach ($this->hydrate($this->db->select('posts')->whereIn('id', $chunk)->all()) as $post) {
+                $byId[$post->id] = $post;
+            }
+        }
+        $out = [];
+        foreach ($ids as $id) {
+            if (isset($byId[$id])) {
+                $out[] = $byId[$id];
+            }
+        }
+
+        return $out;
+    }
+
     /** The blog's post with this source item id, if it is live: published and not scheduled. */
     public function findLiveByItemId(int $blogId, string $itemId, DateTimeImmutable $now): ?Post
     {

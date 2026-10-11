@@ -1,0 +1,22 @@
+<header class="blog-header">
+<p class="blog-name">{{ blog.title }}</p>
+<h1 class="blog-title">{{ t('Search') }}</h1>
+</header>
+{{ render('blog::partials/searchform', {action: action, q: q}) }}
+{% if q != '' %}
+<p class="search-count">{{ total == 1 ? t('1 result') : t('{count} results', {count: total}) }}</p>
+{% endif %}
+{% if results is not empty %}
+<ol class="search-results">
+{% for result in results %}
+<li class="search-result">
+<h2 class="search-result-title"><a href="{{ result.url }}">{{ result.title }}</a></h2>
+{% if result.snippet != '' %}
+<p class="search-snippet">{{ result.snippet|raw }}</p>
+{% endif %}
+<p class="post-meta"><time datetime="{{ result.publishedIso }}">{{ result.publishedDisplay }}</time></p>
+</li>
+{% endfor %}
+</ol>
+{% endif %}
+{{ render('blog::partials/pager', {pager: pager}) }}
