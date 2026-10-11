@@ -100,4 +100,8 @@ private, link-local and other internal addresses are refused unless `blog.fetch_
 set to true in the config.
 `bin/xar blog:mode <handle> native` stops mirroring; post ids never change.
 
+Search uses its own index (`xar_post_search`), kept current by sync. `bin/xar blog:reindex <handle>|--all`
+rebuilds it. **Upgrading an install that already has blogs:** run `bin/xar migrate`, then
+`bin/xar blog:reindex --all` once, or older posts won't be found.
+
 License: GPL-2.0-or-later.

@@ -86,6 +86,21 @@ final class PostRepository
         return $this->hydrate($query->orderBy('date_published', 'desc')->orderBy('id', 'desc')->limit($limit)->all());
     }
 
+    /**
+     * Published posts of a blog, scheduled ones included, in id order after $afterId: the chunks blog:reindex walks.
+     *
+     * @return list<Post>
+     */
+    public function publishedAfter(int $blogId, ?string $afterId, int $limit): array
+    {
+        $query = $this->db->select('posts')->where('blog_id', '=', $blogId)->where('status', '=', 'published');
+        if ($afterId !== null) {
+            $query->where('id', '>', $afterId);
+        }
+
+        return $this->hydrate($query->orderBy('id')->limit($limit)->all());
+    }
+
     /** @return list<string> */
     public function liveItemIds(int $blogId): array
     {
