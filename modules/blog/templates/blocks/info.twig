@@ -1,0 +1,8 @@
+{% if description != '' %}
+<p class="blog-info-description">{{ description }}</p>
+{% endif %}
+<ul class="blog-info-links">
+<li><a href="{{ aboutUrl }}">{{ t('About {title}', {title: title}) }}</a></li>
+<li><a href="{{ jsonUrl }}" type="application/feed+json">{{ t('JSON Feed') }}</a></li>
+<li><a href="{{ rssUrl }}" type="application/rss+xml">{{ t('RSS') }}</a></li>
+</ul>

@@ -12,10 +12,23 @@
     { "event": "Xaraya\\Kernel\\Events\\ItemDeleted", "listener": "Xaraya\\Module\\Blog\\Search\\SearchIndexer" }
   ],
   "commands": [
+    "Xaraya\\Module\\Blog\\Cli\\BlogBlocksCommand",
     "Xaraya\\Module\\Blog\\Cli\\BlogCreateCommand",
     "Xaraya\\Module\\Blog\\Cli\\BlogListCommand",
     "Xaraya\\Module\\Blog\\Cli\\BlogModeCommand",
     "Xaraya\\Module\\Blog\\Cli\\BlogReindexCommand",
     "Xaraya\\Module\\Blog\\Cli\\BlogSyncCommand"
+  ],
+  "blocks": {
+    "blog.info": "Xaraya\\Module\\Blog\\Blocks\\InfoBlock",
+    "blog.tagcloud": "Xaraya\\Module\\Blog\\Blocks\\TagCloudBlock",
+    "blog.searchbox": "Xaraya\\Module\\Blog\\Blocks\\SearchBoxBlock",
+    "blog.recent": "Xaraya\\Module\\Blog\\Blocks\\RecentBlock"
+  },
+  "blockDefaults": [
+    { "type": "blog.searchbox", "region": "sidebar", "title": "Search", "visibility": { "routes": ["blog.*"] }, "sort": 10 },
+    { "type": "blog.info", "region": "sidebar", "title": "About", "visibility": { "routes": ["blog.*"] }, "sort": 20 },
+    { "type": "blog.recent", "region": "sidebar", "title": "Recent posts", "config": { "limit": 5 }, "visibility": { "routes": ["blog.*"] }, "sort": 30 },
+    { "type": "blog.tagcloud", "region": "sidebar", "title": "Tags", "config": { "limit": 30 }, "visibility": { "routes": ["blog.*"] }, "sort": 40 }
   ]
 }
