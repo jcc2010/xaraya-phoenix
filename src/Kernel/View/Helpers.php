@@ -7,6 +7,7 @@ namespace Xaraya\Kernel\View;
 use InvalidArgumentException;
 use Psr\Http\Message\ServerRequestInterface;
 use Stringable;
+use Xaraya\Kernel\Assets\AssetUrls;
 use Xaraya\Kernel\Auth\Access;
 use Xaraya\Kernel\Blocks\BlockRenderer;
 use Xaraya\Kernel\Config\Config;
@@ -60,12 +61,7 @@ final class Helpers
     /** The URL of a published asset, e.g. asset('theme/phoenix/phoenix.css'). */
     public function asset(string $path): string
     {
-        $path = ltrim($path, '/');
-        if ($path === '' || in_array('..', explode('/', $path), true)) {
-            throw new InvalidArgumentException("Invalid asset path '{$path}'");
-        }
-
-        return rtrim((string) $this->config('assets.url', '/assets'), '/') . '/' . $path;
+        return $this->container->get(AssetUrls::class)->url($path);
     }
 
     public function can(string $level, string $module = '*', string $component = '*', mixed $item = null): bool
