@@ -41,7 +41,7 @@ final class BlogPagesController extends Controller
         if ($before === null && $blog->pinnedItemId !== null) {
             // A pinned post that is deleted, scheduled or unknown is simply not shown.
             $post = $this->posts->findLiveByItemId($blog->id, $blog->pinnedItemId, $now);
-            $pinned = $post === null ? null : $this->factory->make($blog, $post, $this->media->map($blog, [$post]));
+            $pinned = $post === null ? null : $this->factory->make($blog, $post, $this->media->map($blog, [$post]), true);
         }
 
         return $this->pages->page(

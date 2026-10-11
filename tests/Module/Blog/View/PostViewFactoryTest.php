@@ -188,7 +188,7 @@ final class PostViewFactoryTest extends AppTestCase
         }
     }
 
-    public function testTheMirrorPatternDrivesLinksAndThePinnedFlag(): void
+    public function testTheMirrorPatternDrivesLinksAndThePinnedFlagIsOptIn(): void
     {
         $mirror = self::blog([
             'mode' => 'mirror',
@@ -200,7 +200,8 @@ final class PostViewFactoryTest extends AppTestCase
         $view = $this->factory()->make($mirror, self::post());
         self::assertSame('https://www.example.test/post?id=' . self::ID, $view->url);
         self::assertSame('https://www.example.test/post?id=' . self::ID, $view->canonicalUrl);
-        self::assertTrue($view->pinned);
+        self::assertFalse($view->pinned, 'a pinned item id alone never marks a card');
+        self::assertTrue($this->factory()->make($mirror, self::post(), [], true)->pinned);
 
         $native = self::blog(['post_url_pattern' => 'https://www.example.test/post?id={id}']);
         $view = $this->factory()->make($native, self::post());

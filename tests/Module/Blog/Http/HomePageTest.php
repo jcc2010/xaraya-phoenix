@@ -106,6 +106,26 @@ final class HomePageTest extends BlogPageTestCase
         self::assertStringNotContainsString('blog-pinned', $html);
     }
 
+    public function testThePinnedBadgeIsOnlyOnThePinnedSection(): void
+    {
+        $this->posts(25);
+        $this->pin('item-3'); // inside page 1's range
+        [, $html] = $this->both('/blog/notes');
+        $main = self::main($html);
+        self::assertSame(2, count(array_keys(self::titles($main), 'Post 3', true)));
+        self::assertSame(1, substr_count($main, 'post-pinned">'), 'only the pinned section carries the badge class');
+        self::assertSame(1, substr_count($main, 'post-pinned-label'));
+        self::assertSame(1, preg_match('#<section class="blog-pinned".*?</section>#', $main, $m));
+        self::assertStringContainsString('post-pinned">', $m[0]);
+
+        $this->pin('item-22'); // on page 2
+        [, $html] = $this->both('/blog/notes');
+        [, $html] = $this->both(self::next(self::main($html)));
+        $page2 = self::main($html);
+        self::assertContains('Post 22', self::titles($page2));
+        self::assertStringNotContainsString('post-pinned', $page2);
+    }
+
     public function testAPinnedPostThatIsHiddenIsNotShown(): void
     {
         $this->posts(3);

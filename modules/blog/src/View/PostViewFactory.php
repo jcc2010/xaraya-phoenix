@@ -33,8 +33,11 @@ final class PostViewFactory
         private readonly string $appUrl,
     ) {}
 
-    /** @param array<string, string> $media source media URL => local URL, from MediaUrls::map() */
-    public function make(Blog $blog, Post $post, array $media = []): PostView
+    /**
+     * @param array<string, string> $media source media URL => local URL, from MediaUrls::map()
+     * @param bool $pinned true only for the card in the home page's pinned section; every other card is plain
+     */
+    public function make(Blog $blog, Post $post, array $media = [], bool $pinned = false): PostView
     {
         $doc = $post->doc;
         $athenana = self::map($doc, '_athenana');
@@ -76,7 +79,7 @@ final class PostViewFactory
             podcast: self::podcast(self::map($athenana, 'podcast'), $local),
             song: self::song(self::map($athenana, 'song')),
             mentions: self::mentions($athenana),
-            pinned: $blog->pinnedItemId !== null && $blog->pinnedItemId === $post->itemId,
+            pinned: $pinned,
         );
     }
 
