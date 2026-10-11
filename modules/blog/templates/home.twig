@@ -1,0 +1,21 @@
+<header class="blog-header">
+<h1 class="blog-title">{{ blog.title }}</h1>
+{% if blog.description != '' %}
+<p class="blog-description">{{ blog.description }}</p>
+{% endif %}
+</header>
+{% if pinned is not null %}
+<section class="blog-pinned" aria-label="{{ t('Pinned post') }}">
+{{ render('blog::partials/post', {post: pinned, full: false}) }}
+</section>
+{% endif %}
+{% if posts is empty %}
+<p class="blog-empty">{{ t('No posts yet.') }}</p>
+{% else %}
+<div class="post-list">
+{% for post in posts %}
+{{ render('blog::partials/post', {post: post, full: false}) }}
+{% endfor %}
+</div>
+{% endif %}
+{{ render('blog::partials/pager', {pager: pager}) }}

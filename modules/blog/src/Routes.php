@@ -25,6 +25,8 @@ final class Routes implements RouteProvider
         $routes->get('/media/{id:[0-9a-hjkmnp-tv-z]{26}}.{ext:[a-z0-9]{2,5}}', [MediaController::class, 'show'], 'blog.media');
 
         // HTML pages.
+        $routes->get('/blog/{handle:[a-z0-9_-]{2,32}}', [BlogPagesController::class, 'home'], 'blog.home')
+            ->middleware('secureHtml', 'conditional');
         $routes->get('/blog/{handle:[a-z0-9_-]{2,32}}/tag/{slug:[^/]{1,128}}', [BlogPagesController::class, 'tag'], 'blog.tag')
             ->middleware('secureHtml', 'conditional');
         $routes->get('/s/{id:[0-9a-hjkmnp-tv-z]{26}}', [PostPageController::class, 'show'], 'blog.post')

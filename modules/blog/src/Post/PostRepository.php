@@ -87,6 +87,19 @@ final class PostRepository
         return $this->hydrate($query->orderBy('date_published', 'desc')->orderBy('id', 'desc')->limit($limit)->all());
     }
 
+    /** The blog's post with this source item id, if it is live: published and not scheduled. */
+    public function findLiveByItemId(int $blogId, string $itemId, DateTimeImmutable $now): ?Post
+    {
+        $row = $this->db->select('posts')
+            ->where('blog_id', '=', $blogId)
+            ->where('item_id', '=', $itemId)
+            ->where('status', '=', 'published')
+            ->where('date_published', '<=', $now)
+            ->first();
+
+        return $row === null ? null : $this->hydrate([$row])[0];
+    }
+
     /**
      * The live posts just before (older) and just after (newer) $post in its blog, by (date_published, id).
      *

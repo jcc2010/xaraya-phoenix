@@ -17,7 +17,7 @@ use Xaraya\Module\Blog\Post\PostRepository;
 use Xaraya\Module\Blog\View\PostView;
 use Xaraya\Module\Blog\View\PostViewFactory;
 
-/** The paged post lists: a tag's posts (and, from Task 9, the blog home). */
+/** The paged post lists: the blog home and a tag's posts. */
 final class BlogPagesController extends Controller
 {
     public function __construct(
@@ -27,6 +27,31 @@ final class BlogPagesController extends Controller
         private readonly BlogPage $pages,
         private readonly UrlGenerator $urls,
     ) {}
+
+    /** @param array<string, string> $params */
+    public function home(ServerRequestInterface $request, array $params): Page
+    {
+        $blog = $this->pages->blog($params['handle']);
+        $before = Paging::before($request);
+        $now = BlogPage::now();
+        $rows = $this->posts->page($blog->id, $now, $before, BlogPage::PAGE_SIZE + 1);
+        $route = ['handle' => $blog->handle];
+        [$posts, $pager] = $this->listing($blog, $rows, 'blog.home', $route, $before);
+        $pinned = null;
+        if ($before === null && $blog->pinnedItemId !== null) {
+            // A pinned post that is deleted, scheduled or unknown is simply not shown.
+            $post = $this->posts->findLiveByItemId($blog->id, $blog->pinnedItemId, $now);
+            $pinned = $post === null ? null : $this->factory->make($blog, $post, $this->media->map($blog, [$post]));
+        }
+
+        return $this->pages->page(
+            $blog,
+            'blog::home',
+            ['posts' => $posts, 'pinned' => $pinned, 'pager' => $pager],
+            '',
+            $this->urls->generate('blog.home', $route + Paging::cursorParam($before), true),
+        );
+    }
 
     /** @param array<string, string> $params */
     public function tag(ServerRequestInterface $request, array $params): Page
