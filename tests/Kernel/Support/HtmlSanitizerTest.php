@@ -45,6 +45,9 @@ final class HtmlSanitizerTest extends AppTestCase
             'escaped text stays escaped' => ['<p>a &lt;b&gt; &amp; c</p>', '<p>a &lt;b&gt; &amp; c</p>'],
             'query string ampersand' => ['<a href="/s?a=1&amp;b=2">q</a>', '<a href="/s?a=1&amp;b=2" rel="nofollow noopener ugc">q</a>'],
             'empty' => ['  ', ''],
+            'empty img src' => ['<img src=""><img src="  "><p>i</p>', '<p>i</p>'],
+            'meta windows-1252' => ['<p>ok é</p><meta http-equiv="content-type" content="text/html;charset=windows-1252"><p>é</p>', '<p>ok é</p><p>é</p>'],
+            'meta utf-7' => ['<meta charset="UTF-7"><p>a é +ADw-b</p>', '<p>a é +ADw-b</p>'],
         ];
     }
 
@@ -72,6 +75,17 @@ final class HtmlSanitizerTest extends AppTestCase
             (new HtmlSanitizer())->clean('<a href="https://xar.test/">a</a>'),
             'with no site host every absolute link is external',
         );
+    }
+
+    public function testExternalLinkWithLeadingWhitespaceIsIdempotent(): void
+    {
+        $clean = $this->clean("<a href=\" https://ext.test/\">x</a><a href=\"https://ex&#x09;t.test/\">y</a>");
+        self::assertSame(
+            '<a href="https://ext.test/" rel="nofollow noopener ugc" target="_blank">x</a>'
+            . '<a href="https://ex%09t.test/" rel="nofollow noopener ugc" target="_blank">y</a>',
+            $clean,
+        );
+        self::assertSame($clean, $this->clean($clean));
     }
 
     public function testUtf8RoundTrips(): void
@@ -107,6 +121,9 @@ final class HtmlSanitizerTest extends AppTestCase
             self::assertFalse(HtmlSanitizer::isSafeUrl($url), $url);
         }
         self::assertTrue(HtmlSanitizer::isSafeUrl('mailto:a@b.test', true));
+        foreach (["javascript:alert(1)\xff", "javascript:alert(1)\xc0", "\xffjavascript:x"] as $url) {
+            self::assertFalse(HtmlSanitizer::isSafeUrl($url), bin2hex($url));
+        }
     }
 
     public function testTheAppBindsItWithTheSiteHost(): void

@@ -51,8 +51,10 @@ final class HtmlSanitizer
         $doc = new DOMDocument('1.0', 'UTF-8');
         $previous = libxml_use_internal_errors(true);
         try {
-            // The XML declaration makes libxml read the fragment as UTF-8 instead of Latin-1.
-            $doc->loadHTML('<?xml encoding="UTF-8"?><html><body>' . $html . '</body></html>', LIBXML_NONET | LIBXML_COMPACT | LIBXML_HTML_NODEFDTD);
+            // libxml only ever sees ASCII, so a <meta charset> inside the content cannot re-decode anything.
+            $ascii = mb_encode_numericentity($html, [0x80, 0x10FFFF, 0, 0x1FFFFF], 'UTF-8');
+            $doc->loadHTML('<html><head><meta charset="utf-8"></head><body>' . $ascii . '</body></html>', LIBXML_NONET | LIBXML_COMPACT | LIBXML_HTML_NODEFDTD);
+            $doc->encoding = 'UTF-8';
         } finally {
             libxml_clear_errors();
             libxml_use_internal_errors($previous);
@@ -73,14 +75,23 @@ final class HtmlSanitizer
     /** True for http:, https:, mailto: (when allowed) and scheme-less URLs, after decoding entities and removing whitespace and control characters. */
     public static function isSafeUrl(string $value, bool $allowMailto = false): bool
     {
-        $decoded = html_entity_decode($value, ENT_QUOTES | ENT_HTML5, 'UTF-8');
-        $check = (string) preg_replace('/[\s\x00-\x1f\x7f]+/u', '', $decoded);
+        if (!mb_check_encoding($value, 'UTF-8')) {
+            return false;
+        }
+        $check = self::normalizeUrl($value);
         if (preg_match('/^([a-z][a-z0-9+.\-]*):/i', $check, $m) !== 1) {
             return true;
         }
         $scheme = strtolower($m[1]);
 
         return $scheme === 'http' || $scheme === 'https' || ($allowMailto && $scheme === 'mailto');
+    }
+
+    private static function normalizeUrl(string $value): string
+    {
+        $decoded = html_entity_decode(mb_scrub($value, 'UTF-8'), ENT_QUOTES | ENT_HTML5, 'UTF-8');
+
+        return (string) preg_replace('/[\s\x00-\x1f\x7f]+/u', '', $decoded);
     }
 
     private function children(DOMNode $parent, int $depth): void
@@ -129,7 +140,7 @@ final class HtmlSanitizer
             return;
         }
         $this->attributes($node, self::ALLOWED[$name]);
-        if ($name === 'img' && !$node->hasAttribute('src')) {
+        if ($name === 'img' && trim($node->getAttribute('src')) === '') {
             $parent->removeChild($node);
         } elseif ($name === 'a') {
             $this->link($node);
@@ -171,7 +182,7 @@ final class HtmlSanitizer
     private function link(DOMElement $node): void
     {
         $node->setAttribute('rel', self::LINK_REL);
-        $host = $node->hasAttribute('href') ? parse_url($node->getAttribute('href'), PHP_URL_HOST) : null;
+        $host = $node->hasAttribute('href') ? parse_url(self::normalizeUrl($node->getAttribute('href')), PHP_URL_HOST) : null;
         if (is_string($host) && $host !== '' && ($this->siteHost === null || strcasecmp($host, $this->siteHost) !== 0)) {
             $node->setAttribute('target', '_blank');
         }
