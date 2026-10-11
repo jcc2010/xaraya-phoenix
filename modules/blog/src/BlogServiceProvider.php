@@ -11,6 +11,8 @@ use Xaraya\Kernel\Container\Container;
 use Xaraya\Kernel\Container\ServiceProvider;
 use Xaraya\Kernel\Db\Connection;
 use Xaraya\Module\Blog\Media\MediaStore;
+use Xaraya\Module\Blog\Search\LikeSearchIndex;
+use Xaraya\Module\Blog\Search\SearchIndex;
 use Xaraya\Module\Blog\Source\HttpFetcher;
 use Xaraya\Module\Blog\Source\StreamFetcher;
 use Xaraya\Module\Blog\Sync\SyncLock;
@@ -34,5 +36,6 @@ final class BlogServiceProvider implements ServiceProvider
             $c->get(LoggerInterface::class),
             (string) $c->get(Config::class)->get('blog.uploads', $c->get(App::class)->path('var/uploads')),
         ));
+        $container->set(SearchIndex::class, static fn(Container $c): SearchIndex => $c->get(LikeSearchIndex::class));
     }
 }

@@ -6,6 +6,11 @@
   "provider": "Xaraya\\Module\\Blog\\BlogServiceProvider",
   "routes": "Xaraya\\Module\\Blog\\Routes",
   "migrations": "migrations",
+  "subscribers": [
+    { "event": "Xaraya\\Kernel\\Events\\ItemCreated", "listener": "Xaraya\\Module\\Blog\\Search\\SearchIndexer" },
+    { "event": "Xaraya\\Kernel\\Events\\ItemUpdated", "listener": "Xaraya\\Module\\Blog\\Search\\SearchIndexer" },
+    { "event": "Xaraya\\Kernel\\Events\\ItemDeleted", "listener": "Xaraya\\Module\\Blog\\Search\\SearchIndexer" }
+  ],
   "commands": [
     "Xaraya\\Module\\Blog\\Cli\\BlogCreateCommand",
     "Xaraya\\Module\\Blog\\Cli\\BlogListCommand",
