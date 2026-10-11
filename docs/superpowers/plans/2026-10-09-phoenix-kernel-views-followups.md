@@ -2,12 +2,12 @@
 
 Deferred findings from the Plan 2 reviews (SDD ledger). Items fixed by the final fix wave are excluded.
 
-## Blog pages plan: decide or carry
+## Blog pages plan: decided (2026-10-11-phoenix-blog-pages-plan.md)
 
-- [Final] Controllers have no asset-URL service. `Page::$styles` needs URLs, but the asset-URL logic lives only in `Helpers::asset`. Extract an `AssetUrls` service before blog controllers build `styles`.
-- [Final] `layout.php`/`layout.twig` hardcode `phoenix.css`, so a child theme inheriting the layout cannot add its own sheet without an override. The `href="/"` home link breaks subdirectory installs. `url('home')` is not safe as a replacement, because a module may claim `/` under another name.
-- [Final] ErrorPages always uses `app.locale`, so a blog 404 can't carry `blog.language`.
-- [Final] Overridable partials pulled with `include` must ship both engines, or callers must use `render()` (documented in README). The blog plan must pick a convention.
+- [Done, Task 1] Controllers have no asset-URL service: `Xaraya\Kernel\Assets\AssetUrls` now holds the logic, `Helpers::asset` delegates to it, and blog controllers fill `Page::$styles` with it.
+- [Carried] `layout.php`/`layout.twig` hardcode `phoenix.css`, so a child theme inheriting the layout cannot add its own sheet without an override. The `href="/"` home link breaks subdirectory installs; it stays as it is. `url('home')` is not safe as a replacement, because a module may claim `/` under another name.
+- [Carried] ErrorPages always uses `app.locale`, so a blog 404 can't carry `blog.language`.
+- [Done] Overridable partials: the blog module pulls every overridable partial (post, kinds/*, extras/*, pager, tagcloud, searchform and the block templates) with `render()`, never `include`, so a theme override in either engine is found (tested in `PostTemplatesTest` and `BlogPagesSmokeTest`).
 
 ## Kernel
 

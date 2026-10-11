@@ -100,6 +100,26 @@ private, link-local and other internal addresses are refused unless `blog.fetch_
 set to true in the config.
 `bin/xar blog:mode <handle> native` stops mirroring; post ids never change.
 
+### Blog pages
+
+Every blog also has HTML pages in the active theme (`phoenix` by default):
+
+- `/blog/{handle}`: posts, newest first, 20 a page. The pinned post sits in its own section above page 1 (the pinned badge appears only there)
+- `/blog/{handle}/tag/{slug}` and `/blog/{handle}/tags` (the tag cloud). A tag slug over 128 bytes, or containing `/`, is not linked and is left out of the cloud
+- `/blog/{handle}/about` and `/blog/{handle}/search?q=`
+- `/s/{id}`: one post. A mirror with `--post-url` links its cards to that canonical address instead. The canonical URL must pass `SafeUrl`; otherwise the card falls back to `/s/{id}`. Mention dates must be strict ISO 8601.
+
+Run `bin/xar asset:publish` once so `/assets/module/blog/blog.css` exists. Post HTML is sanitised when it
+is rendered (and cached under `var/cache/data`); stored posts and the JSON/RSS feeds are never changed. Pages
+send a strict `Content-Security-Policy` and load no scripts or iframes: a video is a link to YouTube.
+
+New installs get four sidebar blocks (search, about, recent posts, tags) on every `blog.*` page. An install
+that enabled the blog module before they existed creates them with `bin/xar blog:blocks`.
+
+Themes override any blog template at `themes/<theme>/templates/modules/blog/<path>.php` (or `.twig`), for
+example `partials/kinds/link`, without touching the module. The blog templates pull every overridable
+partial with `render()`, so an override in either engine is found.
+
 Search uses its own index (`xar_post_search`), kept current by sync. `bin/xar blog:reindex <handle>|--all`
 rebuilds it. **Upgrading an install that already has blogs:** run `bin/xar migrate`, then
 `bin/xar blog:reindex --all` once, or older posts won't be found.
