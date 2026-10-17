@@ -133,6 +133,14 @@ final class PostRepository
         return $out;
     }
 
+    /** The blog's post with this item id, whatever its status. */
+    public function findByItemId(int $blogId, string $itemId): ?Post
+    {
+        $row = $this->db->select('posts')->where('blog_id', '=', $blogId)->where('item_id', '=', $itemId)->first();
+
+        return $row === null ? null : $this->hydrate([$row])[0];
+    }
+
     /** The blog's post with this source item id, if it is live: published and not scheduled. */
     public function findLiveByItemId(int $blogId, string $itemId, DateTimeImmutable $now): ?Post
     {

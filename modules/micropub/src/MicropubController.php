@@ -10,7 +10,11 @@ use Psr\Http\Message\ServerRequestInterface;
 use Xaraya\Kernel\Config\Config;
 use Xaraya\Kernel\Http\Controller;
 use Xaraya\Kernel\Http\Exception\HttpException;
+use Xaraya\Module\Blog\Blog;
+use Xaraya\Module\Blog\BlogRepository;
 use Xaraya\Module\Blog\Feed\ItemSerializer;
+use Xaraya\Module\Blog\Http\Api\ApiAccess;
+use Xaraya\Module\Blog\Post\Post;
 use Xaraya\Module\Blog\Write\PostWriter;
 use Xaraya\Module\Tokens\Token;
 
@@ -21,6 +25,8 @@ final class MicropubController extends Controller
         private readonly PostWriter $writer,
         private readonly Mf2Mapper $mapper,
         private readonly Destination $destination,
+        private readonly PostLocator $locator,
+        private readonly BlogRepository $blogs,
         private readonly ItemSerializer $items,
         private readonly Config $config,
     ) {}
@@ -31,6 +37,9 @@ final class MicropubController extends Controller
 
         return match ($input->action) {
             null, 'create' => $this->create($request, $input),
+            'update' => $this->update($request, $input),
+            'delete' => $this->delete($request, $input),
+            'undelete' => $this->undelete($request, $input),
             default => throw new HttpException(400, "Unknown action '{$input->action}'"),
         };
     }
@@ -47,6 +56,96 @@ final class MicropubController extends Controller
         $post = $this->writer->create($blog, $this->mapper->toItem($input->properties));
 
         return new Response(201, ['Location' => $this->items->url($blog, $post, $this->appUrl())]);
+    }
+
+    /**
+     * action=update (JSON only): replace, add and delete operate on the post's h-entry properties (as q=source
+     * shows them); only the touched properties are written back, and date_modified is set to now.
+     */
+    private function update(ServerRequestInterface $request, MicropubInput $input): ResponseInterface
+    {
+        if ($input->json === []) {
+            throw new HttpException(400, 'Send updates as JSON');
+        }
+        [$blog, $post] = $this->locate($request, $input);
+        $properties = $this->mapper->fromItem($this->items->item($blog, $post, $this->appUrl()), PostWriter::hasDerivedTitle($post));
+        $touched = [];
+        foreach (['replace', 'add'] as $operation) {
+            foreach (self::operation($input->json, $operation) as $property => $values) {
+                $property = (string) $property;
+                if (!is_array($values) || !array_is_list($values)) {
+                    throw new HttpException(400, "{$operation}.{$property} must be a list of values");
+                }
+                $properties[$property] = $operation === 'replace' ? $values : [...($properties[$property] ?? []), ...$values];
+                $touched[] = $property;
+            }
+        }
+        $delete = $input->json['delete'] ?? [];
+        if (!is_array($delete)) {
+            throw new HttpException(400, 'delete must be a list of properties or an object of values');
+        }
+        foreach ($delete as $key => $value) {
+            if (is_int($key)) {
+                if (!is_string($value)) {
+                    throw new HttpException(400, 'delete must list property names');
+                }
+                unset($properties[$value]);
+                $touched[] = $value;
+            } elseif (is_array($value)) {
+                $properties[$key] = array_values(array_filter($properties[$key] ?? [], static fn(mixed $v): bool => !in_array($v, $value, true)));
+                $touched[] = $key;
+            } else {
+                throw new HttpException(400, "delete.{$key} must be a list of values");
+            }
+        }
+        $patch = $this->mapper->patchFor($properties, $touched);
+        $patch['date_modified'] = gmdate(DATE_ATOM);
+        $this->writer->patch($post, $patch);
+
+        return new Response(204);
+    }
+
+    private function delete(ServerRequestInterface $request, MicropubInput $input): ResponseInterface
+    {
+        [, $post] = $this->locate($request, $input);
+        $this->writer->delete($post);
+
+        return new Response(204);
+    }
+
+    private function undelete(ServerRequestInterface $request, MicropubInput $input): ResponseInterface
+    {
+        [, $post] = $this->locate($request, $input);
+        $this->writer->undelete($post);
+
+        return new Response(204);
+    }
+
+    /** @return array{0: Blog, 1: Post} the post the url names and its blog, once the token may write to that blog */
+    private function locate(ServerRequestInterface $request, MicropubInput $input): array
+    {
+        if ($input->url === null) {
+            throw new HttpException(400, "action={$input->action} needs a url");
+        }
+        $post = $this->locator->find($input->url) ?? throw new HttpException(400, "No post at {$input->url}");
+        $blog = $this->blogs->findById($post->blogId) ?? throw new HttpException(400, "No post at {$input->url}");
+        ApiAccess::allow($request, $blog);
+
+        return [$blog, $post];
+    }
+
+    /**
+     * @param array<string, mixed> $json
+     * @return array<array-key, mixed>
+     */
+    private static function operation(array $json, string $name): array
+    {
+        $value = $json[$name] ?? [];
+        if (!is_array($value) || ($value !== [] && array_is_list($value))) {
+            throw new HttpException(400, "{$name} must be an object of properties");
+        }
+
+        return $value;
     }
 
     private function appUrl(): string

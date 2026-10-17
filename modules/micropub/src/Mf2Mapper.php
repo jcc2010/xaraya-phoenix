@@ -17,6 +17,16 @@ final class Mf2Mapper
 {
     public const PROPERTIES = ['content', 'name', 'bookmark-of', 'photo', 'category', 'published'];
 
+    /** The item fields each property writes ("_athenana.images" is nested), so an update clears exactly those. */
+    public const FIELDS = [
+        'content' => ['content_html'],
+        'name' => ['title'],
+        'bookmark-of' => ['external_url'],
+        'photo' => ['image', '_athenana.images'],
+        'category' => ['tags'],
+        'published' => ['date_published'],
+    ];
+
     /**
      * @param array<string, list<mixed>> $properties
      * @return array<string, mixed> item fields; `_athenana` holds kind (always) and images (with photos)
@@ -93,6 +103,35 @@ final class Mf2Mapper
         }
 
         return $properties;
+    }
+
+    /**
+     * A JSON Merge Patch for PostWriter::patch() that sets every field of the $touched properties from $properties
+     * (the whole post after the update), or removes it. Touching bookmark-of or photo re-derives the kind.
+     *
+     * @param array<string, list<mixed>> $properties
+     * @param list<string> $touched
+     * @return array<string, mixed>
+     */
+    public function patchFor(array $properties, array $touched): array
+    {
+        $touched = array_values(array_intersect(self::PROPERTIES, $touched));
+        $item = $this->toItem(array_intersect_key($properties, array_flip($touched)));
+        $patch = [];
+        foreach ($touched as $property) {
+            foreach (self::FIELDS[$property] as $field) {
+                if ($field === '_athenana.images') {
+                    $patch['_athenana']['images'] = $item['_athenana']['images'] ?? null;
+                } else {
+                    $patch[$field] = $item[$field] ?? null;
+                }
+            }
+        }
+        if (in_array('bookmark-of', $touched, true) || in_array('photo', $touched, true)) {
+            $patch['_athenana']['kind'] = isset($properties['bookmark-of'][0]) ? 'link' : (isset($properties['photo'][0]) ? 'photo' : 'note');
+        }
+
+        return $patch;
     }
 
     /** Escapes plain text into paragraphs: blank lines split paragraphs, single newlines become <br>. 400 for bad UTF-8. */
