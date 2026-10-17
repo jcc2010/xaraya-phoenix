@@ -17,7 +17,8 @@
     "Xaraya\\Module\\Blog\\Cli\\BlogListCommand",
     "Xaraya\\Module\\Blog\\Cli\\BlogModeCommand",
     "Xaraya\\Module\\Blog\\Cli\\BlogReindexCommand",
-    "Xaraya\\Module\\Blog\\Cli\\BlogSyncCommand"
+    "Xaraya\\Module\\Blog\\Cli\\BlogSyncCommand",
+    "Xaraya\\Module\\Blog\\Cli\\MediaLocalizeCommand"
   ],
   "blocks": {
     "blog.info": "Xaraya\\Module\\Blog\\Blocks\\InfoBlock",
