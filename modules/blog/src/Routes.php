@@ -8,6 +8,7 @@ use Xaraya\Kernel\Module\ModuleRegistry;
 use Xaraya\Kernel\Routing\RouteCollector;
 use Xaraya\Kernel\Routing\RouteProvider;
 use Xaraya\Module\Blog\Http\AboutController;
+use Xaraya\Module\Blog\Http\Api\MediaApiController;
 use Xaraya\Module\Blog\Http\Api\PostApiController;
 use Xaraya\Module\Blog\Http\BlogPagesController;
 use Xaraya\Module\Blog\Http\FeedController;
@@ -57,6 +58,8 @@ final class Routes implements RouteProvider
                 $api->delete('/posts/' . self::ID, [PostApiController::class, 'delete'], 'blog.api.post.delete');
                 $api->post('/posts/' . self::ID . '/undelete', [PostApiController::class, 'undelete'], 'blog.api.post.undelete');
             });
+            $routes->post('/api/blogs/{handle:[a-z0-9_-]{2,32}}/media', [MediaApiController::class, 'upload'], 'blog.api.media')
+                ->middleware('csrf:off', 'token:media:write');
         }
     }
 }

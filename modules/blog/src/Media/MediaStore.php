@@ -59,11 +59,15 @@ final class MediaStore
         return $this->store($blog, $result->body, $url, $now);
     }
 
-    /** @return array<string, mixed>|null */
+    /**
+     * Like ingest(), but logs any failure and returns null: sync and media:localize carry on without the file.
+     *
+     * @return array<string, mixed>|null
+     */
     public function store(Blog $blog, string $bytes, ?string $sourceUrl, DateTimeImmutable $now): ?array
     {
         try {
-            return $this->doStore($blog, $bytes, $sourceUrl, $now);
+            return $this->ingest($blog, $bytes, $sourceUrl, $now);
         } catch (Throwable $e) {
             $this->logger->warning('Media {url} for {blog} could not be stored: {reason}', ['url' => $sourceUrl ?? '(upload)', 'blog' => $blog->handle, 'reason' => $e->getMessage()]);
 
@@ -71,26 +75,29 @@ final class MediaStore
         }
     }
 
-    /** @return array<string, mixed>|null */
-    private function doStore(Blog $blog, string $bytes, ?string $sourceUrl, DateTimeImmutable $now): ?array
+    /**
+     * Stores $bytes as a new media row of $blog. The type comes from finfo (never from a client), the file name is a
+     * fresh ULID with the extension of that type, under {uploads}/{handle}/. Identical bytes share one file.
+     *
+     * @return array<string, mixed> the media row
+     * @throws MediaRejected when the bytes are empty, too large, of a type not allowed or not a valid image
+     */
+    public function ingest(Blog $blog, string $bytes, ?string $sourceUrl, DateTimeImmutable $now): array
     {
         $size = strlen($bytes);
-        if ($size === 0 || $size > self::MAX_BYTES) {
-            $this->logger->warning('Media {url} for {blog} rejected: {bytes} bytes', ['url' => $sourceUrl ?? '(upload)', 'blog' => $blog->handle, 'bytes' => $size]);
-
-            return null;
+        if ($size === 0) {
+            throw new MediaRejected(422, 'The file is empty');
+        }
+        if ($size > self::MAX_BYTES) {
+            throw new MediaRejected(413, 'The file is larger than ' . self::MAX_BYTES . ' bytes');
         }
         $mime = (string) (new finfo(FILEINFO_MIME_TYPE))->buffer($bytes);
         $ext = self::TYPES[$mime] ?? null;
         if ($ext === null) {
-            $this->logger->warning('Media {url} for {blog} rejected: type {mime}', ['url' => $sourceUrl ?? '(upload)', 'blog' => $blog->handle, 'mime' => $mime]);
-
-            return null;
+            throw new MediaRejected(415, "Files of type {$mime} are not allowed; send " . implode(', ', array_keys(self::TYPES)));
         }
         if (str_starts_with($mime, 'image/') && $mime !== 'image/avif' && !self::isRealImage($bytes)) {
-            $this->logger->warning('Media {url} for {blog} rejected: not a valid image', ['url' => $sourceUrl ?? '(upload)', 'blog' => $blog->handle]);
-
-            return null;
+            throw new MediaRejected(422, "The file is not a valid {$mime} image");
         }
         $sha = hash('sha256', $bytes);
         $same = $this->db->select('media')->columns('path')->where('blog_id', '=', $blog->id)->where('sha256', '=', $sha)->first();
@@ -111,7 +118,7 @@ final class MediaStore
             'created_at' => $now,
         ]);
 
-        return $this->find($id);
+        return $this->find($id) ?? throw new RuntimeException("Media {$id} vanished after insert");
     }
 
     /** @return array<string, mixed>|null */
