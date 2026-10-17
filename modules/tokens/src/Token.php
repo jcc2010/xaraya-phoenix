@@ -6,6 +6,7 @@ namespace Xaraya\Module\Tokens;
 
 use DateTimeImmutable;
 use DateTimeZone;
+use Psr\Http\Message\ServerRequestInterface;
 
 /** A stored API token. The plaintext is never kept: only its sha256 is in xar_tokens. */
 final class Token
@@ -41,6 +42,17 @@ final class Token
             $date('expires_at'),
             $date('created_at') ?? new DateTimeImmutable('@0'),
         );
+    }
+
+    /**
+     * The token TokenMiddleware put on the request: the one way controllers read it. Throws the 401 when the
+     * route ran without the `token` middleware or the attribute is missing.
+     */
+    public static function fromRequest(ServerRequestInterface $request): self
+    {
+        $token = $request->getAttribute(self::class);
+
+        return $token instanceof self ? $token : throw TokenError::missing();
     }
 
     public function hasScope(string $scope): bool
