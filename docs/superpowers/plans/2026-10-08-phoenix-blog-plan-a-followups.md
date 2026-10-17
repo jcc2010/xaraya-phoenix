@@ -12,6 +12,16 @@ Deferred and parked findings from the Plan A reviews (SDD ledger, 2026-10-09). T
 - Decide listener-exception policy in `Syncer` before adding subscribers.
 - Inline `<img src>` in `content_html` is not rewritten by local media (matters after cut-over).
 
+How Plan B (`2026-10-11-phoenix-blog-plan-b.md`) settled these:
+
+- Native creates use `PostRepository::insert()`, which never swaps ids; `item_id` embeds the id.
+- `ItemValidator` rejects relative or impossible dates, titles over 1000 characters, non-http(s) URLs and unknown top-level fields (422 with `fields`).
+- Column lengths are checked before writing (422); unique violations stay 500s (a ULID collision is the only way to reach one).
+- `tombstone()` is unchanged (sync only); native deletes are one conditional `UPDATE` (`setStatus()`). Cross-blog isolation is tested for tokens, the API and Micropub.
+- Uploads read at most 10 MB + 1 byte from the upload stream. Nothing deletes media yet, so no refcount is needed.
+- Listener policy: writes dispatch item events only after the transaction commits, as sync does; `SearchIndexer` swallows and logs its own failures.
+- Inline `<img src>` rewriting is still open.
+
 ## Parked
 
 - StreamFetcher deadline is not total during the header phase (`fopen` blocks while a server drips headers). Mitigated by `timeout` in the documented cron lines. Fix: `stream_socket_client` + own HTTP/1.0 parsing inside the deadline loop, or ext-curl.

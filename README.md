@@ -99,6 +99,7 @@ third-party files referenced by the posts onto your server. Fetches only go to p
 private, link-local and other internal addresses are refused unless `blog.fetch_allow_private` is
 set to true in the config.
 `bin/xar blog:mode <handle> native` stops mirroring; post ids never change.
+`bin/xar media:localize <handle>` downloads a blog's remote media now and switches it to `media=local`.
 
 ### Blog pages
 
@@ -126,5 +127,58 @@ partial with `render()`, so an override in either engine is found.
 Search uses its own index (`xar_post_search`), kept current by sync. `bin/xar blog:reindex <handle>|--all`
 rebuilds it. **Upgrading an install that already has blogs:** run `bin/xar migrate`, then
 `bin/xar blog:reindex --all` once, or older posts won't be found.
+
+### Writing natively: tokens, the JSON API and Micropub
+
+A native blog is written in Phoenix itself. Enable the two modules, create the blog and a token:
+
+```sh
+bin/xar module:enable tokens
+bin/xar module:enable micropub
+bin/xar blog:create notes --mode=native --title=Notes
+bin/xar token:create --name=phone --scopes=blog:write,media:write --blog=notes --expires=365d
+```
+
+`token:create` prints the token (`xar_` and 40 letters and digits) once; only its sha256 is stored.
+`bin/xar token:list` shows ids, scopes, blog and last use (never a token), and `bin/xar token:revoke <id>`
+deletes one. A token made with `--blog` can only write to that blog. Send it as `Authorization: Bearer xar_…`;
+a token in a query string is ignored. The two Micropub routes (`/micropub` and `/micropub/media`) also accept it
+as an `access_token` form field, but not both that and the header; no other route does.
+
+The JSON API takes and returns JSON Feed 1.1 items (scope `blog:write`):
+
+- `POST /api/blogs/{handle}/posts`: 201 with `Location: /api/posts/{id}`
+- `GET /api/posts/{id}`: the item, with `_phoenix.status` set to `published`, `scheduled` or `deleted`
+- `PUT /api/posts/{id}` replaces; `PATCH /api/posts/{id}` merges (RFC 7396). PATCH accepts
+  `application/merge-patch+json`, `application/json` and `application/feed+json`.
+- `DELETE /api/posts/{id}`: 204; `POST /api/posts/{id}/undelete`: 200
+- `POST /api/blogs/{handle}/media` (scope `media:write`): the multipart field `file`; 201 with `Location` set to its `/media/…` URL
+
+Errors are JSON. An unknown or invalid field is a 422 whose `error.fields` names it, and a write to a mirror
+blog is a 409. JSON bodies are capped at 1,000,000 bytes (413 beyond that). Tags are normalised, and a tag slug
+must match `^[a-z0-9-]{1,128}$`. A `date_published` in the future schedules the post: feeds, pages and search show
+it from then on. `content_html` is stored as sent. Pages sanitise it when they render, but the JSON and RSS feeds
+serve it unchanged, so give tokens only to people you trust with the blog's HTML.
+
+Uploads may be JPEG, PNG, GIF, WebP, AVIF or MP3, at most 10 MB. The type is read from the bytes, never the file
+name, and the file is stored as `var/uploads/<handle>/<ulid>.<ext>`. PHP's `upload_max_filesize` and
+`post_max_size` must allow 10 MB.
+
+Micropub clients use `{app.url}/micropub` and the media endpoint `{app.url}/micropub/media`. Phoenix has no
+IndieAuth yet, so give the client a token from `token:create`. Creating, updating, deleting, undeleting and the
+`q=config`, `q=source` and `q=syndicate-to` queries need `blog:write`; the media endpoint needs `media:write`.
+Files go to the media endpoint only: a file uploaded to `/micropub` is a 400. Every Micropub error other than
+401 and 403 (including an oversized body or a wrong content type) is a 400 `invalid_request`, and `q=source`
+for a deleted post is a 400 too. Updates keep a post's image sizes and a `highlight` kind.
+`mp-destination` is a blog handle (`q=config` lists them); without it the token's blog, or the only native blog,
+is used. `content` becomes `content_html` (plain text is escaped into paragraphs), `name` the title,
+`bookmark-of` a link post, `photo` a photo post (upload files to the media endpoint first and send their URLs),
+`category` the tags and `published` the date. Other properties are ignored.
+
+Switching a mirror with `bin/xar blog:mode <handle> native` keeps every post's id and URL; the old posts can then
+be edited through the API or Micropub by their URL.
+
+Known deviation: the design spec (§5.1) gives `token_hash` as `char(64)`. The migration uses `string(64)`
+(VARCHAR(64)) because Blueprint has no char type; the values are always 64 hex characters.
 
 License: GPL-2.0-or-later.
