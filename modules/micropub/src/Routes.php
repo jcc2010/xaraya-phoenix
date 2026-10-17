@@ -17,5 +17,9 @@ final class Routes implements RouteProvider
     {
         $routes->post('/micropub', [MicropubController::class, 'post'], 'micropub')
             ->middleware('csrf:off', 'micropubErrors', 'micropubToken', 'token:blog:write');
+        $routes->get('/micropub', [MicropubController::class, 'query'], 'micropub.query')
+            ->middleware('micropubErrors', 'micropubToken', 'token:blog:write');
+        $routes->post('/micropub/media', [MicropubMediaController::class, 'upload'], 'micropub.media')
+            ->middleware('csrf:off', 'micropubErrors', 'micropubToken', 'token:media:write');
     }
 }

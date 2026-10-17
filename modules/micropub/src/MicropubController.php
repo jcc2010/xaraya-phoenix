@@ -10,6 +10,7 @@ use Psr\Http\Message\ServerRequestInterface;
 use Xaraya\Kernel\Config\Config;
 use Xaraya\Kernel\Http\Controller;
 use Xaraya\Kernel\Http\Exception\HttpException;
+use Xaraya\Kernel\Routing\UrlGenerator;
 use Xaraya\Module\Blog\Blog;
 use Xaraya\Module\Blog\BlogRepository;
 use Xaraya\Module\Blog\Feed\ItemSerializer;
@@ -18,7 +19,7 @@ use Xaraya\Module\Blog\Post\Post;
 use Xaraya\Module\Blog\Write\PostWriter;
 use Xaraya\Module\Tokens\Token;
 
-/** POST /micropub. Every Micropub action maps onto PostWriter and needs the blog:write scope. */
+/** POST /micropub and its GET queries. Every action maps onto PostWriter; all of them need the blog:write scope. */
 final class MicropubController extends Controller
 {
     public function __construct(
@@ -28,8 +29,29 @@ final class MicropubController extends Controller
         private readonly PostLocator $locator,
         private readonly BlogRepository $blogs,
         private readonly ItemSerializer $items,
+        private readonly UrlGenerator $urls,
         private readonly Config $config,
     ) {}
+
+    /** GET /micropub?q=config|source|syndicate-to */
+    public function query(ServerRequestInterface $request): ResponseInterface
+    {
+        $token = Token::fromRequest($request);
+        parse_str($request->getUri()->getQuery(), $query);
+        $q = $query['q'] ?? null;
+        $body = match ($q) {
+            'config' => [
+                'media-endpoint' => $this->urls->generate('micropub.media', [], true),
+                'destination' => array_map(static fn(Blog $blog): array => ['uid' => $blog->handle, 'name' => $blog->title], $this->destination->choices($token)),
+                'syndicate-to' => [],
+            ],
+            'source' => $this->source($request, $query),
+            'syndicate-to' => ['syndicate-to' => []],
+            default => throw new HttpException(400, is_string($q) ? "Unknown query '" . mb_scrub($q, 'UTF-8') . "'" : 'Send q=config, q=source or q=syndicate-to'),
+        };
+
+        return $this->json($body)->withHeader('Cache-Control', 'no-store');
+    }
 
     public function post(ServerRequestInterface $request): ResponseInterface
     {
@@ -122,14 +144,48 @@ final class MicropubController extends Controller
         return new Response(204);
     }
 
+    /**
+     * q=source: the post's h-entry, or only the requested properties[] (then without "type"). A deleted post is
+     * "not found" here, as for a post that never existed.
+     *
+     * @param array<array-key, mixed> $query
+     * @return array<string, mixed>
+     */
+    private function source(ServerRequestInterface $request, array $query): array
+    {
+        $url = $query['url'] ?? null;
+        if (!is_string($url) || $url === '') {
+            throw new HttpException(400, 'q=source needs a url');
+        }
+        [$blog, $post] = $this->find($request, $url);
+        if ($post->status === 'deleted') {
+            throw new HttpException(400, 'No post at ' . mb_scrub($url, 'UTF-8'));
+        }
+        $properties = $this->mapper->fromItem($this->items->item($blog, $post, $this->appUrl()), PostWriter::hasDerivedTitle($post));
+        $wanted = $query['properties'] ?? null;
+        if ($wanted === null) {
+            return ['type' => ['h-entry'], 'properties' => $properties];
+        }
+        $wanted = array_filter(is_array($wanted) ? $wanted : [$wanted], 'is_string');
+
+        return ['properties' => array_intersect_key($properties, array_flip($wanted))];
+    }
+
     /** @return array{0: Blog, 1: Post} the post the url names and its blog, once the token may write to that blog */
     private function locate(ServerRequestInterface $request, MicropubInput $input): array
     {
         if ($input->url === null) {
             throw new HttpException(400, "action={$input->action} needs a url");
         }
-        $post = $this->locator->find($input->url) ?? throw new HttpException(400, "No post at {$input->url}");
-        $blog = $this->blogs->findById($post->blogId) ?? throw new HttpException(400, "No post at {$input->url}");
+
+        return $this->find($request, $input->url);
+    }
+
+    /** @return array{0: Blog, 1: Post} */
+    private function find(ServerRequestInterface $request, string $url): array
+    {
+        $post = $this->locator->find($url) ?? throw new HttpException(400, 'No post at ' . mb_scrub($url, 'UTF-8'));
+        $blog = $this->blogs->findById($post->blogId) ?? throw new HttpException(400, 'No post at ' . mb_scrub($url, 'UTF-8'));
         ApiAccess::allow($request, $blog);
 
         return [$blog, $post];
