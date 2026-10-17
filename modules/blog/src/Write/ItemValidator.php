@@ -11,6 +11,8 @@ use Xaraya\Module\Blog\Source\JsonFeedAdapter;
 /**
  * Checks a JSON Feed 1.1 item sent to the write path. Only the JSON Feed item fields and `_`-prefixed extension
  * objects are allowed. Returns field => message; an empty array means valid. Null values count as absent.
+ * Nested fields are named by their dotted path (`_athenana.tags.0.slug`). Every string, nested ones and keys
+ * included, must be valid UTF-8; a key that is not is named with its bad bytes scrubbed to `?`.
  */
 final class ItemValidator
 {
@@ -20,6 +22,8 @@ final class ItemValidator
     ];
     public const MAX_TITLE = 1000;
     public const MAX_TAG = 128;
+    /** Text::slug()'s alphabet: tag slugs become tag page URLs, so nothing else gets through. */
+    public const TAG_SLUG = '/^[a-z0-9-]{1,128}$/D';
 
     private const STRINGS = ['id', 'url', 'external_url', 'title', 'content_html', 'content_text', 'summary', 'image', 'banner_image', 'date_published', 'date_modified', 'language'];
     /** field => longest value in bytes (the posts column sizes) */
@@ -33,7 +37,7 @@ final class ItemValidator
     {
         $errors = [];
         foreach ($item as $key => $value) {
-            $key = (string) $key;
+            $key = mb_scrub((string) $key, 'UTF-8');
             if ($value === null) {
                 continue;
             }
@@ -94,6 +98,17 @@ final class ItemValidator
             if ($athenaTags !== null && (!is_array($athenaTags) || !array_is_list($athenaTags)
                 || array_filter($athenaTags, static fn(mixed $t): bool => !is_array($t) || !is_string($t['name'] ?? null) || $t['name'] === '') !== [])) {
                 $errors['_athenana.tags'] = 'Must be a list of {name, slug} objects';
+            } elseif (is_array($athenaTags)) {
+                foreach ($athenaTags as $i => $tag) {
+                    /** @var array{name: string, slug?: mixed} $tag */
+                    if (mb_strlen($tag['name']) > self::MAX_TAG) {
+                        $errors["_athenana.tags.{$i}.name"] = 'Must be at most ' . self::MAX_TAG . ' characters';
+                    }
+                    $slug = $tag['slug'] ?? null;
+                    if ($slug !== null && (!is_string($slug) || preg_match(self::TAG_SLUG, $slug) !== 1)) {
+                        $errors["_athenana.tags.{$i}.slug"] = 'Must be 1 to 128 characters of a-z, 0-9 and -';
+                    }
+                }
             }
             $images = $athenana['images'] ?? null;
             if ($images !== null && (!is_array($images) || !array_is_list($images)
@@ -107,6 +122,9 @@ final class ItemValidator
         }
         if (!$hasContent) {
             $errors['content_html'] ??= 'An item needs content_html, content_text, a title, an external_url or an image';
+        }
+        foreach (self::notUtf8($item) as $path) {
+            $errors[$path] = 'Must be valid UTF-8';
         }
 
         return $errors;
@@ -129,6 +147,27 @@ final class ItemValidator
     public static function isHttpUrl(string $url): bool
     {
         return preg_match('#^https?://[^\s/?\#\\\\]+[^\s\\\\\x00-\x1f\x7f]*$#iD', $url) === 1;
+    }
+
+    /**
+     * Dotted paths of the strings (values or keys) in $value that are not valid UTF-8.
+     *
+     * @param array<array-key, mixed> $value
+     * @return list<string>
+     */
+    private static function notUtf8(array $value, string $prefix = ''): array
+    {
+        $paths = [];
+        foreach ($value as $key => $v) {
+            $path = $prefix . (string) $key;
+            if (!mb_check_encoding($path, 'UTF-8') || (is_string($v) && !mb_check_encoding($v, 'UTF-8'))) {
+                $paths[] = mb_scrub($path, 'UTF-8');
+            } elseif (is_array($v)) {
+                array_push($paths, ...self::notUtf8($v, $path . '.'));
+            }
+        }
+
+        return $paths;
     }
 
     private static function isObject(mixed $value): bool

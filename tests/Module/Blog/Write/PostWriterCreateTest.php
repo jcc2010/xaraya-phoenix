@@ -89,6 +89,11 @@ final class PostWriterCreateTest extends PostWriterTestCase
             [['title' => 'x', 'tags' => ['ok', '']], 'tags', 'Must be a list of tag names of 1 to 128 characters'],
             [['title' => 'x', 'attachments' => [['url' => 'ftp://x']]], 'attachments', 'Each attachment needs an http(s) url and a mime_type'],
             [['title' => 'x', '_athenana' => ['kind' => 'essay']], '_athenana.kind', 'Must be one of: note, photo, link, highlight'],
+            [['title' => 'x', '_athenana' => ['tags' => [['name' => str_repeat('n', ItemValidator::MAX_TAG + 1), 'slug' => 'n']]]], '_athenana.tags.0.name', 'Must be at most 128 characters'],
+            [['title' => 'x', '_athenana' => ['tags' => [['name' => 'ok', 'slug' => 'ok'], ['name' => 'A b', 'slug' => 'a b']]]], '_athenana.tags.1.slug', 'Must be 1 to 128 characters of a-z, 0-9 and -'],
+            [['title' => 'x', '_athenana' => ['tags' => [['name' => 'Up', 'slug' => '../up']]]], '_athenana.tags.0.slug', 'Must be 1 to 128 characters of a-z, 0-9 and -'],
+            [['title' => 'x', '_athenana' => ['tags' => [['name' => 'Up', 'slug' => 'Up']]]], '_athenana.tags.0.slug', 'Must be 1 to 128 characters of a-z, 0-9 and -'],
+            [['title' => 'x', '_athenana' => ['tags' => [['name' => 'Long', 'slug' => str_repeat('s', 129)]]]], '_athenana.tags.0.slug', 'Must be 1 to 128 characters of a-z, 0-9 and -'],
             [['title' => 'x', 'id' => 'mine'], 'id', 'Is assigned by the server; leave it out'],
             [['title' => 'x', 'url' => 'https://elsewhere.test/'], 'url', 'Is assigned by the server; leave it out'],
             [[], 'content_html', 'An item needs content_html, content_text, a title, an external_url or an image'],
@@ -99,6 +104,28 @@ final class PostWriterCreateTest extends PostWriterTestCase
             self::assertSame($message, $fields[$field] ?? null, json_encode($item) . ' => ' . json_encode($fields));
         }
         self::assertSame(0, $this->app->container()->get(PostRepository::class)->countLive($this->blog->id));
+    }
+
+    public function testInvalidUtf8IsRejectedFieldByField(): void
+    {
+        $fields = self::fieldErrors(fn() => $this->writer()->create($this->blog, [
+            'title' => "bad \xC3\x28",
+            'authors' => [['name' => 'Ada'], ['name' => "B\xFF"]],
+            '_athenana' => ['tags' => [['name' => "\xFE", 'slug' => 'x']]],
+            "k\xFFy" => ['v' => 1],
+        ]));
+        self::assertSame('Must be valid UTF-8', $fields['title'] ?? null);
+        self::assertSame('Must be valid UTF-8', $fields['authors.1.name'] ?? null);
+        self::assertSame('Must be valid UTF-8', $fields['_athenana.tags.0.name'] ?? null);
+        self::assertSame('Must be valid UTF-8', $fields['k?y'] ?? null);
+        self::assertArrayNotHasKey('item', $fields);
+        json_encode($fields, JSON_THROW_ON_ERROR); // every key and message can be sent back
+    }
+
+    public function testATagSlugMayBeLeftOutAndIsDerived(): void
+    {
+        $post = $this->writer()->create($this->blog, ['title' => 'x', 'tags' => ['Two words'], '_athenana' => ['tags' => [['name' => 'Two words']]]]);
+        self::assertSame([['name' => 'Two words', 'slug' => 'two-words']], $post->tags);
     }
 
     public function testReservedAndNullFieldsAreIgnored(): void
