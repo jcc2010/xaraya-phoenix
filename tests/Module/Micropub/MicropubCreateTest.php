@@ -6,8 +6,15 @@ namespace Xaraya\Tests\Module\Micropub;
 
 use Nyholm\Psr7\ServerRequest;
 use Nyholm\Psr7\Stream;
+use Nyholm\Psr7\UploadedFile;
+use RuntimeException;
+use Xaraya\Kernel\Events\EventDispatcher;
+use Xaraya\Kernel\Events\ItemCreated;
+use Xaraya\Kernel\Http\Exception\HttpException;
 use Xaraya\Module\Blog\Http\Api\JsonBody;
+use Xaraya\Module\Micropub\Destination;
 use Xaraya\Module\Micropub\Mf2Mapper;
+use Xaraya\Module\Tokens\Token;
 
 final class MicropubCreateTest extends MicropubTestCase
 {
@@ -62,7 +69,7 @@ final class MicropubCreateTest extends MicropubTestCase
         self::assertMicropubError($this->form(['content' => 'Bad', 'access_token' => 'nope'], ''), 401, 'unauthorized', 'The token is invalid or expired');
     }
 
-    public function testTheTokenNeverAppearsInAResponseOrALog(): void
+    public function testTheTokenNeverAppearsInAResponseAPostOrALog(): void
     {
         $bad = 'not-a-real-token-' . bin2hex(random_bytes(8));
         $responses = [
@@ -71,15 +78,73 @@ final class MicropubCreateTest extends MicropubTestCase
             $this->form(['content' => 'Bad', 'access_token' => $bad], ''),
             $this->form(['h' => 'card', 'access_token' => $this->token], ''),
         ];
-        foreach ($responses as $response) {
-            $text = implode("\n", array_map(static fn(array $v): string => implode(',', $v), $response->getHeaders())) . (string) $response->getBody();
-            self::assertStringNotContainsString($this->token, $text);
-            self::assertStringNotContainsString($bad, $text);
+        // A listener that throws turns an accepted create into a 500, which the error handler logs with its trace.
+        $app = $this->app();
+        $app->container()->get(EventDispatcher::class)->listen(ItemCreated::class, static function (): never {
+            throw new RuntimeException('listener exploded');
+        });
+        $request = (new ServerRequest('POST', '/micropub'))
+            ->withHeader('Content-Type', 'application/x-www-form-urlencoded')
+            ->withBody(Stream::create(http_build_query(['content' => 'Logged?', 'access_token' => $this->token])))
+            ->withParsedBody(['content' => 'Logged?', 'access_token' => $this->token]);
+        $failed = $app->handle($request);
+        self::assertSame(500, $failed->getStatusCode());
+        $responses[] = $failed;
+
+        $log = implode('', array_map('file_get_contents', glob($this->tmp . '/logs/*') ?: []));
+        self::assertStringContainsString('listener exploded', $log, 'the failure was logged');
+        self::assertStringContainsString('MicropubController', $log, 'the log holds the trace');
+        $posts = json_encode($this->db($app)->select('posts')->all(), JSON_THROW_ON_ERROR);
+        self::assertStringContainsString('Logged?', $posts, 'the posts were stored');
+        // The first characters of each secret: a full token, and the 15-character prefix a trace argument shows.
+        foreach ([substr($this->token, 4, 11), substr($bad, 4, 11)] as $secret) {
+            self::assertStringNotContainsString($secret, $log);
+            self::assertStringNotContainsString($secret, $posts);
+            foreach ($responses as $response) {
+                $headers = implode("\n", array_map(static fn(array $v): string => implode(',', $v), $response->getHeaders()));
+                self::assertStringNotContainsString($secret, $headers . (string) $response->getBody());
+            }
         }
-        foreach (glob($this->tmp . '/logs/*') ?: [] as $log) {
-            $contents = (string) file_get_contents($log);
-            self::assertStringNotContainsString($this->token, $contents, $log);
-            self::assertStringNotContainsString($bad, $contents, $log);
+    }
+
+    public function testInvalidUtf8IsA400(): void
+    {
+        self::assertMicropubError($this->form(['content' => 'x', 'mp-destination' => "no\xff"]), 400, 'invalid_request', 'mp-destination must be valid UTF-8');
+        self::assertMicropubError($this->form(['action' => "x\xff", 'url' => 'http://xar.test/s/x']), 400, 'invalid_request', 'action must be valid UTF-8');
+        self::assertMicropubError($this->form(['content' => "bad\xff", 'name' => 'Named']), 400, 'invalid_request', 'content must be valid UTF-8');
+        self::assertMicropubError($this->form(['category' => ['ok', "bad\xff"], 'content' => 'x']), 400, 'invalid_request', 'category must be valid UTF-8');
+        self::assertMicropubError($this->form(['content' => 'x', 'mp-destination' => 'Not A Handle']), 400, 'invalid_request', "Unknown destination 'Not A Handle'");
+        try {
+            Mf2Mapper::textToHtml("bad\xff");
+            self::fail('textToHtml accepted invalid UTF-8');
+        } catch (HttpException $e) {
+            self::assertSame([400, 'content must be valid UTF-8'], [$e->status(), $e->getMessage()]);
+        }
+        // The backstop: input that reaches an error message unchecked is scrubbed, never a 500.
+        try {
+            $this->app()->container()->get(Destination::class)->choose("no\xff", Token::fromRow(['id' => 't', 'name' => 't', 'scopes' => '["blog:write"]']));
+            self::fail('choose accepted an invalid handle');
+        } catch (HttpException $e) {
+            self::assertSame("Unknown destination 'no?'", $e->getMessage());
+        }
+    }
+
+    public function testAnUploadedFileIsRejected(): void
+    {
+        $request = (new ServerRequest('POST', '/micropub'))
+            ->withHeader('Authorization', 'Bearer ' . $this->token)
+            ->withHeader('Content-Type', 'multipart/form-data; boundary=x')
+            ->withParsedBody(['content' => 'With a photo'])
+            ->withUploadedFiles(['photo' => new UploadedFile(Stream::create('GIF89a'), 6, UPLOAD_ERR_OK, 'a.gif', 'image/gif')]);
+        self::assertMicropubError($this->app()->handle($request), 400, 'invalid_request', 'Upload files to the media endpoint');
+    }
+
+    public function testANonStringJsonDestinationIs400(): void
+    {
+        $this->nativeBlog($this->app(), ['handle' => 'other', 'title' => 'Other']);
+        foreach ([[5], [''], []] as $destination) {
+            $response = $this->postJson(['type' => ['h-entry'], 'properties' => ['content' => ['x'], 'mp-destination' => $destination]]);
+            self::assertMicropubError($response, 400, 'invalid_request', 'mp-destination must be a string');
         }
     }
 

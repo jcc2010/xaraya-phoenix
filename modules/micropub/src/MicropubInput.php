@@ -47,12 +47,14 @@ final class MicropubInput
         return strtolower(trim(explode(';', $request->getHeaderLine('Content-Type'), 2)[0]));
     }
 
-    /** The first value of an mp-* command, when it is a string. */
+    /** The first value of an mp-* command; null when it is absent, 400 when it is not a non-empty string. */
     public function command(string $name): ?string
     {
-        $value = $this->commands[$name][0] ?? null;
+        if (!array_key_exists($name, $this->commands)) {
+            return null;
+        }
 
-        return is_string($value) && $value !== '' ? $value : null;
+        return self::string($this->commands[$name][0] ?? null, $name);
     }
 
     /** @param array<array-key, mixed> $form */
@@ -63,6 +65,7 @@ final class MicropubInput
         $properties = $commands = [];
         foreach ($form as $key => $value) {
             $key = (string) $key;
+            self::assertUtf8($key, $value);
             match (true) {
                 $key === 'h' => $type = self::string($value, 'h'),
                 $key === 'action' => $action = self::string($value, 'action'),
@@ -110,8 +113,31 @@ final class MicropubInput
         if (!is_string($value) || $value === '') {
             throw new HttpException(400, "{$name} must be a string");
         }
+        self::assertUtf8($name, $value);
 
         return $value;
+    }
+
+    /** Form bytes are not checked by anyone else (JSON is, by json_decode): a 400 for a key or value that is not UTF-8. */
+    private static function assertUtf8(string $name, mixed $value): void
+    {
+        if (!mb_check_encoding($name, 'UTF-8') || !self::isUtf8($value)) {
+            throw new HttpException(400, mb_scrub($name, 'UTF-8') . ' must be valid UTF-8');
+        }
+    }
+
+    private static function isUtf8(mixed $value): bool
+    {
+        if (is_string($value)) {
+            return mb_check_encoding($value, 'UTF-8');
+        }
+        foreach (is_array($value) ? $value : [] as $key => $item) {
+            if (!mb_check_encoding((string) $key, 'UTF-8') || !self::isUtf8($item)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     /** @return list<mixed> a form value as an mf2 value list: "x" => ["x"], x[]=a&x[]=b => ["a","b"], x[html]=… => [{html: …}] */

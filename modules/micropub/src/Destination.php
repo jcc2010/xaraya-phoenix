@@ -27,9 +27,10 @@ final class Destination
     public function choose(?string $uid, Token $token): Blog
     {
         if ($uid !== null) {
-            $blog = $this->blogs->find($uid);
+            // Checked before the query: a handle is ASCII, and the uid is echoed into the error message.
+            $blog = preg_match('/^[a-z0-9_-]{2,32}$/D', $uid) === 1 ? $this->blogs->find($uid) : null;
             if ($blog === null || $blog->isMirror()) {
-                throw new HttpException(400, "Unknown destination '{$uid}'");
+                throw new HttpException(400, "Unknown destination '" . mb_scrub($uid, 'UTF-8') . "'");
             }
             if (!$token->allowsBlog($blog->id)) {
                 throw TokenError::wrongBlog();

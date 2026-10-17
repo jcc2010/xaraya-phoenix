@@ -35,7 +35,8 @@ final class MicropubErrors implements MiddlewareInterface
                 $status === 403 => [403, 'forbidden'],
                 default => [400, 'invalid_request'],
             };
-            $response = Controller::jsonResponse(['error' => $error, 'error_description' => self::describe($e)], $status);
+            // mb_scrub: a backstop, so input echoed into a message can never make the JSON encoder throw (a 500).
+            $response = Controller::jsonResponse(['error' => $error, 'error_description' => mb_scrub(self::describe($e), 'UTF-8')], $status);
             foreach ($e->headers() as $name => $value) {
                 $response = $response->withHeader($name, $value);
             }

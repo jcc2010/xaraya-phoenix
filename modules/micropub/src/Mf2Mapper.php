@@ -95,11 +95,15 @@ final class Mf2Mapper
         return $properties;
     }
 
-    /** Escapes plain text into paragraphs: blank lines split paragraphs, single newlines become <br>. */
+    /** Escapes plain text into paragraphs: blank lines split paragraphs, single newlines become <br>. 400 for bad UTF-8. */
     public static function textToHtml(string $text): string
     {
+        $paragraphs = mb_check_encoding($text, 'UTF-8') ? preg_split('/\R\s*\R/u', trim($text)) : false;
+        if ($paragraphs === false) {
+            throw new HttpException(400, 'content must be valid UTF-8');
+        }
         $html = '';
-        foreach (preg_split('/\R\s*\R/u', trim($text)) ?: [] as $paragraph) {
+        foreach ($paragraphs as $paragraph) {
             if (trim($paragraph) !== '') {
                 $html .= '<p>' . nl2br(htmlspecialchars(trim($paragraph), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'), false) . '</p>';
             }

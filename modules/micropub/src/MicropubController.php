@@ -30,17 +30,20 @@ final class MicropubController extends Controller
         $input = MicropubInput::fromRequest($request);
 
         return match ($input->action) {
-            null, 'create' => $this->create($input, Token::fromRequest($request)),
+            null, 'create' => $this->create($request, $input),
             default => throw new HttpException(400, "Unknown action '{$input->action}'"),
         };
     }
 
-    private function create(MicropubInput $input, Token $token): ResponseInterface
+    private function create(ServerRequestInterface $request, MicropubInput $input): ResponseInterface
     {
         if ($input->type !== 'entry') {
             throw new HttpException(400, 'Only h-entry posts are supported');
         }
-        $blog = $this->destination->choose($input->command('mp-destination'), $token);
+        if ($request->getUploadedFiles() !== []) {
+            throw new HttpException(400, 'Upload files to the media endpoint');
+        }
+        $blog = $this->destination->choose($input->command('mp-destination'), Token::fromRequest($request));
         $post = $this->writer->create($blog, $this->mapper->toItem($input->properties));
 
         return new Response(201, ['Location' => $this->items->url($blog, $post, $this->appUrl())]);
