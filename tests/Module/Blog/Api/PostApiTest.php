@@ -10,7 +10,9 @@ use RuntimeException;
 use Xaraya\Kernel\App;
 use Xaraya\Kernel\Events\EventDispatcher;
 use Xaraya\Kernel\Events\ItemCreated;
+use Xaraya\Module\Blog\BlogRepository;
 use Xaraya\Module\Blog\Http\Api\JsonBody;
+use Xaraya\Module\Blog\Post\PostRepository;
 
 final class PostApiTest extends ApiTestCase
 {
@@ -246,6 +248,55 @@ final class PostApiTest extends ApiTestCase
             self::assertStringNotContainsString($secret, (string) $response->getBody());
             self::assertStringNotContainsString($secret, implode("\n", array_map(static fn(array $v): string => implode(',', $v), $response->getHeaders())));
         }
+    }
+
+    public function testU0000IsA422AtItsPath(): void
+    {
+        $cases = [
+            '{"title":"a\\u0000b"}' => ['title' => 'Must not contain U+0000'],
+            '{"title":"x","_ext":{"a":["ok","b\\u0000"]}}' => ['_ext.a.1' => 'Must not contain U+0000'],
+            '{"title":"x","_ext":{"k\\u0000":1}}' => ['_ext.k?' => 'Must not contain U+0000'],
+        ];
+        foreach ($cases as $body => $fields) {
+            $response = $this->api('POST', '/api/blogs/notes/posts', $this->token, $body);
+            self::assertSame(422, $response->getStatusCode(), $body . ' ' . $response->getBody());
+            self::assertSame($fields, self::json($response)['error']['fields'], $body);
+        }
+        self::assertSame(0, (int) $this->db($this->app())->fetchValue('SELECT COUNT(*) FROM {posts}'));
+    }
+
+    public function testAMirrorBlogIs409WhateverTheBody(): void
+    {
+        $app = $this->app();
+        $mirror = $app->container()->get(BlogRepository::class)->create(['handle' => 'src', 'mode' => 'mirror', 'source_url' => 'https://src.test/f.json', 'source_format' => 'athena'], $this->now());
+        $id = $this->addPost($app, $mirror, self::postRecord(1));
+        foreach ([['POST', '/api/blogs/src/posts'], ['PUT', "/api/posts/{$id}"], ['PATCH', "/api/posts/{$id}"]] as [$method, $uri]) {
+            $response = $this->api($method, $uri, $this->token, 'title=x', 'text/plain');
+            self::assertSame(409, $response->getStatusCode(), $method . ' ' . $response->getBody());
+        }
+    }
+
+    public function testTheComputedStatusBeatsAStoredPhoenixField(): void
+    {
+        $app = $this->app();
+        $mirror = $app->container()->get(BlogRepository::class)->create(['handle' => 'src', 'mode' => 'mirror', 'source_url' => 'https://src.test/f.json', 'source_format' => 'athena'], $this->now());
+        $id = $this->addPost($app, $mirror, self::postRecord(1, ['itemId' => 'https://src.test/posts/1', 'doc' => ['_phoenix' => ['status' => 'published']]]));
+        $app->container()->get(PostRepository::class)->tombstone($mirror->id, ['https://src.test/posts/1'], $this->now());
+        $response = $this->api('GET', "/api/posts/{$id}", $this->token);
+        self::assertSame(200, $response->getStatusCode(), (string) $response->getBody());
+        self::assertSame(['status' => 'deleted'], self::json($response)['_phoenix']);
+    }
+
+    public function testJsonResponsesAreNosniff(): void
+    {
+        $created = $this->api('POST', '/api/blogs/notes/posts', $this->token, ['title' => 'Sniff']);
+        self::assertSame(201, $created->getStatusCode());
+        self::assertSame('nosniff', $created->getHeaderLine('X-Content-Type-Options'));
+        $id = substr((string) self::json($created)['id'], -26);
+        self::assertSame('nosniff', $this->api('GET', "/api/posts/{$id}", $this->token)->getHeaderLine('X-Content-Type-Options'));
+        $error = $this->api('GET', '/api/posts/' . str_repeat('0', 26), $this->token);
+        self::assertSame(404, $error->getStatusCode());
+        self::assertSame('nosniff', $error->getHeaderLine('X-Content-Type-Options'));
     }
 
     public function testErrorsAreJsonEvenForHtmlClients(): void

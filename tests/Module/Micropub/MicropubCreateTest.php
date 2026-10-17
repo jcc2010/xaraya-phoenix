@@ -129,6 +129,19 @@ final class MicropubCreateTest extends MicropubTestCase
         }
     }
 
+    public function testU0000IsA400(): void
+    {
+        $response = $this->app()->handle((new ServerRequest('POST', '/micropub'))
+            ->withHeader('Authorization', 'Bearer ' . $this->token)
+            ->withHeader('Content-Type', 'application/x-www-form-urlencoded')
+            ->withBody(Stream::create('h=entry&content=x%00y')));
+        self::assertMicropubError($response, 400, 'invalid_request', 'content_html: Must not contain U+0000');
+        self::assertMicropubError($this->postJson(['type' => ['h-entry'], 'properties' => ['name' => ["a\0"], 'content' => ['x']]]), 400, 'invalid_request', 'title: Must not contain U+0000');
+        self::assertSame(0, (int) $this->db($this->app())->fetchValue('SELECT COUNT(*) FROM {posts}'));
+        // A leading U+0000 is whitespace to trim(), so plain-text content drops it rather than failing.
+        self::assertSame('<p>x</p>', $this->created($this->form(['content' => "\0x"]))->contentHtml);
+    }
+
     public function testAnUploadedFileIsRejected(): void
     {
         $request = (new ServerRequest('POST', '/micropub'))

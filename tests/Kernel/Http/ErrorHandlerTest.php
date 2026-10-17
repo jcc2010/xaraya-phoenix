@@ -66,6 +66,7 @@ final class ErrorHandlerTest extends TestCase
         foreach (['/api/posts/x', '/API/blogs/a/posts', '/api'] as $path) {
             $response = $this->send($eh, (new ServerRequest('GET', $path))->withHeader('Accept', 'text/html'), new NotFound());
             self::assertSame('application/json', $response->getHeaderLine('Content-Type'), $path);
+            self::assertSame('nosniff', $response->getHeaderLine('X-Content-Type-Options'), $path);
             self::assertSame(['error' => ['status' => 404, 'message' => 'Not Found']], json_decode((string) $response->getBody(), true));
         }
         $html = $this->send($eh, new ServerRequest('GET', '/apiary'), new NotFound());

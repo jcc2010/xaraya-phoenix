@@ -164,11 +164,12 @@ final class MicropubController extends Controller
         $properties = $this->mapper->fromItem($this->items->item($blog, $post, $this->appUrl()), PostWriter::hasDerivedTitle($post));
         $wanted = $query['properties'] ?? null;
         if ($wanted === null) {
-            return ['type' => ['h-entry'], 'properties' => $properties];
+            return ['type' => ['h-entry'], 'properties' => (object) $properties];
         }
         $wanted = array_filter(is_array($wanted) ? $wanted : [$wanted], 'is_string');
 
-        return ['properties' => array_intersect_key($properties, array_flip($wanted))];
+        // An empty mf2 properties set is still a JSON object, never `[]`.
+        return ['properties' => (object) array_intersect_key($properties, array_flip($wanted))];
     }
 
     /** @return array{0: Blog, 1: Post} the post the url names and its blog, once the token may write to that blog */

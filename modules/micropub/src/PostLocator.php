@@ -26,6 +26,10 @@ final class PostLocator
 
     public function find(string $url): ?Post
     {
+        // Postgres text holds neither U+0000 nor bytes that are not UTF-8: no post has such an id, so do not ask.
+        if (str_contains($url, "\0") || !mb_check_encoding($url, 'UTF-8')) {
+            return null;
+        }
         $app = preg_quote(rtrim((string) $this->config->get('app.url', ''), '/'), '#');
         if (preg_match('#^' . $app . '/s/' . self::ULID . '(?:\.json)?$#D', $url, $m) === 1) {
             $post = $this->posts->find($m[1]);

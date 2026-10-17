@@ -12,13 +12,17 @@ use Xaraya\Kernel\Http\Exception\HttpException;
 
 /**
  * Micropub lets a form body carry the token as `access_token` (spec §5.1: Micropub routes only). This parses a
- * form-encoded body when the server has not, and moves that field into `Authorization: Bearer`, so `token:` reads
+ * form-encoded POST body when the server has not, and moves that field into `Authorization: Bearer`, so `token:` reads
  * a header as everywhere else. Sending the token both ways is a 400 (RFC 6750 §2). The query string is never read.
  */
 final class FormToken implements MiddlewareInterface
 {
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
+        // Only a POST carries a form: a GET's body (and any token in it) is ignored.
+        if ($request->getMethod() !== 'POST') {
+            return $handler->handle($request);
+        }
         $form = $request->getParsedBody();
         if (!is_array($form) && MicropubInput::mediaType($request) === 'application/x-www-form-urlencoded') {
             parse_str((string) $request->getBody(), $form);

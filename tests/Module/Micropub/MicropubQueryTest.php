@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Xaraya\Tests\Module\Micropub;
 
 use Nyholm\Psr7\ServerRequest;
+use Nyholm\Psr7\Stream;
 
 final class MicropubQueryTest extends MicropubTestCase
 {
@@ -51,6 +52,30 @@ final class MicropubQueryTest extends MicropubTestCase
 
         $response = $this->app()->handle((new ServerRequest('GET', '/micropub?q=source&url=' . rawurlencode($link) . '&properties[]=name&properties[]=photo'))->withHeader('Authorization', 'Bearer ' . $this->token));
         self::assertSame(['properties' => ['name' => ['Named'], 'photo' => ['https://img.test/a.jpg', 'https://img.test/b.jpg']]], self::body($response));
+    }
+
+    public function testSourceWithNoMatchingPropertiesIsAnEmptyObject(): void
+    {
+        $note = $this->form(['content' => 'A note'])->getHeaderLine('Location');
+        $response = $this->app()->handle((new ServerRequest('GET', '/micropub?q=source&url=' . rawurlencode($note) . '&properties[]=photo'))->withHeader('Authorization', 'Bearer ' . $this->token));
+        self::assertSame(200, $response->getStatusCode());
+        self::assertSame('{"properties":{}}', (string) $response->getBody());
+    }
+
+    public function testAUrlWithU0000OrBadUtf8NamesNoPost(): void
+    {
+        foreach (["https://src.test/a\0b", "https://src.test/a\xffb"] as $url) {
+            self::assertMicropubError($this->query(['q' => 'source', 'url' => $url]), 400, 'invalid_request', 'No post at ' . mb_scrub($url, 'UTF-8'));
+        }
+        self::assertMicropubError($this->form(['action' => 'delete', 'url' => "https://src.test/a\0b"]), 400, 'invalid_request', "No post at https://src.test/a\0b");
+    }
+
+    public function testAGetIgnoresAFormBodyToken(): void
+    {
+        $response = $this->app()->handle((new ServerRequest('GET', '/micropub?q=config'))
+            ->withHeader('Content-Type', 'application/x-www-form-urlencoded')
+            ->withBody(Stream::create('access_token=' . $this->token)));
+        self::assertMicropubError($response, 401, 'unauthorized', 'A bearer token is required');
     }
 
     public function testSourceHonoursTheTokensBlogPin(): void

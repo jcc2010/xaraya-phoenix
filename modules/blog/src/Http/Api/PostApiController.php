@@ -41,6 +41,8 @@ final class PostApiController extends Controller
     {
         $blog = $this->blogs->find($params['handle']) ?? throw new NotFound("Unknown blog '{$params['handle']}'");
         ApiAccess::allow($request, $blog);
+        // A mirror is a 409 whatever the body, so check it before the body is read.
+        PostWriter::assertNative($blog);
         $post = $this->writer->create($blog, JsonBody::decode($request));
 
         return $this->item($blog, $post, 201)->withHeader('Location', '/api/posts/' . $post->id);
@@ -58,6 +60,7 @@ final class PostApiController extends Controller
     public function replace(ServerRequestInterface $request, array $params): ResponseInterface
     {
         [$blog, $post] = $this->load($request, $params['id']);
+        PostWriter::assertNative($blog);
 
         return $this->item($blog, $this->writer->replace($post, JsonBody::decode($request)));
     }
@@ -66,6 +69,7 @@ final class PostApiController extends Controller
     public function patch(ServerRequestInterface $request, array $params): ResponseInterface
     {
         [$blog, $post] = $this->load($request, $params['id']);
+        PostWriter::assertNative($blog);
         $partial = JsonBody::decode($request, self::PATCH_TYPES);
 
         return $this->item($blog, $this->writer->patch($post, $partial));
@@ -103,8 +107,9 @@ final class PostApiController extends Controller
     {
         $now = new DateTimeImmutable('now', new DateTimeZone('UTC'));
         $state = $post->status === 'deleted' ? 'deleted' : ($post->datePublished > $now ? 'scheduled' : 'published');
-        $item = $this->items->item($blog, $post, rtrim((string) $this->config->get('app.url', ''), '/')) + ['_phoenix' => ['status' => $state]];
+        // A mirrored doc may carry its own `_phoenix`: the computed status always wins.
+        $item = array_replace($this->items->item($blog, $post, rtrim((string) $this->config->get('app.url', ''), '/')), ['_phoenix' => ['status' => $state]]);
 
-        return $this->json($item, $status)->withHeader('Cache-Control', 'no-store');
+        return $this->json($item, $status)->withHeader('Cache-Control', 'no-store')->withHeader('X-Content-Type-Options', 'nosniff');
     }
 }

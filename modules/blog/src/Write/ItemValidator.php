@@ -123,8 +123,8 @@ final class ItemValidator
         if (!$hasContent) {
             $errors['content_html'] ??= 'An item needs content_html, content_text, a title, an external_url or an image';
         }
-        foreach (self::notUtf8($item) as $path) {
-            $errors[$path] = 'Must be valid UTF-8';
+        foreach (self::badStrings($item) as $path => $error) {
+            $errors[$path] = $error;
         }
 
         return $errors;
@@ -150,24 +150,28 @@ final class ItemValidator
     }
 
     /**
-     * Dotted paths of the strings (values or keys) in $value that are not valid UTF-8.
+     * The strings (values or keys) in $value that are not valid UTF-8 or that hold U+0000, which Postgres text
+     * cannot store, by dotted path (scrubbed, with U+0000 shown as "?").
      *
      * @param array<array-key, mixed> $value
-     * @return list<string>
+     * @return array<string, string>
      */
-    private static function notUtf8(array $value, string $prefix = ''): array
+    private static function badStrings(array $value, string $prefix = ''): array
     {
-        $paths = [];
+        $errors = [];
         foreach ($value as $key => $v) {
             $path = $prefix . (string) $key;
+            $shown = str_replace("\0", '?', mb_scrub($path, 'UTF-8'));
             if (!mb_check_encoding($path, 'UTF-8') || (is_string($v) && !mb_check_encoding($v, 'UTF-8'))) {
-                $paths[] = mb_scrub($path, 'UTF-8');
+                $errors[$shown] = 'Must be valid UTF-8';
+            } elseif (str_contains($path, "\0") || (is_string($v) && str_contains($v, "\0"))) {
+                $errors[$shown] = 'Must not contain U+0000';
             } elseif (is_array($v)) {
-                array_push($paths, ...self::notUtf8($v, $path . '.'));
+                $errors += self::badStrings($v, $path . '.');
             }
         }
 
-        return $paths;
+        return $errors;
     }
 
     private static function isObject(mixed $value): bool

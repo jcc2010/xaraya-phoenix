@@ -75,7 +75,7 @@ final class ErrorHandler implements MiddlewareInterface
                 $error['trace'] = $trace;
             }
             $body = json_encode(['error' => $error], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_INVALID_UTF8_SUBSTITUTE | JSON_PARTIAL_OUTPUT_ON_ERROR);
-            $response = new Response($status, ['Content-Type' => 'application/json'], $body === false ? '{"error":{"status":' . $status . '}}' : $body);
+            $response = new Response($status, ['Content-Type' => 'application/json', 'X-Content-Type-Options' => 'nosniff'], $body === false ? '{"error":{"status":' . $status . '}}' : $body);
         } else {
             $html = null;
             if ($this->renderHtml !== null) {
