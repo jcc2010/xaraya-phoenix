@@ -29,20 +29,7 @@ final class PostRepository
                 ->where('blog_id', '=', $blogId)
                 ->where('item_id', '=', $record->itemId)
                 ->first();
-            $columns = [
-                'kind' => $record->kind,
-                'title' => $record->title,
-                'url' => $record->url,
-                'external_url' => $record->externalUrl,
-                'content_html' => $record->contentHtml,
-                'image' => $record->image,
-                'date_published' => $record->datePublished,
-                'date_modified' => $record->dateModified,
-                'status' => 'published',
-                'source_hash' => $record->sourceHash,
-                'doc' => $record->doc === [] ? null : $record->doc,
-                'updated_at' => $now,
-            ];
+            $columns = [...$this->columns($record, $now), 'status' => 'published'];
             if ($existing !== null) {
                 $id = (string) $existing['id'];
                 if ($record->sourceHash !== null && $existing['source_hash'] === $record->sourceHash && $existing['status'] === 'published') {
@@ -61,6 +48,43 @@ final class PostRepository
 
             return new SaveResult(SaveResult::CREATED, $id);
         });
+    }
+
+    /**
+     * Inserts a post written natively, under the id its item_id already embeds. Unlike save(), it never swaps a
+     * colliding id: a collision is an error.
+     */
+    public function insert(int $blogId, string $id, PostRecord $record, DateTimeImmutable $now): void
+    {
+        $this->db->transaction(function () use ($blogId, $id, $record, $now): void {
+            $this->db->insert('posts', [
+                'id' => $id,
+                'blog_id' => $blogId,
+                'item_id' => $record->itemId,
+                ...$this->columns($record, $now),
+                'status' => 'published',
+                'created_at' => $now,
+            ]);
+            $this->writeTags($id, $blogId, $record->tags);
+        });
+    }
+
+    /** Replaces a post's content columns, doc and tags. Its id, item_id, status and created_at stay. */
+    public function rewrite(Post $post, PostRecord $record, DateTimeImmutable $now): void
+    {
+        $this->db->transaction(function () use ($post, $record, $now): void {
+            $this->db->update('posts', $this->columns($record, $now), ['id' => $post->id]);
+            $this->writeTags($post->id, $post->blogId, $record->tags);
+        });
+    }
+
+    /** Sets a post's status (published or deleted) and bumps updated_at; false when it already had that status. */
+    public function setStatus(string $id, string $status, DateTimeImmutable $now): bool
+    {
+        return $this->db->query(
+            'UPDATE {posts} SET status = ?, updated_at = ? WHERE id = ? AND status <> ?',
+            [$status, $now, $id, $status],
+        )->rowCount() > 0;
     }
 
     public function find(string $id): ?Post
@@ -241,6 +265,24 @@ final class PostRepository
         }
 
         return $deleted;
+    }
+
+    /** @return array<string, mixed> every content column, plus updated_at */
+    private function columns(PostRecord $record, DateTimeImmutable $now): array
+    {
+        return [
+            'kind' => $record->kind,
+            'title' => $record->title,
+            'url' => $record->url,
+            'external_url' => $record->externalUrl,
+            'content_html' => $record->contentHtml,
+            'image' => $record->image,
+            'date_published' => $record->datePublished,
+            'date_modified' => $record->dateModified,
+            'source_hash' => $record->sourceHash,
+            'doc' => $record->doc === [] ? null : $record->doc,
+            'updated_at' => $now,
+        ];
     }
 
     /** @param list<array{name: string, slug: string}> $tags */
