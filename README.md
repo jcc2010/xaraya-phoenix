@@ -149,31 +149,62 @@ The JSON API takes and returns JSON Feed 1.1 items (scope `blog:write`):
 
 - `POST /api/blogs/{handle}/posts`: 201 with `Location: /api/posts/{id}`
 - `GET /api/posts/{id}`: the item, with `_phoenix.status` set to `published`, `scheduled` or `deleted`
-- `PUT /api/posts/{id}` replaces; `PATCH /api/posts/{id}` merges (RFC 7396). PATCH accepts
-  `application/merge-patch+json`, `application/json` and `application/feed+json`.
+- `PUT /api/posts/{id}` replaces; `PATCH /api/posts/{id}` merges (RFC 7396). POST and PUT accept only
+  `application/json` or `application/feed+json`; PATCH also accepts `application/merge-patch+json`. Any other
+  content type is a 415, and a body that is not valid JSON or not a JSON object is a 400.
 - `DELETE /api/posts/{id}`: 204; `POST /api/posts/{id}/undelete`: 200
-- `POST /api/blogs/{handle}/media` (scope `media:write`): the multipart field `file`; 201 with `Location` set to its `/media/…` URL
+- `POST /api/blogs/{handle}/media` (scope `media:write`): the multipart field `file`; 201 with an absolute
+  `Location` (`{app.url}/media/<ulid>.<ext>`) and the body `{"url", "type", "bytes", "width", "height"}`.
+  `width` and `height` are null for MP3 (and for any image whose size cannot be read).
 
-Errors are JSON. An unknown or invalid field is a 422 whose `error.fields` names it, and a write to a mirror
-blog is a 409. JSON bodies are capped at 1,000,000 bytes (413 beyond that). Tags are normalised, and a tag slug
-must match `^[a-z0-9-]{1,128}$`. A `date_published` in the future schedules the post: feeds, pages and search show
+Errors are JSON. An unknown or invalid field (including a string or key that is not UTF-8 or holds U+0000) is
+a 422 whose `error.fields` names it, and a write to a mirror blog is a 409. JSON bodies are capped at 1,000,000
+bytes (413 beyond that). Tags are normalised, and a tag slug must match `^[a-z0-9-]{1,128}$`. A `date_published` in the future schedules the post: feeds, pages and search show
 it from then on. `content_html` is stored as sent. Pages sanitise it when they render, but the JSON and RSS feeds
 serve it unchanged, so give tokens only to people you trust with the blog's HTML.
 
-Uploads may be JPEG, PNG, GIF, WebP, AVIF or MP3, at most 10 MB. The type is read from the bytes, never the file
-name, and the file is stored as `var/uploads/<handle>/<ulid>.<ext>`. PHP's `upload_max_filesize` and
-`post_max_size` must allow 10 MB.
+Uploads may be JPEG, PNG, GIF, WebP, AVIF or MP3, at most 10,000,000 bytes (413 beyond that). The type is read
+from the bytes, never the file name, and the file is stored as `var/uploads/<handle>/<ulid>.<ext>` (the
+`blog.uploads` setting replaces `var/uploads`). Identical bytes uploaded to the same blog share one stored file.
+PHP's `upload_max_filesize` and `post_max_size` must allow 10 MB.
 
 Micropub clients use `{app.url}/micropub` and the media endpoint `{app.url}/micropub/media`. Phoenix has no
 IndieAuth yet, so give the client a token from `token:create`. Creating, updating, deleting, undeleting and the
 `q=config`, `q=source` and `q=syndicate-to` queries need `blog:write`; the media endpoint needs `media:write`.
 Files go to the media endpoint only: a file uploaded to `/micropub` is a 400. Every Micropub error other than
 401 and 403 (including an oversized body or a wrong content type) is a 400 `invalid_request`, and `q=source`
-for a deleted post is a 400 too. Updates keep a post's image sizes and a `highlight` kind.
+for a deleted post is a 400 too. Errors from the router itself (a 404 or 405 on `/micropub`) come before
+Micropub's handling, so they use the kernel's error format (`{"error": {"status", "message"}}` for a client that
+accepts JSON), not Micropub's. A create is a 201 with `Location` set to the post's URL; `action=update`,
+`delete` and `undelete` are a 204; the media endpoint is a 201 with `Location` set to the file's absolute URL.
+`action=update` must be sent as JSON; `delete` and `undelete` may be form-encoded or JSON. Updates keep a
+post's image sizes and a `highlight` kind.
 `mp-destination` is a blog handle (`q=config` lists them); without it the token's blog, or the only native blog,
 is used. `content` becomes `content_html` (plain text is escaped into paragraphs), `name` the title,
 `bookmark-of` a link post, `photo` a photo post (upload files to the media endpoint first and send their URLs),
 `category` the tags and `published` the date. Other properties are ignored.
+
+With curl (`$TOKEN` holds a token from `token:create`):
+
+```sh
+# Create a post
+curl -i https://example.com/api/blogs/notes/posts \
+  -H "Authorization: Bearer $TOKEN" -H 'Content-Type: application/json' \
+  -d '{"title": "Hello", "content_html": "<p>First post</p>", "tags": ["hello"]}'
+
+# Change its title (merge patch)
+curl -i -X PATCH https://example.com/api/posts/<id> \
+  -H "Authorization: Bearer $TOKEN" -H 'Content-Type: application/merge-patch+json' \
+  -d '{"title": "Hello again"}'
+
+# Upload a file
+curl -i https://example.com/api/blogs/notes/media \
+  -H "Authorization: Bearer $TOKEN" -F 'file=@photo.jpg'
+
+# Post a note through Micropub
+curl -i https://example.com/micropub \
+  -H "Authorization: Bearer $TOKEN" -d h=entry --data-urlencode 'content=Hello from Micropub'
+```
 
 Switching a mirror with `bin/xar blog:mode <handle> native` keeps every post's id and URL; the old posts can then
 be edited through the API or Micropub by their URL.
