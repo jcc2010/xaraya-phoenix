@@ -12,6 +12,7 @@ use Xaraya\Module\Blog\Post\Post;
 use Xaraya\Module\Blog\Post\PostRepository;
 use Xaraya\Module\Blog\Search\SearchIndex;
 use Xaraya\Module\Blog\Write\MergePatch;
+use Xaraya\Module\Blog\Write\PostWriter;
 
 final class PostWriterChangeTest extends PostWriterTestCase
 {
@@ -118,7 +119,7 @@ final class PostWriterChangeTest extends PostWriterTestCase
         self::assertSame(['date_published' => 'Cannot be removed'], self::fieldErrors(fn() => $this->writer()->patch($post, ['date_published' => null])));
         $fields = self::fieldErrors(fn() => $this->writer()->patch($post, ['title' => null, 'content_html' => null]));
         self::assertSame('An item needs content_html, content_text, a title, an external_url or an image', $fields['content_html'] ?? null);
-        self::assertSame('First', $this->writer()->patch($post, [])->title, 'nothing was written');
+        self::assertSame('First', $this->writer()->patch($post, [])->title, 'the refused patches changed nothing');
     }
 
     public function testDeleteAndUndeleteAreIdempotentAndFireOnce(): void
@@ -236,5 +237,49 @@ final class PostWriterChangeTest extends PostWriterTestCase
 
         $cleared = $this->writer()->patch($patched, ['_athenana' => ['tags' => null]]);
         $this->assertTagsAgree([], $cleared);
+    }
+
+    public function testTagNamesAreServedAsStoredOnCreate(): void
+    {
+        $spaced = $this->writer()->create($this->blog, ['title' => 'A', 'date_published' => '2026-10-01T08:00:00Z', 'tags' => [' Café ', 'New']]);
+        $this->assertTagsAgree([['name' => 'Café', 'slug' => 'caf'], ['name' => 'New', 'slug' => 'new']], $spaced);
+        $this->writer()->delete($spaced);
+
+        $twins = $this->writer()->create($this->blog, ['title' => 'B', 'date_published' => '2026-10-01T08:00:00Z', 'tags' => ['Foo Bar', 'foo bar'], '_athenana' => ['tags' => [['name' => 'Foo Bar', 'slug' => 'foo-bar'], ['name' => 'foo bar']]]]);
+        $this->assertTagsAgree([['name' => 'Foo Bar', 'slug' => 'foo-bar']], $twins);
+    }
+
+    public function testTagNamesAreServedAsStoredOnReplaceAndPatch(): void
+    {
+        $post = $this->tagged();
+        $served = $this->served($post);
+        $served['tags'] = [' Café Life ', 'New'];
+        $replaced = $this->writer()->replace($post, $served);
+        $this->assertTagsAgree([['name' => 'Café Life', 'slug' => 'cafe-life'], ['name' => 'New', 'slug' => 'new']], $replaced);
+
+        $patched = $this->writer()->patch($replaced, ['tags' => ['Foo Bar', 'foo bar']]);
+        $this->assertTagsAgree([['name' => 'Foo Bar', 'slug' => 'foo-bar']], $patched);
+        self::assertArrayNotHasKey('tags', $patched->doc);
+    }
+
+    public function testANoOpPatchWritesNothingAndFiresNothing(): void
+    {
+        $note = $this->writer()->create($this->blog, ['content_html' => '<p>Derived</p>', 'tags' => ['A']]);
+        $post = $this->post();
+        $this->backdate($note);
+        $this->backdate($post);
+        foreach ([[$post, []], [$post, ['title' => 'First', 'tags' => ['Old tag']]], [$note, []], [$note, ['content_html' => '<p>Derived</p>']], [$post, ['_phoenix' => ['status' => 'published']]]] as [$target, $partial]) {
+            self::assertSame($target, $this->writer()->patch($target, $partial), 'the post comes back as it was');
+            $stored = $this->app->container()->get(PostRepository::class)->find($target->id);
+            self::assertSame('2000-01-01', $stored?->updatedAt?->format('Y-m-d'), json_encode($partial) ?: '');
+        }
+        self::assertSame([], $this->events);
+    }
+
+    public function testHasDerivedTitle(): void
+    {
+        self::assertTrue(PostWriter::hasDerivedTitle($this->writer()->create($this->blog, ['content_html' => '<p>Words</p>'])));
+        self::assertTrue(PostWriter::hasDerivedTitle($this->writer()->create($this->blog, ['content_text' => 'Plain & simple'])));
+        self::assertFalse(PostWriter::hasDerivedTitle($this->post()));
     }
 }

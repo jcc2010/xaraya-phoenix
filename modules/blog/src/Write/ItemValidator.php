@@ -96,13 +96,13 @@ final class ItemValidator
             }
             $athenaTags = $athenana['tags'] ?? null;
             if ($athenaTags !== null && (!is_array($athenaTags) || !array_is_list($athenaTags)
-                || array_filter($athenaTags, static fn(mixed $t): bool => !is_array($t) || !is_string($t['name'] ?? null) || $t['name'] === '') !== [])) {
+                || array_filter($athenaTags, static fn(mixed $t): bool => !is_array($t) || !is_string($t['name'] ?? null)) !== [])) {
                 $errors['_athenana.tags'] = 'Must be a list of {name, slug} objects';
             } elseif (is_array($athenaTags)) {
                 foreach ($athenaTags as $i => $tag) {
                     /** @var array{name: string, slug?: mixed} $tag */
-                    if (mb_strlen($tag['name']) > self::MAX_TAG) {
-                        $errors["_athenana.tags.{$i}.name"] = 'Must be at most ' . self::MAX_TAG . ' characters';
+                    if (trim($tag['name']) === '' || mb_strlen($tag['name']) > self::MAX_TAG) {
+                        $errors["_athenana.tags.{$i}.name"] = 'Must be a tag name of 1 to ' . self::MAX_TAG . ' characters';
                     }
                     $slug = $tag['slug'] ?? null;
                     if ($slug !== null && (!is_string($slug) || preg_match(self::TAG_SLUG, $slug) !== 1)) {

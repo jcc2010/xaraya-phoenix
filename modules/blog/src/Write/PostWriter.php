@@ -7,6 +7,7 @@ namespace Xaraya\Module\Blog\Write;
 use DateTimeImmutable;
 use DateTimeZone;
 use InvalidArgumentException;
+use JsonException;
 use RuntimeException;
 use Xaraya\Kernel\Config\Config;
 use Xaraya\Kernel\Events\EventDispatcher;
@@ -98,8 +99,8 @@ final class PostWriter
     }
 
     /**
-     * Applies a JSON Merge Patch (RFC 7396) to the item as the feed serves it, then replaces. A derived title
-     * follows the content. Patching only `tags` rebuilds the tag list from the new names (reusing the slugs of the
+     * Applies a JSON Merge Patch (RFC 7396) to the item as the feed serves it, then replaces. A patch that leaves
+     * the served item as it is writes nothing, fires no event and returns $post. A derived title follows the content. Patching only `tags` rebuilds the tag list from the new names (reusing the slugs of the
      * names that stay); patching only `_athenana.tags` moves the served `tags` with it.
      *
      * @param array<array-key, mixed> $partial
@@ -113,9 +114,11 @@ final class PostWriter
             self::check(['date_published' => 'Cannot be removed']);
         }
         $current = $this->serializer->item($blog, $post, $this->appUrl());
+        if (self::isNoOp($current, $partial)) {
+            return $post;
+        }
         // A title that was only derived from the content (§3.1) is derived again from the patched content.
-        $text = is_string($post->doc['content_text'] ?? null) ? htmlspecialchars($post->doc['content_text']) : null;
-        if (!array_key_exists('title', $partial) && $post->title === Text::deriveTitle($post->kind, $post->contentHtml ?? $text, $post->externalUrl)) {
+        if (!array_key_exists('title', $partial) && self::hasDerivedTitle($post)) {
             unset($current['title']);
         }
         $patchesTags = array_key_exists('tags', $partial);
@@ -129,6 +132,14 @@ final class PostWriter
         $merged = MergePatch::apply($current, $partial);
 
         return $this->replace($post, is_array($merged) ? $merged : [], $now);
+    }
+
+    /** True when the post's title is the one Text::deriveTitle() gives its content (no title was ever sent). */
+    public static function hasDerivedTitle(Post $post): bool
+    {
+        $text = is_string($post->doc['content_text'] ?? null) ? htmlspecialchars($post->doc['content_text']) : null;
+
+        return $post->title === Text::deriveTitle($post->kind, $post->contentHtml ?? $text, $post->externalUrl);
     }
 
     /** Tombstones the post (status deleted). Deleting a deleted post changes nothing and fires no event. */
@@ -160,6 +171,21 @@ final class PostWriter
     {
         if ($blog->isMirror()) {
             throw new HttpException(409, sprintf(self::MIRROR_MESSAGE, $blog->handle));
+        }
+    }
+
+    /**
+     * @param array<string, mixed> $served
+     * @param array<array-key, mixed> $partial
+     */
+    private static function isNoOp(array $served, array $partial): bool
+    {
+        unset($partial['_phoenix']);
+        $merged = MergePatch::apply($served, $partial);
+        try {
+            return is_array($merged) && Text::canonicalJson($merged) === Text::canonicalJson($served);
+        } catch (JsonException) {
+            return false; // not valid UTF-8: replace() reports it
         }
     }
 
@@ -226,40 +252,51 @@ final class PostWriter
     }
 
     /**
-     * AthenaAdapter takes the tags from `_athenana.tags` whenever it is there, but a served item carries both it and
-     * `tags`, and a client editing the body edits `tags`. So when the `tags` names differ from the `_athenana.tags`
-     * names, `_athenana.tags` is rebuilt from `tags`, keeping the slug of every name it already had. When the names
-     * agree (or either field is absent), `_athenana.tags` stands, so a slug-only edit is kept.
+     * Settles the item's tags before AthenaAdapter maps it, so that the served `tags`, the served `_athenana.tags`
+     * and the stored post_tags always agree:
+     *
+     * - The tag list comes from `tags` when it is there and its names differ from the `_athenana.tags` names (a
+     *   client editing a served body edits `tags`); each name keeps the slug `_athenana.tags` already had for it.
+     *   Otherwise it comes from `_athenana.tags`, so a slug-only edit is kept.
+     * - Names are trimmed, a missing slug is derived, and the first tag of each slug wins (as post_tags stores them).
+     * - Both fields are then set to that list, so the adapter keeps no raw copy of `tags` in the doc.
      *
      * @param array<string, mixed> $item a validated item
      * @return array<string, mixed>
      */
     private static function reconcileTags(array $item): array
     {
-        $athenana = $item['_athenana'] ?? null;
-        if (!is_array($item['tags'] ?? null) || !is_array($athenana) || !is_array($athenana['tags'] ?? null)) {
+        $athenana = is_array($item['_athenana'] ?? null) ? $item['_athenana'] : null;
+        $given = is_array($athenana['tags'] ?? null) ? $athenana['tags'] : null;
+        $names = is_array($item['tags'] ?? null) ? $item['tags'] : null;
+        if ($names === null && $given === null) {
             return $item;
         }
-        $names = [];
         $slugs = [];
-        foreach ($athenana['tags'] as $tag) {
+        $pairs = [];
+        foreach ($given ?? [] as $tag) {
             if (is_array($tag) && is_string($tag['name'] ?? null)) {
-                $names[] = $tag['name'];
-                if (is_string($tag['slug'] ?? null)) {
-                    $slugs[$tag['name']] ??= $tag['slug'];
+                $slug = is_string($tag['slug'] ?? null) ? $tag['slug'] : null;
+                $pairs[] = [$tag['name'], $slug];
+                if ($slug !== null) {
+                    $slugs[trim($tag['name'])] ??= $slug;
                 }
             }
         }
-        if ($item['tags'] === $names) {
-            return $item;
+        if ($names !== null && ($given === null || $names !== array_column($pairs, 0))) {
+            $pairs = array_map(static fn(mixed $name): array => [(string) $name, null], $names);
         }
         $tags = [];
-        foreach ($item['tags'] as $name) {
-            $name = trim((string) $name);
-            $tags[] = ['name' => $name, 'slug' => $slugs[$name] ?? Text::slug($name)];
+        foreach ($pairs as [$name, $slug]) {
+            $name = trim($name);
+            $slug ??= $slugs[$name] ?? Text::slug($name);
+            $tags[$slug] ??= ['name' => $name, 'slug' => $slug];
         }
-        $athenana['tags'] = $tags;
-        $item['_athenana'] = $athenana;
+        $tags = array_values($tags);
+        $item['_athenana'] = ['tags' => $tags] + ($athenana ?? []);
+        if ($names !== null) {
+            $item['tags'] = array_column($tags, 'name');
+        }
 
         return $item;
     }
