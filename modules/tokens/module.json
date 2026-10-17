@@ -1,0 +1,11 @@
+{
+  "name": "tokens",
+  "version": "0.1.0",
+  "requires": { "kernel": "^0.1", "modules": { "blog": "^0.1" } },
+  "migrations": "migrations",
+  "commands": [
+    "Xaraya\\Module\\Tokens\\Cli\\TokenCreateCommand",
+    "Xaraya\\Module\\Tokens\\Cli\\TokenListCommand",
+    "Xaraya\\Module\\Tokens\\Cli\\TokenRevokeCommand"
+  ]
+}

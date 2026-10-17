@@ -32,7 +32,9 @@
     "autoload-dev": {
         "psr-4": {
             "Xaraya\\Tests\\": "tests/",
-            "Xaraya\\Module\\Blog\\": "modules/blog/src/"
+            "Xaraya\\Module\\Blog\\": "modules/blog/src/",
+            "Xaraya\\Module\\Micropub\\": "modules/micropub/src/",
+            "Xaraya\\Module\\Tokens\\": "modules/tokens/src/"
         }
     },
     "scripts": {
