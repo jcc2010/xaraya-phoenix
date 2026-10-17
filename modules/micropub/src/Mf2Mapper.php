@@ -17,9 +17,12 @@ final class Mf2Mapper
 {
     public const PROPERTIES = ['content', 'name', 'bookmark-of', 'photo', 'category', 'published'];
 
-    /** The item fields each property writes ("_athenana.images" is nested), so an update clears exactly those. */
+    /**
+     * The item fields each property owns ("_athenana.images" is nested), so an update sets or clears exactly those.
+     * content also owns content_text, which toItem() never writes: replacing or deleting content clears it.
+     */
     public const FIELDS = [
-        'content' => ['content_html'],
+        'content' => ['content_html', 'content_text'],
         'name' => ['title'],
         'bookmark-of' => ['external_url'],
         'photo' => ['image', '_athenana.images'],
@@ -107,31 +110,59 @@ final class Mf2Mapper
 
     /**
      * A JSON Merge Patch for PostWriter::patch() that sets every field of the $touched properties from $properties
-     * (the whole post after the update), or removes it. Touching bookmark-of or photo re-derives the kind.
+     * (the whole post after the update), or removes it. $current is the item as served before the update: a photo
+     * whose URL it already lists in _athenana.images keeps that whole object (width, height…), since a merge patch
+     * replaces a list whole. Touching bookmark-of or photo re-derives the kind, unless the post has a kind Micropub
+     * does not model (a highlight, say), which is left alone.
      *
      * @param array<string, list<mixed>> $properties
      * @param list<string> $touched
+     * @param array<string, mixed> $current
      * @return array<string, mixed>
      */
-    public function patchFor(array $properties, array $touched): array
+    public function patchFor(array $properties, array $touched, array $current = []): array
     {
         $touched = array_values(array_intersect(self::PROPERTIES, $touched));
         $item = $this->toItem(array_intersect_key($properties, array_flip($touched)));
+        $athenana = is_array($current['_athenana'] ?? null) ? $current['_athenana'] : [];
         $patch = [];
         foreach ($touched as $property) {
             foreach (self::FIELDS[$property] as $field) {
                 if ($field === '_athenana.images') {
-                    $patch['_athenana']['images'] = $item['_athenana']['images'] ?? null;
+                    $images = $item['_athenana']['images'] ?? null;
+                    $patch['_athenana']['images'] = is_array($images) ? self::keepImages($images, $athenana['images'] ?? null) : null;
                 } else {
                     $patch[$field] = $item[$field] ?? null;
                 }
             }
         }
-        if (in_array('bookmark-of', $touched, true) || in_array('photo', $touched, true)) {
+        $kind = $athenana['kind'] ?? 'note';
+        if ((in_array('bookmark-of', $touched, true) || in_array('photo', $touched, true)) && in_array($kind, ['note', 'photo', 'link'], true)) {
             $patch['_athenana']['kind'] = isset($properties['bookmark-of'][0]) ? 'link' : (isset($properties['photo'][0]) ? 'photo' : 'note');
         }
 
         return $patch;
+    }
+
+    /**
+     * @param array<array-key, mixed> $images the new [{url}] list
+     * @return list<mixed> each entry replaced by the current image object with the same url, when there is one
+     */
+    private static function keepImages(array $images, mixed $current): array
+    {
+        $byUrl = [];
+        foreach (is_array($current) ? $current : [] as $image) {
+            if (is_array($image) && is_string($image['url'] ?? null)) {
+                $byUrl[$image['url']] ??= $image;
+            }
+        }
+        $out = [];
+        foreach ($images as $image) {
+            $url = is_array($image) ? ($image['url'] ?? null) : null;
+            $out[] = is_string($url) && isset($byUrl[$url]) ? $byUrl[$url] : $image;
+        }
+
+        return $out;
     }
 
     /** Escapes plain text into paragraphs: blank lines split paragraphs, single newlines become <br>. 400 for bad UTF-8. */

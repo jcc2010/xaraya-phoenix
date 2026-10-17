@@ -68,7 +68,8 @@ final class MicropubController extends Controller
             throw new HttpException(400, 'Send updates as JSON');
         }
         [$blog, $post] = $this->locate($request, $input);
-        $properties = $this->mapper->fromItem($this->items->item($blog, $post, $this->appUrl()), PostWriter::hasDerivedTitle($post));
+        $current = $this->items->item($blog, $post, $this->appUrl());
+        $properties = $this->mapper->fromItem($current, PostWriter::hasDerivedTitle($post));
         $touched = [];
         foreach (['replace', 'add'] as $operation) {
             foreach (self::operation($input->json, $operation) as $property => $values) {
@@ -98,7 +99,7 @@ final class MicropubController extends Controller
                 throw new HttpException(400, "delete.{$key} must be a list of values");
             }
         }
-        $patch = $this->mapper->patchFor($properties, $touched);
+        $patch = $this->mapper->patchFor($properties, $touched, $current);
         $patch['date_modified'] = gmdate(DATE_ATOM);
         $this->writer->patch($post, $patch);
 

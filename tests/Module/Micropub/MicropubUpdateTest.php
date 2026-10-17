@@ -7,6 +7,9 @@ namespace Xaraya\Tests\Module\Micropub;
 use Nyholm\Psr7\ServerRequest;
 use Nyholm\Psr7\Stream;
 use Psr\Http\Message\ResponseInterface;
+use Xaraya\Kernel\Events\EventDispatcher;
+use Xaraya\Kernel\Events\ItemEvent;
+use Xaraya\Kernel\Events\ItemUpdated;
 use Xaraya\Kernel\Support\Ulid;
 use Xaraya\Module\Blog\BlogRepository;
 use Xaraya\Module\Blog\Post\Post;
@@ -46,6 +49,24 @@ final class MicropubUpdateTest extends MicropubTestCase
             ->withHeader('Authorization', 'Bearer ' . $this->token)
             ->withHeader('Content-Type', 'application/json')
             ->withBody(Stream::create($body)));
+    }
+
+    /**
+     * Creates a post through the JSON API (in "notes"); returns its URL.
+     *
+     * @param array<string, mixed> $item
+     */
+    private function apiPost(array $item): string
+    {
+        $response = $this->app()->handle((new ServerRequest('POST', '/api/blogs/notes/posts'))
+            ->withHeader('Authorization', 'Bearer ' . $this->token)
+            ->withHeader('Content-Type', 'application/json')
+            ->withBody(Stream::create(json_encode($item, JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR))));
+        self::assertSame(201, $response->getStatusCode(), (string) $response->getBody());
+        $url = self::body($response)['url'] ?? null;
+        self::assertIsString($url);
+
+        return $url;
     }
 
     public function testReplaceRewritesOnlyThatProperty(): void
@@ -101,6 +122,88 @@ final class MicropubUpdateTest extends MicropubTestCase
         self::assertSame(404, $this->app()->handle(new ServerRequest('GET', '/s/' . substr($url, -26) . '.json'))->getStatusCode());
         self::assertSame(204, $this->postJson(['action' => 'undelete', 'url' => $url])->getStatusCode());
         self::assertSame('published', $this->post($url)->status);
+    }
+
+    public function testPhotoUpdatesKeepTheSizesOfImagesThatStay(): void
+    {
+        // assertEquals for the images: MySQL's JSON column does not keep object key order (list order is still checked).
+        $url = $this->apiPost(['content_html' => '<p>Pics</p>', 'image' => 'https://img.test/a.jpg', '_athenana' => ['kind' => 'photo', 'images' => [
+            ['url' => 'https://img.test/a.jpg', 'width' => 800, 'height' => 600],
+            ['url' => 'https://img.test/b.jpg', 'width' => 640, 'height' => 480],
+        ]]]);
+        self::assertSame(204, $this->update($url, ['add' => ['photo' => ['https://img.test/c.jpg']]])->getStatusCode());
+        self::assertEquals([
+            ['url' => 'https://img.test/a.jpg', 'width' => 800, 'height' => 600],
+            ['url' => 'https://img.test/b.jpg', 'width' => 640, 'height' => 480],
+            ['url' => 'https://img.test/c.jpg'],
+        ], $this->post($url)->doc['_athenana']['images'] ?? null);
+        self::assertSame(204, $this->update($url, ['delete' => ['photo' => ['https://img.test/a.jpg']]])->getStatusCode());
+        $post = $this->post($url);
+        self::assertEquals([['url' => 'https://img.test/b.jpg', 'width' => 640, 'height' => 480], ['url' => 'https://img.test/c.jpg']], $post->doc['_athenana']['images'] ?? null);
+        self::assertSame('https://img.test/b.jpg', $post->image);
+    }
+
+    public function testContentUpdatesClearContentText(): void
+    {
+        $url = $this->apiPost(['title' => 'Plain', 'content_text' => 'Old text', 'content_html' => '<p>Old text</p>']);
+        self::assertSame(204, $this->update($url, ['replace' => ['content' => ['New text']]])->getStatusCode());
+        $post = $this->post($url);
+        self::assertSame('<p>New text</p>', $post->contentHtml);
+        self::assertArrayNotHasKey('content_text', $post->doc);
+
+        $url = $this->apiPost(['title' => 'Text only', 'content_text' => 'Just text']);
+        self::assertSame(204, $this->update($url, ['delete' => ['content']])->getStatusCode());
+        $post = $this->post($url);
+        self::assertNull($post->contentHtml);
+        self::assertArrayNotHasKey('content_text', $post->doc);
+    }
+
+    public function testAKindMicropubDoesNotModelIsKept(): void
+    {
+        $url = $this->apiPost(['content_html' => '<p>A quote</p>', '_athenana' => ['kind' => 'highlight']]);
+        self::assertSame(204, $this->update($url, ['replace' => ['bookmark-of' => ['https://example.com/source']]])->getStatusCode());
+        $post = $this->post($url);
+        self::assertSame(['highlight', 'https://example.com/source'], [$post->kind, $post->externalUrl]);
+        self::assertSame(204, $this->update($url, ['add' => ['photo' => ['https://img.test/q.jpg']]])->getStatusCode());
+        self::assertSame('highlight', $this->post($url)->kind);
+    }
+
+    public function testFieldsMicropubDoesNotModelSurviveAnUpdate(): void
+    {
+        $url = $this->apiPost([
+            'content_html' => '<p>Episode</p>',
+            'attachments' => [['url' => 'https://cdn.test/e.mp3', 'mime_type' => 'audio/mpeg']],
+            '_video' => ['provider' => 'youtube', 'id' => 'abc'],
+            '_athenana' => ['podcast' => ['duration' => 1800, 'episode' => 7]],
+        ]);
+        self::assertSame(204, $this->update($url, ['replace' => ['content' => ['Episode 7']], 'add' => ['category' => ['pods']]])->getStatusCode());
+        $post = $this->post($url);
+        self::assertSame('<p>Episode 7</p>', $post->contentHtml);
+        // assertEquals: MySQL's JSON column does not keep object key order.
+        self::assertEquals([['url' => 'https://cdn.test/e.mp3', 'mime_type' => 'audio/mpeg']], $post->doc['attachments'] ?? null);
+        self::assertEquals(['provider' => 'youtube', 'id' => 'abc'], $post->doc['_video'] ?? null);
+        self::assertEquals(['duration' => 1800, 'episode' => 7], $post->doc['_athenana']['podcast'] ?? null);
+    }
+
+    public function testDeleteAndUndeleteAreIdempotent(): void
+    {
+        $url = $this->note('Twice');
+        $this->form(['action' => 'delete', 'url' => $url]);
+        $app = $this->app(); // app() boots a new App each call: the listener lives on this one
+        $events = [];
+        $app->container()->get(EventDispatcher::class)->listen(ItemEvent::class, static function (ItemEvent $e) use (&$events): void {
+            $events[] = $e::class;
+        });
+        $send = fn(string $action): int => $app->handle((new ServerRequest('POST', '/micropub'))
+            ->withHeader('Authorization', 'Bearer ' . $this->token)
+            ->withHeader('Content-Type', 'application/json')
+            ->withBody(Stream::create(json_encode(['action' => $action, 'url' => $url], JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR))))->getStatusCode();
+        self::assertSame(204, $send('delete'));
+        self::assertSame('deleted', $this->post($url)->status);
+        self::assertSame(204, $send('undelete'));
+        self::assertSame(204, $send('undelete'));
+        self::assertSame('published', $this->post($url)->status);
+        self::assertSame([ItemUpdated::class], $events, 'only the real undelete fires an event');
     }
 
     public function testUpdatingADeletedPostIs400(): void
