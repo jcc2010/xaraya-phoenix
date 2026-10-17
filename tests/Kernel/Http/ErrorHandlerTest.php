@@ -13,6 +13,7 @@ use Xaraya\Kernel\Http\CallableHandler;
 use Xaraya\Kernel\Http\Exception\HttpException;
 use Xaraya\Kernel\Http\Exception\MethodNotAllowed;
 use Xaraya\Kernel\Http\Exception\NotFound;
+use Xaraya\Kernel\Http\Exception\ValidationFailed;
 use Xaraya\Kernel\Http\Middleware\ErrorHandler;
 use Xaraya\Kernel\Http\Pipeline;
 
@@ -57,6 +58,40 @@ final class ErrorHandlerTest extends TestCase
 
         $r2 = $this->send($eh, (new ServerRequest('GET', '/x'))->withHeader('Accept', 'application/json'), new NotFound());
         self::assertStringContainsString('application/json', $r2->getHeaderLine('Content-Type'));
+    }
+
+    public function testApiPathsAnswerInJsonWhateverTheAcceptHeader(): void
+    {
+        $eh = new ErrorHandler(new MemoryLogger());
+        foreach (['/api/posts/x', '/API/blogs/a/posts', '/api'] as $path) {
+            $response = $this->send($eh, (new ServerRequest('GET', $path))->withHeader('Accept', 'text/html'), new NotFound());
+            self::assertSame('application/json', $response->getHeaderLine('Content-Type'), $path);
+            self::assertSame(['error' => ['status' => 404, 'message' => 'Not Found']], json_decode((string) $response->getBody(), true));
+        }
+        $html = $this->send($eh, new ServerRequest('GET', '/apiary'), new NotFound());
+        self::assertStringContainsString('text/html', $html->getHeaderLine('Content-Type'));
+    }
+
+    public function testValidationFailedCarriesItsFieldsInJsonOnly(): void
+    {
+        $eh = new ErrorHandler(new MemoryLogger());
+        $e = new ValidationFailed(['title' => 'Must be a string', 'tags' => 'Must be a list of strings'], 'Invalid item');
+        $json = $this->send($eh, new ServerRequest('POST', '/api/blogs/a/posts'), $e);
+        self::assertSame(422, $json->getStatusCode());
+        self::assertSame(
+            ['error' => ['status' => 422, 'message' => 'Invalid item', 'fields' => ['title' => 'Must be a string', 'tags' => 'Must be a list of strings']]],
+            json_decode((string) $json->getBody(), true),
+        );
+        $html = $this->send($eh, new ServerRequest('POST', '/form'), $e);
+        self::assertSame(422, $html->getStatusCode());
+        self::assertStringContainsString('Invalid item', (string) $html->getBody());
+    }
+
+    public function testNewReasonPhrases(): void
+    {
+        self::assertSame('Conflict', HttpException::reason(409));
+        self::assertSame('Content Too Large', HttpException::reason(413));
+        self::assertSame('Unsupported Media Type', HttpException::reason(415));
     }
 
     public function testExceptionHeadersArePreserved(): void

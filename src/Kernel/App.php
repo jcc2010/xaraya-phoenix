@@ -128,6 +128,21 @@ final class App
             $registry->register('conditional', ConditionalGet::class);
             $registry->register('secureHtml', SecureHtml::class);
             $registry->registerMarker('csrf');
+            foreach ($c->get(ModuleRegistry::class)->enabled() as $manifest) {
+                try {
+                    $aliases = $manifest->middleware();
+                } catch (\Throwable $e) {
+                    $c->get(LoggerInterface::class)->error("Ignoring the middleware of module '{$manifest->name}': {$e->getMessage()}", ['exception' => $e]);
+                    continue;
+                }
+                foreach ($aliases as $alias => $class) {
+                    if ($registry->has($alias)) {
+                        $c->get(LoggerInterface::class)->error("Module '{$manifest->name}' cannot register middleware '{$alias}': the alias is taken");
+                        continue;
+                    }
+                    $registry->register($alias, $class);
+                }
+            }
 
             return $registry;
         });

@@ -14,6 +14,7 @@ use Psr\Log\LoggerInterface;
 use Throwable;
 use Xaraya\Kernel\Http\Controller;
 use Xaraya\Kernel\Http\Exception\HttpException;
+use Xaraya\Kernel\Http\Exception\ValidationFailed;
 
 final class ErrorHandler implements MiddlewareInterface
 {
@@ -39,7 +40,7 @@ final class ErrorHandler implements MiddlewareInterface
             }
             $message = $status >= 500 && !$this->debug ? HttpException::reason($status) : $cause->getMessage();
 
-            return $this->respond($request, $status, $message, $e->headers(), $cause);
+            return $this->respond($request, $status, $message, $e->headers(), $cause, $e instanceof ValidationFailed ? $e->fields() : []);
         } catch (Throwable $e) {
             $this->log($e);
 
@@ -56,14 +57,20 @@ final class ErrorHandler implements MiddlewareInterface
         }
     }
 
-    /** @param array<string, string> $headers */
-    private function respond(ServerRequestInterface $request, int $status, string $message, array $headers, Throwable $e): ResponseInterface
+    /**
+     * @param array<string, string> $headers
+     * @param array<string, string> $fields
+     */
+    private function respond(ServerRequestInterface $request, int $status, string $message, array $headers, Throwable $e, array $fields = []): ResponseInterface
     {
         $trace = $this->debug && $status >= 500
             ? $e::class . ' in ' . $e->getFile() . ':' . $e->getLine() . "\n" . $e->getTraceAsString()
             : null;
         if ($this->wantsJson($request)) {
             $error = ['status' => $status, 'message' => $message];
+            if ($fields !== []) {
+                $error['fields'] = $fields;
+            }
             if ($trace !== null) {
                 $error['trace'] = $trace;
             }
@@ -92,7 +99,9 @@ final class ErrorHandler implements MiddlewareInterface
 
     private function wantsJson(ServerRequestInterface $request): bool
     {
-        if (str_ends_with(strtolower($request->getUri()->getPath()), '.json')) {
+        $path = strtolower($request->getUri()->getPath());
+        // JSON paths and the /api/ prefix always answer in JSON, whatever the Accept header says.
+        if (str_ends_with($path, '.json') || $path === '/api' || str_starts_with($path, '/api/')) {
             return true;
         }
         $accept = $request->getHeaderLine('Accept');

@@ -107,6 +107,25 @@ final class Manifest
         return $out;
     }
 
+    /**
+     * Route middleware aliases this module adds, e.g. {"token": "Xaraya\\Module\\Tokens\\TokenMiddleware"}.
+     * A route then uses "token" or "token:<args>"; the class receives the args as a constructor parameter named $args.
+     *
+     * @return array<string, string> alias => class implementing MiddlewareInterface
+     */
+    public function middleware(): array
+    {
+        $out = [];
+        foreach ((array) ($this->data['middleware'] ?? []) as $alias => $class) {
+            if (!is_string($alias) || preg_match('/^[a-z][A-Za-z0-9_]*$/D', $alias) !== 1 || !is_string($class) || $class === '') {
+                throw new ModuleException("{$this->name}: middleware must map aliases ([a-z][A-Za-z0-9_]*) to class names");
+            }
+            $out[$alias] = $class;
+        }
+
+        return $out;
+    }
+
     /** @return list<array{subject: string, itemtype: string}> bindings seeded when this (observer) module is enabled */
     public function hookDefaults(): array
     {

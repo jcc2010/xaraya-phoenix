@@ -39,6 +39,12 @@ final class MiddlewareRegistry
         $this->markers[$alias] = true;
     }
 
+    /** True when $alias is registered, as middleware or as a marker. */
+    public function has(string $alias): bool
+    {
+        return isset($this->aliases[$alias]) || isset($this->markers[$alias]);
+    }
+
     public function isMarker(string $spec): bool
     {
         return isset($this->markers[explode(':', $spec, 2)[0]]);

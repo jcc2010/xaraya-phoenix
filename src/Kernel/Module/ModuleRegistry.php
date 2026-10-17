@@ -113,6 +113,7 @@ final class ModuleRegistry
         $manifest->hookDefaults();
         $manifest->blocks();
         $manifest->blockDefaults();
+        $manifest->middleware();
         // Kernel and module migrations run as separate batches so a rollback
         // of the module never takes the kernel tables with it.
         $this->migrator->migrate(['kernel' => $this->kernelMigrations]);

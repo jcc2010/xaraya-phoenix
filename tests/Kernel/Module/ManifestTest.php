@@ -53,6 +53,25 @@ final class ManifestTest extends TestCase
         self::assertSame('Xaraya\\Module\\HelloHooks\\', Manifest::fromDirectory($dir)->namespace());
     }
 
+    public function testReadsMiddlewareAliases(): void
+    {
+        $dir = $this->tempModule('{"name": "mw", "version": "1", "middleware": {"token": "Xaraya\\\\Module\\\\Mw\\\\Token"}}');
+        self::assertSame(['token' => 'Xaraya\\Module\\Mw\\Token'], Manifest::fromDirectory($dir)->middleware());
+        self::assertSame([], Manifest::fromDirectory(self::FIXTURES . '/alpha')->middleware());
+    }
+
+    public function testBadMiddlewareAliasesThrow(): void
+    {
+        foreach (['{"Token": "X"}', '{"to:ken": "X"}', '{"token": ""}', '{"token": 5}', '["X"]'] as $middleware) {
+            try {
+                Manifest::fromDirectory($this->tempModule('{"name": "mw", "version": "1", "middleware": ' . $middleware . '}'))->middleware();
+                self::fail("{$middleware} must be rejected");
+            } catch (ModuleException $e) {
+                self::assertStringContainsString('middleware must map', $e->getMessage());
+            }
+        }
+    }
+
     public function testInvalidJsonThrows(): void
     {
         $this->expectException(ModuleException::class);
