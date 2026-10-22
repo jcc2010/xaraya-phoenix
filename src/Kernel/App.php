@@ -53,6 +53,10 @@ use Xaraya\Kernel\Http\MiddlewareRegistry;
 use Xaraya\Kernel\Http\Pipeline;
 use Xaraya\Kernel\Http\RouteHandler;
 use Xaraya\Kernel\Log\FileLogger;
+use Xaraya\Kernel\Mail\LogMailer;
+use Xaraya\Kernel\Mail\Mailer;
+use Xaraya\Kernel\Mail\MailFunctionMailer;
+use Xaraya\Kernel\Mail\MemoryMailer;
 use Xaraya\Kernel\Module\Manifest;
 use Xaraya\Kernel\Module\ModuleException;
 use Xaraya\Kernel\Module\ModuleRegistry;
@@ -139,6 +143,20 @@ final class App
         ));
         $c->set(Throttle::class, static fn(Container $c): Throttle => new Throttle($c->get(Connection::class)));
         $c->set(ClientIp::class, fn(): ClientIp => new ClientIp(array_values(array_filter((array) $config->get('http.trusted_proxies', []), 'is_string'))));
+        $c->set(Mailer::class, function () use ($config): Mailer {
+            $from = $config->get('mail.from');
+            if (!is_string($from) || $from === '') {
+                $host = parse_url((string) $config->get('app.url', ''), PHP_URL_HOST);
+                $from = 'phoenix@' . (is_string($host) && str_contains($host, '.') ? $host : 'example.invalid');
+            }
+
+            return match ($config->get('mail.driver', 'log')) {
+                'log' => new LogMailer($this->path((string) $config->get('mail.path', 'var/mail')), $from),
+                'mail' => new MailFunctionMailer($from),
+                'memory' => new MemoryMailer(),
+                default => throw new LogicException('mail.driver must be "log", "mail" or "memory"'),
+            };
+        });
         $c->set(EventDispatcher::class, fn(Container $c): EventDispatcher => new EventDispatcher($c));
         $c->set(MiddlewareRegistry::class, function (Container $c): MiddlewareRegistry {
             $registry = new MiddlewareRegistry($c);

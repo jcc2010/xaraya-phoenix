@@ -39,6 +39,13 @@ return [
         'path' => $root . '/public/assets',
         'url' => env('ASSET_URL', '/assets'),
     ],
+    'mail' => [
+        // "log" writes each message to mail.path as an .eml file (development only); "mail" sends with PHP's mail().
+        'driver' => env('MAIL_DRIVER', 'log'),
+        // Empty means phoenix@<host of app.url>, or phoenix@example.invalid when that host has no dot.
+        'from' => env('MAIL_FROM', ''),
+        'path' => $root . '/var/mail',
+    ],
     'session' => [
         'cookie' => env('SESSION_COOKIE', 'xar_session'),
         // Idle minutes before a session expires; expired rows are deleted on about 1 in 100 session writes.
