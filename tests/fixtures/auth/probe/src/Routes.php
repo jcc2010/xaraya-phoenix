@@ -10,6 +10,7 @@ use Psr\Http\Message\ServerRequestInterface;
 use Xaraya\Kernel\Auth\Auth;
 use Xaraya\Kernel\Auth\Session;
 use Xaraya\Kernel\Auth\SessionStore;
+use Xaraya\Kernel\Http\Exception\Forbidden;
 use Xaraya\Kernel\Routing\RouteCollector;
 use Xaraya\Kernel\Routing\RouteProvider;
 use Xaraya\Kernel\View\View;
@@ -30,6 +31,19 @@ final class Routes implements RouteProvider
             [],
             $r->getMethod() === 'GET' ? '<form method="post">' . $this->view->helpers($r)->csrf() . '</form>' : 'ok ' . $r->getMethod(),
         ), 'probe.form');
+        $whoami = fn(): ResponseInterface => new Response(200, [], (string) $this->auth->user()?->handle);
+        $routes->get('/probe/members', $whoami, 'probe.members')->middleware('auth');
+        $routes->get('/probe/members.json', $whoami, 'probe.members.json')->middleware('auth');
+        $routes->post('/probe/members', $whoami, 'probe.members.post')->middleware('auth');
+        $routes->get('/probe/admin', $whoami, 'probe.admin')->middleware('secureHtml', 'auth:probe.secret.admin');
+        $routes->get('/probe/public', $whoami, 'probe.public')->middleware('auth:probe.secret.read');
+        $routes->get('/probe/notes', $whoami, 'probe.notes')->middleware('auth:probe.note.delete');
+        // The controller checks the item itself: the route middleware only asks about the component.
+        $routes->get('/probe/notes/{owner}', function (ServerRequestInterface $r, array $params): ResponseInterface {
+            $this->auth->can('delete', 'probe', 'note', ['id' => 'n1', 'owner_id' => $params['owner']]) || throw new Forbidden();
+
+            return new Response(200, [], 'deleted');
+        }, 'probe.note')->middleware('auth:probe.note.delete');
         $routes->get('/probe/plain', static fn(): ResponseInterface => new Response(200, [], 'plain'), 'probe.plain');
         $routes->get('/probe/count', static function (ServerRequestInterface $r): ResponseInterface {
             $session = self::session($r);
@@ -52,7 +66,7 @@ final class Routes implements RouteProvider
 
             return new Response(204);
         }, 'probe.logout')->middleware('csrf:off');
-        $routes->get('/probe/public', static fn(): ResponseInterface => new Response(200, ['Cache-Control' => 'public, max-age=60'], 'public'), 'probe.public');
+        $routes->get('/probe/shared', static fn(): ResponseInterface => new Response(200, ['Cache-Control' => 'public, max-age=60'], 'public'), 'probe.shared');
         $routes->get('/probe/forget', static function (ServerRequestInterface $r): ResponseInterface {
             self::session($r)->forget('n');
 

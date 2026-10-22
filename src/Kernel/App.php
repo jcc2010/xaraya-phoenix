@@ -41,6 +41,7 @@ use Xaraya\Kernel\Http\Middleware\Authenticate;
 use Xaraya\Kernel\Http\Middleware\ConditionalGet;
 use Xaraya\Kernel\Http\Middleware\Cors;
 use Xaraya\Kernel\Http\Middleware\ErrorHandler;
+use Xaraya\Kernel\Http\Middleware\RequireAuth;
 use Xaraya\Kernel\Http\Middleware\SecureHtml;
 use Xaraya\Kernel\Http\Middleware\SessionMiddleware;
 use Xaraya\Kernel\Http\Middleware\VerifyCsrf;
@@ -138,6 +139,7 @@ final class App
             $registry->register('cors', Cors::class);
             $registry->register('conditional', ConditionalGet::class);
             $registry->register('secureHtml', SecureHtml::class);
+            $registry->register('auth', RequireAuth::class);
             $registry->registerMarker('csrf');
             foreach ($c->get(ModuleRegistry::class)->enabled() as $manifest) {
                 try {

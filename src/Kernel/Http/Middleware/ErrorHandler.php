@@ -66,7 +66,7 @@ final class ErrorHandler implements MiddlewareInterface
         $trace = $this->debug && $status >= 500
             ? $e::class . ' in ' . $e->getFile() . ':' . $e->getLine() . "\n" . $e->getTraceAsString()
             : null;
-        if ($this->wantsJson($request)) {
+        if (self::wantsJson($request)) {
             $error = ['status' => $status, 'message' => $message];
             if ($fields !== []) {
                 $error['fields'] = $fields;
@@ -97,7 +97,8 @@ final class ErrorHandler implements MiddlewareInterface
         return $response;
     }
 
-    private function wantsJson(ServerRequestInterface $request): bool
+    /** Whether errors for $request are answered in JSON: .json and /api paths, or an Accept that prefers JSON. */
+    public static function wantsJson(ServerRequestInterface $request): bool
     {
         $path = strtolower($request->getUri()->getPath());
         // JSON paths and the /api/ prefix always answer in JSON, whatever the Accept header says.
