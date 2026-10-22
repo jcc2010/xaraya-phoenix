@@ -43,6 +43,7 @@ final class PostListTest extends AdminTestCase
 
         $published = self::main($this->both('/admin/blog/notes/posts', 'ada'));
         self::assertStringContainsString('Live one', $published);
+        self::assertStringContainsString('<div class="admin-scroll"><table class="admin-posts">', $published, 'a wide table scrolls on its own');
         self::assertStringNotContainsString('Future one', $published);
         self::assertStringNotContainsString('Gone one', $published);
         self::assertStringContainsString('<a href="/admin/blog/notes/posts" aria-current="page">Published (1)</a>', $published);
@@ -73,10 +74,28 @@ final class PostListTest extends AdminTestCase
         self::assertSame(['COFFEE at noon', 'Coffee notes'], $titles('coffee'));
         self::assertSame(['100% tea'], $titles('%'));
         self::assertSame(['tea_time'], $titles('_'));
+        self::assertSame([], $titles("a\0b"), 'an embedded NUL is dropped, never an error');
+        self::assertSame(200, $browser->get('/admin/blog/notes/posts?q=a%00b')->getStatusCode());
+        self::assertSame(200, $browser->get('/admin/blog/notes/posts?q=%00')->getStatusCode());
         self::assertSame(400, $browser->get('/admin/blog/notes/posts?tab=drafts')->getStatusCode());
         self::assertSame(400, $browser->get('/admin/blog/notes/posts?q[]=x')->getStatusCode());
         self::assertSame(400, $browser->get('/admin/blog/notes/posts?q=' . str_repeat('a', 201))->getStatusCode());
         self::assertSame(404, $browser->get('/admin/blog/nope/posts')->getStatusCode());
+    }
+
+    public function testTitleSearchFindsNonAsciiTitles(): void
+    {
+        $app = $this->site();
+        $this->setUpPosts($app);
+        foreach (['Été à Paris', 'Winter'] as $title) {
+            $this->postAs($app, $this->ada, $this->blog, ['title' => $title, 'content_html' => '<p>x</p>']);
+        }
+        $browser = $this->signIn($app, 'ada');
+        foreach (['Été', 'à Paris'] as $q) {
+            $list = self::main((string) $browser->get('/admin/blog/notes/posts?q=' . rawurlencode($q))->getBody());
+            self::assertStringContainsString('Été à Paris', $list, $q);
+            self::assertStringNotContainsString('Winter', $list, $q);
+        }
     }
 
     public function testBadPagesAre400AndEveryResponseIsNoStore(): void

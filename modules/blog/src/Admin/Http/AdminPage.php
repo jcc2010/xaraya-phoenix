@@ -16,11 +16,28 @@ use Xaraya\Kernel\View\Page;
 /** What every admin screen shares: the title, blog.css, the flash messages, and the redirect after a POST. */
 final class AdminPage
 {
+    /** Titles in flash messages are cut to this many columns. */
+    private const FLASH_TITLE_WIDTH = 80;
+
     public function __construct(private readonly AssetUrls $assets) {}
 
     public static function now(): DateTimeImmutable
     {
         return new DateTimeImmutable('now', new DateTimeZone('UTC'));
+    }
+
+    /** A title shortened for a flash message ("Saved “…”."). */
+    public static function flashTitle(string $title): string
+    {
+        return mb_strimwidth($title, 0, self::FLASH_TITLE_WIDTH, '…');
+    }
+
+    /** @return array<array-key, mixed> the parsed form body, or [] when there is none */
+    public static function body(ServerRequestInterface $request): array
+    {
+        $body = $request->getParsedBody();
+
+        return is_array($body) ? $body : [];
     }
 
     /** @param array<string, mixed> $data body template variables; "flash" is added (and the queue emptied) */

@@ -66,8 +66,7 @@ final class BlogAdminController extends Controller
     public function saveSettings(ServerRequestInterface $request, array $params): ResponseInterface|Page
     {
         $blog = $this->adminBlog($params['handle']);
-        $body = $request->getParsedBody();
-        $body = is_array($body) ? $body : [];
+        $body = AdminPage::body($request);
         $values = self::valuesOf($blog);
         $editable = $blog->isMirror() ? ['post_url_pattern', 'media'] : self::SETTINGS;
         foreach ($editable as $key) {
@@ -121,8 +120,7 @@ final class BlogAdminController extends Controller
     public function createBlog(ServerRequestInterface $request): ResponseInterface|Page
     {
         $this->access->canAdminBlogs() || throw new Forbidden();
-        $body = $request->getParsedBody();
-        $body = is_array($body) ? $body : [];
+        $body = AdminPage::body($request);
         $values = ['handle' => '', 'title' => ''];
         foreach ($values as $key => $_) {
             $values[$key] = is_string($body[$key] ?? null) ? trim($body[$key]) : '';
@@ -157,7 +155,7 @@ final class BlogAdminController extends Controller
                 return $this->page->done(
                     $request,
                     $this->urls->generate('admin.blog.posts', ['handle' => $blog->handle]),
-                    'Created blog “' . mb_strimwidth($blog->title, 0, 80, '…') . '”.',
+                    'Created blog “' . AdminPage::flashTitle($blog->title) . '”.',
                 );
             } catch (InvalidArgumentException $e) {
                 [$errors, $formErrors] = self::fieldError($e->getMessage());

@@ -78,6 +78,8 @@ final class MirrorTest extends AdminTestCase
         $root = $this->signIn($app, 'root');
         $list = (string) $root->get('/admin/blog/mirror/posts')->getBody();
         self::assertMatchesRegularExpression('~<form[^>]*method="post"[^>]*action="/admin/blog/mirror/sync"[^>]*>.*?name="_csrf".*?Sync now.*?</form>~s', $list);
+        self::assertMatchesRegularExpression('~<div class="admin-actions">\s*<form[^>]*action="/admin/blog/mirror/sync"~', $list, 'a <form> never sits in a <p>, which the parser would break');
+        self::assertStringNotContainsString('<p class="admin-actions">', $list);
         $response = $root->post('/admin/blog/mirror/sync');
         self::assertSame(303, $response->getStatusCode());
         self::assertSame('/admin/blog/mirror/posts', $response->getHeaderLine('Location'));

@@ -20,7 +20,8 @@
 </p>
 <p class="admin-field">
 <label for="blog-description-html">{{ t('Description (HTML)') }}</label>
-<textarea id="blog-description-html" name="description_html" rows="6"{% if errors.description_html is defined %} aria-invalid="true" aria-describedby="blog-description-html-error"{% endif %}{% if mirror and 'description_html' in synced %} disabled{% endif %}>{{ values.description_html }}</textarea>
+<textarea id="blog-description-html" name="description_html" rows="6"{% if errors.description_html is defined %} aria-invalid="true" aria-describedby="blog-description-html-error"{% endif %}{% if mirror and 'description_html' in synced %} disabled{% endif %}>
+{{ values.description_html }}</textarea>
 {{ render('blog::admin/field-error', {id: 'blog-description-html', error: errors.description_html ?? null}) }}
 </p>
 <p class="admin-field">

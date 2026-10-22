@@ -1,15 +1,19 @@
+{# preview: an admin preview, with no links to the post's (not yet real) URL and an <h2> title #}
+{% set preview = preview|default(false) %}
 <article class="post post-{{ post.kind }}{{ post.pinned ? ' post-pinned' : '' }}">
 {% if post.pinned %}
 <p class="post-pinned-label">{{ t('Pinned') }}</p>
 {% endif %}
 {% if post.kind != 'link' %}
-{% if full %}
+{% if preview %}
+<h2 class="post-title">{{ post.title }}</h2>
+{% elseif full %}
 <h1 class="post-title">{{ post.title }}</h1>
 {% else %}
 <h2 class="post-title"><a href="{{ post.url }}">{{ post.title }}</a></h2>
 {% endif %}
 {% endif %}
-{{ render('blog::partials/kinds/' ~ post.kind, {post: post, full: full}) }}
+{{ render('blog::partials/kinds/' ~ post.kind, {post: post, full: full, preview: preview}) }}
 {% if post.video is not null %}
 {{ render('blog::partials/extras/video', {video: post.video}) }}
 {% endif %}
@@ -20,7 +24,11 @@
 {{ render('blog::partials/extras/song', {song: post.song}) }}
 {% endif %}
 <footer class="post-footer">
+{% if preview %}
+<p class="post-meta"><time datetime="{{ post.publishedIso }}">{{ post.publishedDisplay }}</time></p>
+{% else %}
 <p class="post-meta"><a class="post-permalink" href="{{ post.url }}"><time datetime="{{ post.publishedIso }}">{{ post.publishedDisplay }}</time></a></p>
+{% endif %}
 {% if post.tags is not empty %}
 {{ render('blog::partials/extras/tags', {tags: post.tags}) }}
 {% endif %}

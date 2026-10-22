@@ -3,7 +3,7 @@
 {% if blogs is empty %}
 <p class="admin-empty">{{ t('No blogs yet.') }}</p>
 {% else %}
-<table class="admin-blogs">
+<div class="admin-scroll"><table class="admin-blogs">
 <thead><tr><th scope="col">{{ t('Blog') }}</th><th scope="col">{{ t('Mode') }}</th><th scope="col">{{ t('Posts') }}</th><th scope="col">{{ t('Actions') }}</th></tr></thead>
 <tbody>
 {% for b in blogs %}
@@ -20,7 +20,7 @@
 </tr>
 {% endfor %}
 </tbody>
-</table>
+</table></div>
 {% endif %}
 {% if newBlogUrl %}
 <p><a href="{{ newBlogUrl }}">{{ t('New blog') }}</a></p>

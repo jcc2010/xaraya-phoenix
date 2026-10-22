@@ -185,7 +185,7 @@ final class ImageUploadTest extends AdminTestCase
         ]);
         $html = $this->both('/admin/blog/post/' . $post->id, 'ada');
         self::assertStringContainsString('<form class="admin-form" method="post" action="/admin/blog/post/' . $post->id . '" enctype="multipart/form-data">', $html);
-        self::assertStringContainsString('<img class="admin-image" src="https://cdn.test/1.png" alt="">', $html);
+        self::assertStringContainsString('<img class="admin-image" src="https://cdn.test/1.png" alt="Current image">', $html);
         self::assertStringContainsString('id="post-remove-image" name="remove_image" type="checkbox" value="1"', $html);
         self::assertStringNotContainsString('name="upload_id"', $html);
 
@@ -221,7 +221,7 @@ final class ImageUploadTest extends AdminTestCase
         $main = self::main($html['php']);
         self::assertStringContainsString('enctype="multipart/form-data"', $main);
         self::assertStringContainsString('<label for="post-file">Image</label>', $main);
-        self::assertStringContainsString('<img class="admin-image" src="http://xar.test/media/ULID.png" alt=""><input type="hidden" name="upload_id" value="ULID">', $main);
+        self::assertStringContainsString('<img class="admin-image" src="http://xar.test/media/ULID.png" alt="Current image"><input type="hidden" name="upload_id" value="ULID">', $main);
         self::assertStringNotContainsString('name="remove_image"', $main, 'a new post has nothing to remove');
 
         // A preview with a file shows the notice the same way in both engines.

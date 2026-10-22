@@ -159,6 +159,12 @@ final class PhoenixThemeTest extends AppTestCase
         self::assertStringNotContainsString('url(http', $css);
     }
 
+    public function testMainSpansTheFullWidthWhenThereIsNoSidebar(): void
+    {
+        $css = (string) file_get_contents($this->theme() . '/assets/phoenix.css');
+        self::assertStringContainsString('.site-main:only-child { grid-column: 1 / -1; }', $css);
+    }
+
     public function testAModuleCanClaimTheHomeRoute(): void
     {
         Fixtures::module($this->tmp . '/modules', 'front', ['routes' => 'Xaraya\\Module\\Front\\Routes'], ['src/Routes.php' => <<<'PHP'

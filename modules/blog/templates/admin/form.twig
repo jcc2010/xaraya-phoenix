@@ -25,7 +25,8 @@
 </p>
 <p class="admin-field">
 <label for="post-content">{{ t('Content (HTML)') }}</label>
-<textarea id="post-content" name="content" rows="12"{% if errors.content is defined %} aria-invalid="true" aria-describedby="post-content-error"{% endif %}>{{ values.content }}</textarea>
+<textarea id="post-content" name="content" rows="12"{% if errors.content is defined %} aria-invalid="true" aria-describedby="post-content-error"{% endif %}>
+{{ values.content }}</textarea>
 {{ render('blog::admin/field-error', {id: 'post-content', error: errors.content ?? null}) }}
 </p>
 <p class="admin-field">
@@ -35,7 +36,8 @@
 </p>
 <p class="admin-field">
 <label for="post-quote">{{ t('Quote') }}</label>
-<textarea id="post-quote" name="quote" rows="4"{% if errors.quote is defined %} aria-invalid="true" aria-describedby="post-quote-error"{% endif %}>{{ values.quote }}</textarea>
+<textarea id="post-quote" name="quote" rows="4"{% if errors.quote is defined %} aria-invalid="true" aria-describedby="post-quote-error"{% endif %}>
+{{ values.quote }}</textarea>
 {{ render('blog::admin/field-error', {id: 'post-quote', error: errors.quote ?? null}) }}
 </p>
 <p class="admin-field">
@@ -63,7 +65,7 @@
 <p class="admin-field">
 <label for="post-file">{{ t('Image') }}</label>
 {% if image is not null %}
-<img class="admin-image" src="{{ image.url }}" alt="">
+<img class="admin-image" src="{{ image.url }}" alt="{{ t('Current image') }}">
 {% if image.uploadId is not null %}
 <input type="hidden" name="upload_id" value="{{ image.uploadId }}">
 {% endif %}
@@ -90,6 +92,6 @@
 </form>
 {% if preview is not null %}
 <section class="admin-preview" aria-labelledby="preview-heading"><h2 id="preview-heading">{{ t('Preview') }}</h2>
-{{ render('blog::partials/post', {post: preview, full: true}) }}
+{{ render('blog::partials/post', {post: preview, full: true, preview: true}) }}
 </section>
 {% endif %}

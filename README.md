@@ -120,7 +120,8 @@ refused) and cannot contain a NUL character. Changing a password ends that user'
   are built from it; without it the `/password/*` pages answer 500. A failure to send is logged and the page answers
   as usual.
 
-Migrations: `Schema::table()` can add a foreign key, but only on a new nullable column added by the same call.
+Migrations: `Schema::table()` can add a foreign key, but only on a new nullable column without a default, added by
+the same call.
 
 **Upgrading an install that has no users yet** (one that predates sign-in): run `bin/xar install`. It runs the new
 migrations, seeds the roles and the grants of the enabled modules, and creates the administrator; nothing else
@@ -215,6 +216,14 @@ Pinning a post needs Editor (edit on `blog · blog`). Blog settings and new blog
 
 Posts have an owner, `owner_id`: the signed-in user who created the post in the admin, or the user a token acts as for
 the JSON API and Micropub. It decides which posts an Author may change. It never appears in the JSON or RSS feeds.
+Posts created before ownership existed (synced, imported or written by a scope-only token) have no owner, so only
+Editors and Administrators can manage them; an Author's "own" grant never matches an ownerless post. There is no
+backfill command yet.
+
+The same per-post rules hold for a token that acts as a user (`token:create --user=<handle>`): its JSON API
+`PUT`/`PATCH` and Micropub `action=update` need edit on that post, and `DELETE`, undelete and Micropub
+`action=delete`/`undelete` need delete on it, exactly as in the admin; otherwise the answer is a 403. A scope-only
+token (no `--user`) is not checked per post (see below).
 
 The post form covers:
 
@@ -252,7 +261,11 @@ deletes one. A token made with `--blog` can only write to that blog (the pin is 
 enabled; the `tokens` module no longer requires blog). A token made with `--user=<handle>` acts as that user (route
 checks and `can()` use the user's roles) and is refused (401) once the user is disabled or deleted; a token without a
 user acts as a guest, only through its scopes. A token's scopes decide which token routes it may call; `can()`
-applies only where a controller calls it. Modules add scopes with `"scopes": ["<module>:<name>"]` in `module.json`
+applies only where a controller calls it. Changing an existing post is one such place: a token with a user may
+replace, patch, delete or undelete a post (JSON API or Micropub) only if that user could in the admin (edit for
+replace, patch and update; delete for delete and undelete), so an Author's token is refused (403) on someone else's
+post. A token without a user is checked only for its scope and blog pin, and may change any post of the blogs it
+reaches. Modules add scopes with `"scopes": ["<module>:<name>"]` in `module.json`
 (the hello example declares `hello:write`). A request authenticated by a token never creates or saves a session (no
 cookie) and its response is sent with `Cache-Control: private, no-store`. Send it as `Authorization: Bearer xar_…`;
 a token in a query string is ignored. On a route, `token:` must come before `auth` or `auth:…`, because the token

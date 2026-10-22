@@ -28,8 +28,6 @@ use Xaraya\Module\Blog\Write\PostWriter;
  */
 final class PostActionsController extends Controller
 {
-    private const FLASH_TITLE_WIDTH = 80;
-
     public function __construct(
         private readonly BlogRepository $blogs,
         private readonly PostRepository $posts,
@@ -48,7 +46,7 @@ final class PostActionsController extends Controller
             $this->blogs->update($blog, ['pinned_item_id' => null], AdminPage::now());
         }
 
-        return $this->page->done($request, $this->listUrl($request, $blog), 'Deleted “' . self::flashTitle($deleted) . '”.');
+        return $this->page->done($request, $this->listUrl($request, $blog), 'Deleted “' . AdminPage::flashTitle($deleted->title) . '”.');
     }
 
     /** @param array<string, string> $params */
@@ -57,7 +55,7 @@ final class PostActionsController extends Controller
         [$blog, $post] = $this->target($params['id']);
         $restored = $this->writer->undelete($post);
 
-        return $this->page->done($request, $this->listUrl($request, $blog), 'Restored “' . self::flashTitle($restored) . '”.');
+        return $this->page->done($request, $this->listUrl($request, $blog), 'Restored “' . AdminPage::flashTitle($restored->title) . '”.');
     }
 
     /** @return array{0: Blog, 1: Post} */
@@ -74,8 +72,7 @@ final class PostActionsController extends Controller
     /** The posts list of $blog with the posted tab (a known one other than the default) and page (above 1). */
     private function listUrl(ServerRequestInterface $request, Blog $blog): string
     {
-        $body = $request->getParsedBody();
-        $body = is_array($body) ? $body : [];
+        $body = AdminPage::body($request);
         $tab = $body['tab'] ?? null;
         $page = Paging::pageNumber($body['page'] ?? null);
         $query = [];
@@ -87,10 +84,5 @@ final class PostActionsController extends Controller
         }
 
         return $this->urls->generate('admin.blog.posts', ['handle' => $blog->handle] + $query);
-    }
-
-    private static function flashTitle(Post $post): string
-    {
-        return mb_strimwidth($post->title, 0, self::FLASH_TITLE_WIDTH, '…');
     }
 }

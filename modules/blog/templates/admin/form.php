@@ -30,7 +30,8 @@ $error = static fn(string $name, string $id): string => $x->render('blog::admin/
 </p>
 <p class="admin-field">
 <label for="post-content"><?= $x->e($x->t('Content (HTML)')) ?></label>
-<textarea id="post-content" name="content" rows="12"<?= $aria('content', 'post-content') ?>><?= $x->e($values['content']) ?></textarea>
+<textarea id="post-content" name="content" rows="12"<?= $aria('content', 'post-content') ?>>
+<?= $x->e($values['content']) ?></textarea>
 <?= $error('content', 'post-content') ?>
 </p>
 <p class="admin-field">
@@ -40,7 +41,8 @@ $error = static fn(string $name, string $id): string => $x->render('blog::admin/
 </p>
 <p class="admin-field">
 <label for="post-quote"><?= $x->e($x->t('Quote')) ?></label>
-<textarea id="post-quote" name="quote" rows="4"<?= $aria('quote', 'post-quote') ?>><?= $x->e($values['quote']) ?></textarea>
+<textarea id="post-quote" name="quote" rows="4"<?= $aria('quote', 'post-quote') ?>>
+<?= $x->e($values['quote']) ?></textarea>
 <?= $error('quote', 'post-quote') ?>
 </p>
 <p class="admin-field">
@@ -68,7 +70,7 @@ $error = static fn(string $name, string $id): string => $x->render('blog::admin/
 <p class="admin-field">
 <label for="post-file"><?= $x->e($x->t('Image')) ?></label>
 <?php if ($image !== null): ?>
-<img class="admin-image" src="<?= $x->e($image['url']) ?>" alt="">
+<img class="admin-image" src="<?= $x->e($image['url']) ?>" alt="<?= $x->e($x->t('Current image')) ?>">
 <?php if ($image['uploadId'] !== null): ?>
 <input type="hidden" name="upload_id" value="<?= $x->e($image['uploadId']) ?>">
 <?php endif ?>
@@ -95,6 +97,6 @@ $error = static fn(string $name, string $id): string => $x->render('blog::admin/
 </form>
 <?php if ($preview !== null): ?>
 <section class="admin-preview" aria-labelledby="preview-heading"><h2 id="preview-heading"><?= $x->e($x->t('Preview')) ?></h2>
-<?= $x->render('blog::partials/post', ['post' => $preview, 'full' => true]) ?>
+<?= $x->render('blog::partials/post', ['post' => $preview, 'full' => true, 'preview' => true]) ?>
 </section>
 <?php endif ?>

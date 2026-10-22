@@ -9,12 +9,15 @@ be fixed by the final review instead of waiting here.
 - Mode switching and mirror creation stay on `bin/xar blog:mode` and `bin/xar blog:create`.
 - Authors see every post in the published tab (they can already read them publicly) and act only on their own.
 - The pin is per blog and needs `edit` on `blog · blog`, so Authors cannot pin.
-- Mirror blogs' source-set fields are read-only in settings; a sync still overwrites them.
+- Mirror blogs' source-set fields are read-only so edits can't be lost; the form cannot change them.
 - The spec's open questions remain open.
 
 ## Data and migration
 
 - The owner migration has no `down()`, and re-running it after a manual rollback fails.
+- **Owner backfill CLI.** Posts that predate ownership (or come from a scope-only token or a sync) have no owner, so
+  only Editors and Administrators can manage them. Add `bin/xar blog:owner <handle> --user=<handle>` (optionally
+  limited to ownerless posts or an id list) to assign one.
 - No `replace()` owner pin; no Micropub owner test; PostApiTest mixes container handles; no migration-level test that
   real posts, `post_tags` and `post_search` survive the owner migration.
 - Tag names cannot contain commas in the form.
@@ -26,24 +29,19 @@ be fixed by the final review instead of waiting here.
 
 ## Search and lists
 
-- **Final wave candidate:** admin title search misses non-ASCII titles on SQLite and PG-C, because `LOWER()` is
-  ASCII-only there. Add an unfolded `LIKE` OR.
+- Admin title search matches non-ASCII titles only as typed on SQLite and PG-C (`LOWER()` is ASCII-only there, so an
+  unfolded `LIKE` is OR-ed in): "Été" finds "Été", but "été" does not.
 - Untested: the dashboard Posts link and a page past the end. `COUNT` runs redundantly when `q` is empty.
 - No unit test for `Paging::pageNumber`.
 
 ## Post form
 
-All **final wave candidates**:
-
-- The textarea drops a leading newline (emit a newline after `<textarea>`).
 - A kind that is always sent, or a trimmed title, causes a false "Saved".
 - A post with only `content_text` shows an empty content box.
-- The preview of a new post links to a permalink that 404s (suppress it).
-- The 403 GET test does not check the body.
+- The preview still links its tags to the public tag pages, which leaves the form (the permalink is gone).
 
-From the image upload (final wave or here):
+From the image upload:
 
-- The attached image renders with `alt=""`, which hides it from screen readers.
 - No test for a non-existent or malformed `upload_id`.
 - The remove box is shown with a carried upload.
 
@@ -66,3 +64,9 @@ Other:
 - `DashboardController` re-evaluates `canCreate` and `canAdminBlogs` per blog.
 - A tautological `item()` assertion inside the Forbidden catch in the AdminAccess test.
 - The mode sentence in settings is split into two translatable fragments.
+- **Consolidate the controller helpers.** The admin controllers each still carry their own `nativeBlog()`/`target()`
+  style loaders and 404/403 ordering, and the JSON API and Micropub each locate a post their own way; one shared
+  "post for a write" helper (load, pin, item check, mirror check) would keep the rules in one place. `flashTitle()` and
+  the form-body parsing are already shared on `AdminPage`.
+- **CSS.** The admin tables scroll sideways on narrow screens rather than reflowing; a card layout below ~40rem would
+  read better. The admin stylesheet hard-codes its border colours instead of using the theme's `--border`.

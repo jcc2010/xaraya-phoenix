@@ -4,7 +4,7 @@
 <p class="admin-mirror-note"><?= $x->e($x->t('Mirror of')) ?> <?= $x->e($blog['sourceUrl']) ?>; <?= $x->e($x->t('edits come from the source.')) ?></p>
 <?php endif ?>
 <?php if ($actions !== []): ?>
-<p class="admin-actions"><?= $x->render('blog::admin/actions', ['actions' => $actions]) ?></p>
+<div class="admin-actions"><?= $x->render('blog::admin/actions', ['actions' => $actions]) ?></div>
 <?php endif ?>
 <nav class="admin-tabs" aria-label="<?= $x->e($x->t('Post status')) ?>">
 <?php foreach ($tabs as $tb): ?>
@@ -20,7 +20,7 @@
 <?php if ($rows === []): ?>
 <p class="admin-empty"><?= $x->e($x->t('No posts.')) ?></p>
 <?php else: ?>
-<table class="admin-posts">
+<div class="admin-scroll"><table class="admin-posts">
 <thead><tr><th scope="col"><?= $x->e($x->t('Title')) ?></th><th scope="col"><?= $x->e($x->t('Owner')) ?></th><th scope="col"><?= $x->e($x->t('Date')) ?></th><th scope="col"><?= $x->e($x->t('Status')) ?></th><th scope="col"><?= $x->e($x->t('Actions')) ?></th></tr></thead>
 <tbody>
 <?php foreach ($rows as $row): ?>
@@ -33,6 +33,6 @@
 </tr>
 <?php endforeach ?>
 </tbody>
-</table>
+</table></div>
 <?php endif ?>
 <?= $x->render('blog::partials/pager', ['pager' => $pager]) ?>

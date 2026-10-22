@@ -56,7 +56,8 @@ final class PostListController extends Controller
         if (!is_string($q) || mb_strlen($q) > self::MAX_QUERY_LENGTH) {
             throw new HttpException(400, 'Invalid search query');
         }
-        $q = trim(mb_scrub($q, 'UTF-8'));
+        // Scrub bad UTF-8 and drop NUL bytes, which some drivers cut the bound LIKE pattern at.
+        $q = trim(str_replace("\0", '', mb_scrub($q, 'UTF-8')));
         $pageNo = Paging::page($request);
 
         $now = AdminPage::now();

@@ -73,7 +73,9 @@ final class PostEditTest extends AdminTestCase
             $html = (string) $response->getBody();
             $preview = (string) strstr($html, '<section class="admin-preview"');
             self::assertStringContainsString('<p>Shown</p>', $preview, $path);
-            self::assertStringContainsString('<h1 class="post-title">After</h1>', $preview, $path);
+            self::assertStringContainsString('<h2 class="post-title">After</h2>', $preview, $path);
+            self::assertSame(1, substr_count(self::main($html), '<h1'), "{$path}: the preview's title is not a second <h1>");
+            self::assertStringNotContainsString('post-permalink', $preview, "{$path}: the preview links nowhere that would lose the input");
             foreach (['<script', 'onerror', 'javascript:'] as $needle) {
                 self::assertStringNotContainsString($needle, $preview, "{$path}: {$needle}");
             }
@@ -107,6 +109,66 @@ final class PostEditTest extends AdminTestCase
         self::assertStringContainsString('<h2 id="preview-heading">Preview</h2>', $preview);
         self::assertStringContainsString('&quot;&gt;&lt;b&gt;t&lt;/b&gt;', $preview, 'the title is escaped');
         self::assertStringNotContainsString('<script', $preview);
+        self::assertStringContainsString('<h2 class="post-title">&quot;&gt;&lt;b&gt;t&lt;/b&gt;</h2>', $preview);
+        self::assertStringNotContainsString('post-permalink', $preview);
+        self::assertStringNotContainsString('href="/s/', $preview);
+    }
+
+    public function testAPreviewOfALinkWithoutAUrlLinksNowhere(): void
+    {
+        $app = $this->site();
+        $this->nativeBlog($app);
+        $this->user($app, 'ada', ['Authors']);
+        $html = [];
+        foreach (['php', 'twig'] as $engine) {
+            $browser = $this->signIn($this->site($engine), 'ada');
+            $browser->get('/admin/blog/notes/posts/new');
+            $response = $browser->post('/admin/blog/notes/posts/new', ['kind' => 'link', 'title' => 'Somewhere', 'content' => '<p>c</p>', 'date_published' => '2026-10-01T09:30', 'preview' => '1']);
+            self::assertSame(200, $response->getStatusCode(), $engine);
+            $html[$engine] = Html::normalize(preg_replace('/name="_csrf" value="[^"]*"/', 'name="_csrf" value=""', $browser->body()) ?? '');
+        }
+        self::assertSame($html['php'], $html['twig']);
+        $preview = (string) strstr(self::main($html['php']), '<section class="admin-preview"');
+        self::assertStringContainsString('<h2 class="post-title">Somewhere</h2>', $preview);
+        self::assertStringNotContainsString('href="/s/', $preview);
+        self::assertStringNotContainsString('post-permalink', $preview);
+    }
+
+    public function testALeadingNewlineSurvivesTheTextareaAndAnUnchangedSaveWritesNothing(): void
+    {
+        $app = $this->site();
+        $blog = $this->nativeBlog($app);
+        $ada = $this->user($app, 'ada', ['Authors']);
+        $post = $this->postAs($app, $ada, $blog, ['title' => 'Lead', 'content_html' => "\n<p>Body</p>"]);
+        self::assertSame("\n<p>Body</p>", $this->posts($app)->find($post->id)?->contentHtml, 'the writer keeps the newline');
+        $this->both('/admin/blog/post/' . $post->id, 'ada');
+        foreach (['php', 'twig'] as $engine) {
+            $raw = (string) $this->signIn($this->site($engine), 'ada')->get('/admin/blog/post/' . $post->id)->getBody();
+            self::assertStringContainsString('rows="12">' . "\n\n&lt;p&gt;Body&lt;/p&gt;</textarea>", $raw, $engine);
+        }
+
+        $browser = $this->signIn($app, 'ada');
+        $page = (string) $browser->get('/admin/blog/post/' . $post->id)->getBody();
+        $fields = ['kind' => 'note', 'title' => 'Lead', 'content' => self::textarea($page, 'post-content'), 'quote' => self::textarea($page, 'post-quote'), 'date_published' => $post->datePublished->format('Y-m-d\\TH:i'), 'save' => '1'];
+        self::assertSame("\r\n<p>Body</p>", $fields['content'], 'what a browser submits');
+        self::assertSame(303, $browser->post('/admin/blog/post/' . $post->id, $fields)->getStatusCode());
+        self::assertStringContainsString('No changes.', (string) $browser->get('/admin/blog/post/' . $post->id)->getBody());
+        $after = $this->posts($app)->find($post->id);
+        self::assertSame("\n<p>Body</p>", $after?->contentHtml);
+        self::assertEquals($post->updatedAt, $after?->updatedAt);
+    }
+
+    /**
+     * The value a browser submits for a textarea: HTML parsing drops one newline straight after the start tag
+     * (HTML spec, "in body" insertion mode), and form submission normalises line breaks to CRLF.
+     */
+    private static function textarea(string $html, string $id): string
+    {
+        self::assertSame(1, preg_match('~<textarea id="' . preg_quote($id, '~') . '"[^>]*>(.*?)</textarea>~s', $html, $m), $id);
+        $value = html_entity_decode($m[1], ENT_QUOTES | ENT_HTML5, 'UTF-8');
+        $value = str_starts_with($value, "\n") ? substr($value, 1) : $value;
+
+        return (string) preg_replace('~\r\n|\r|\n~', "\r\n", $value);
     }
 
     public function testAnAuthorCannotOpenPreviewOrSaveSomeoneElsesPost(): void
@@ -116,7 +178,9 @@ final class PostEditTest extends AdminTestCase
         $ada = $this->user($app, 'ada', ['Authors']);
         $bobs = $this->postAs($app, $this->user($app, 'bob', ['Authors']), $blog, ['title' => 'Bob’s', 'content_html' => '<p>b</p>']);
         $browser = $this->signIn($app, 'ada');
-        self::assertSame(403, $browser->get('/admin/blog/post/' . $bobs->id)->getStatusCode());
+        $refused = $browser->get('/admin/blog/post/' . $bobs->id);
+        self::assertSame(403, $refused->getStatusCode());
+        self::assertStringNotContainsString('Bob’s', (string) $refused->getBody(), 'the refusal shows nothing of the post');
         foreach (['save', 'preview'] as $button) {
             $token = $this->token($browser);
             $response = $browser->post('/admin/blog/post/' . $bobs->id, ['_csrf' => $token, 'kind' => 'note', 'title' => 'Hijacked', 'content' => '<p>x</p>', $button => '1']);

@@ -40,7 +40,7 @@ final class Schema
         foreach ($blueprint->foreignKeys as $fk) {
             $column = $added[$fk['column']] ?? null;
             if ($column === null || !$column->nullable || $column->hasDefault) {
-                throw new LogicException('Schema::table() can only add a foreign key on a new nullable column');
+                throw new LogicException('Schema::table() can only add a foreign key on a new nullable column without a default');
             }
         }
         if ($blueprint->primary !== [] || array_filter($blueprint->columns, fn(Column $c): bool => $c->primary) !== []) {

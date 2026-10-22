@@ -1,5 +1,7 @@
 {% set href = post.externalUrl ?? post.url %}
-{% if full %}
+{% if preview|default(false) %}
+<h2 class="post-title">{% if post.externalUrl is not null %}<a href="{{ href }}" rel="nofollow noopener">{{ post.title }}</a>{% else %}{{ post.title }}{% endif %}</h2>
+{% elseif full %}
 <h1 class="post-title"><a href="{{ href }}"{% if post.externalUrl is not null %} rel="nofollow noopener"{% endif %}>{{ post.title }}</a></h1>
 {% else %}
 <h2 class="post-title"><a href="{{ href }}"{% if post.externalUrl is not null %} rel="nofollow noopener"{% endif %}>{{ post.title }}</a></h2>

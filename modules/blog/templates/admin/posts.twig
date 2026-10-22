@@ -4,7 +4,7 @@
 <p class="admin-mirror-note">{{ t('Mirror of') }} {{ blog.sourceUrl }}; {{ t('edits come from the source.') }}</p>
 {% endif %}
 {% if actions is not empty %}
-<p class="admin-actions">{{ render('blog::admin/actions', {actions: actions}) }}</p>
+<div class="admin-actions">{{ render('blog::admin/actions', {actions: actions}) }}</div>
 {% endif %}
 <nav class="admin-tabs" aria-label="{{ t('Post status') }}">
 {% for tb in tabs %}
@@ -20,7 +20,7 @@
 {% if rows is empty %}
 <p class="admin-empty">{{ t('No posts.') }}</p>
 {% else %}
-<table class="admin-posts">
+<div class="admin-scroll"><table class="admin-posts">
 <thead><tr><th scope="col">{{ t('Title') }}</th><th scope="col">{{ t('Owner') }}</th><th scope="col">{{ t('Date') }}</th><th scope="col">{{ t('Status') }}</th><th scope="col">{{ t('Actions') }}</th></tr></thead>
 <tbody>
 {% for row in rows %}
@@ -33,6 +33,6 @@
 </tr>
 {% endfor %}
 </tbody>
-</table>
+</table></div>
 {% endif %}
 {{ render('blog::partials/pager', {pager: pager}) }}

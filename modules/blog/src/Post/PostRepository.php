@@ -158,8 +158,9 @@ final class PostRepository
             $params[] = $ownerId;
         }
         if ($title !== '') {
-            $where[] = "LOWER(title) LIKE ? ESCAPE '!'";
-            $params[] = '%' . LikeSearchIndex::escapeLike(mb_strtolower($title)) . '%';
+            // SQLite's LOWER() folds only ASCII, so also match the query as typed ("Été" finds "Été").
+            $where[] = "(LOWER(title) LIKE ? ESCAPE '!' OR title LIKE ? ESCAPE '!')";
+            array_push($params, '%' . LikeSearchIndex::escapeLike(mb_strtolower($title)) . '%', '%' . LikeSearchIndex::escapeLike($title) . '%');
         }
         $from = 'FROM {posts} WHERE ' . implode(' AND ', $where);
         $rows = $this->db->fetchAll(

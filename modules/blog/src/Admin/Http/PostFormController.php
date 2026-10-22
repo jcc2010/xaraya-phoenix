@@ -46,8 +46,6 @@ use Xaraya\Module\Blog\Write\PostWriter;
  */
 final class PostFormController extends Controller
 {
-    private const FLASH_TITLE_WIDTH = 80;
-
     private const PREVIEW_NOTICE = 'Images are uploaded when you save, not on Preview: choose the file again before saving.';
 
     public function __construct(
@@ -77,8 +75,7 @@ final class PostFormController extends Controller
     public function create(ServerRequestInterface $request, array $params): ResponseInterface|Page
     {
         $blog = $this->nativeBlog($params['handle']);
-        $body = $request->getParsedBody();
-        $body = is_array($body) ? $body : [];
+        $body = AdminPage::body($request);
         $form = PostForm::fromInput($body);
         $timezone = $this->timezone();
         $preview = self::isPreview($body);
@@ -112,7 +109,7 @@ final class PostFormController extends Controller
         $scheduled = $post->datePublished > AdminPage::now();
         $location = $this->urls->generate('admin.blog.posts', ['handle' => $blog->handle] + ($scheduled ? ['tab' => 'scheduled'] : []));
 
-        return $this->page->done($request, $location, 'Created “' . self::flashTitle($post) . '”.');
+        return $this->page->done($request, $location, 'Created “' . AdminPage::flashTitle($post->title) . '”.');
     }
 
     /** @param array<string, string> $params */
@@ -127,8 +124,7 @@ final class PostFormController extends Controller
     public function update(ServerRequestInterface $request, array $params): ResponseInterface|Page
     {
         [$blog, $post] = $this->editable($params['id']);
-        $body = $request->getParsedBody();
-        $body = is_array($body) ? $body : [];
+        $body = AdminPage::body($request);
         $form = PostForm::fromInput($body);
         $timezone = $this->timezone();
         $preview = self::isPreview($body);
@@ -159,7 +155,7 @@ final class PostFormController extends Controller
         }
         $pinChanged = $this->access->canPin() && $this->savePin($blog, $post, $form->pinned);
         // PostWriter::patch() hands back the very same object when the patch changed nothing.
-        $message = $result === $post && !$pinChanged ? 'No changes.' : 'Saved “' . self::flashTitle($result) . '”.';
+        $message = $result === $post && !$pinChanged ? 'No changes.' : 'Saved “' . AdminPage::flashTitle($result->title) . '”.';
 
         return $this->page->done($request, $this->urls->generate('admin.blog.post.edit', ['id' => $post->id]), $message);
     }
@@ -279,11 +275,6 @@ final class PostFormController extends Controller
     private static function isPreview(array $body): bool
     {
         return is_string($body['preview'] ?? null) && $body['preview'] !== '';
-    }
-
-    private static function flashTitle(Post $post): string
-    {
-        return mb_strimwidth($post->title, 0, self::FLASH_TITLE_WIDTH, '…');
     }
 
     /** A native blog; a mirror's posts come from its source, so it has no post form (409). */

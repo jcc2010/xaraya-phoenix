@@ -24,7 +24,8 @@ $error = static fn(string $name, string $id): string => $x->render('blog::admin/
 </p>
 <p class="admin-field">
 <label for="blog-description-html"><?= $x->e($x->t('Description (HTML)')) ?></label>
-<textarea id="blog-description-html" name="description_html" rows="6"<?= $aria('description_html', 'blog-description-html') ?><?= $mirror && in_array('description_html', $synced, true) ? ' disabled' : '' ?>><?= $x->e($values['description_html']) ?></textarea>
+<textarea id="blog-description-html" name="description_html" rows="6"<?= $aria('description_html', 'blog-description-html') ?><?= $mirror && in_array('description_html', $synced, true) ? ' disabled' : '' ?>>
+<?= $x->e($values['description_html']) ?></textarea>
 <?= $error('description_html', 'blog-description-html') ?>
 </p>
 <p class="admin-field">

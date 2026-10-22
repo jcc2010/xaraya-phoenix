@@ -123,6 +123,18 @@ final class BlogSettingsTest extends AdminTestCase
         self::assertStringNotContainsString('<i>x', $new['php']);
     }
 
+    public function testTheDescriptionTextareaKeepsALeadingNewline(): void
+    {
+        $this->nativeBlog($this->site(), ['description_html' => "\n<p>Hi</p>"]);
+        $this->user($this->site(), 'root', ['Administrators']);
+        foreach (['php', 'twig'] as $engine) {
+            $browser = $this->signIn($this->site($engine), 'root');
+            $body = (string) $browser->get('/admin/blog/notes/settings')->getBody();
+            // HTML parsing drops one newline after <textarea>, so the template emits one before the value.
+            self::assertStringContainsString('rows="6">' . "\n\n" . '&lt;p&gt;Hi&lt;/p&gt;</textarea>', $body, $engine);
+        }
+    }
+
     public function testAMirrorOnlyTakesThePostUrlPatternAndMedia(): void
     {
         $app = $this->site();
