@@ -70,3 +70,7 @@ Other:
   the form-body parsing are already shared on `AdminPage`.
 - **CSS.** The admin tables scroll sideways on narrow screens rather than reflowing; a card layout below ~40rem would
   read better. The admin stylesheet hard-codes its border colours instead of using the theme's `--border`.
+
+## From the final re-review
+
+- User-bound tokens can create posts through API/Micropub on `blog:write` scope alone; the admin also requires `can(add, blog, post)`. Add the role-level add check for user-bound tokens, or document that create is scope-gated (tokens are minted by admins only).
