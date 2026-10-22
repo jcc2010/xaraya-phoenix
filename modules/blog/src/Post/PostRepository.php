@@ -54,9 +54,9 @@ final class PostRepository
      * Inserts a post written natively, under the id its item_id already embeds. Unlike save(), it never swaps a
      * colliding id: a collision is an error.
      */
-    public function insert(int $blogId, string $id, PostRecord $record, DateTimeImmutable $now): void
+    public function insert(int $blogId, string $id, PostRecord $record, DateTimeImmutable $now, ?string $ownerId = null): void
     {
-        $this->db->transaction(function () use ($blogId, $id, $record, $now): void {
+        $this->db->transaction(function () use ($blogId, $id, $record, $now, $ownerId): void {
             $this->db->insert('posts', [
                 'id' => $id,
                 'blog_id' => $blogId,
@@ -64,6 +64,7 @@ final class PostRepository
                 ...$this->columns($record, $now),
                 'status' => 'published',
                 'created_at' => $now,
+                'owner_id' => $ownerId,
             ]);
             $this->writeTags($id, $blogId, $record->tags);
         });

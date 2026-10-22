@@ -8,6 +8,7 @@ use Nyholm\Psr7\ServerRequest;
 use Nyholm\Psr7\Stream;
 use RuntimeException;
 use Xaraya\Kernel\App;
+use Xaraya\Kernel\Auth\UserRepository;
 use Xaraya\Kernel\Events\EventDispatcher;
 use Xaraya\Kernel\Events\ItemCreated;
 use Xaraya\Module\Blog\BlogRepository;
@@ -313,5 +314,16 @@ final class PostApiTest extends ApiTestCase
         $response = $this->api('POST', '/api/blogs/notes/posts', $this->token, ['title' => 'x']);
         self::assertSame(404, $response->getStatusCode());
         self::assertSame('application/json', $response->getHeaderLine('Content-Type'));
+    }
+
+    public function testATokenThatActsAsAUserMakesThatUserTheOwner(): void
+    {
+        $ada = $this->site->container()->get(UserRepository::class)
+            ->create('ada', 'ada@example.com', 'correct horse battery', 'Ada', 'active', ['Authors']);
+        $response = $this->api('POST', '/api/blogs/notes/posts', $this->token('blog:write', ['--user=ada']), ['content_html' => '<p>Mine</p>']);
+        self::assertSame(201, $response->getStatusCode(), (string) $response->getBody());
+        self::assertStringNotContainsString('owner', (string) $response->getBody());
+        $id = basename((string) self::json($response)['id']);
+        self::assertSame($ada->id, $this->app()->container()->get(PostRepository::class)->find($id)?->ownerId);
     }
 }

@@ -33,8 +33,15 @@ final class Schema
         self::check($table);
         $blueprint = new Blueprint($table);
         $define($blueprint);
-        if ($blueprint->foreignKeys !== []) {
-            throw new LogicException('Foreign keys can only be declared in Schema::create()');
+        $added = [];
+        foreach ($blueprint->columns as $column) {
+            $added[$column->name] = $column;
+        }
+        foreach ($blueprint->foreignKeys as $fk) {
+            $column = $added[$fk['column']] ?? null;
+            if ($column === null || !$column->nullable || $column->hasDefault) {
+                throw new LogicException('Schema::table() can only add a foreign key on a new nullable column');
+            }
         }
         if ($blueprint->primary !== [] || array_filter($blueprint->columns, fn(Column $c): bool => $c->primary) !== []) {
             throw new LogicException('Primary keys can only be declared in Schema::create()');

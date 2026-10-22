@@ -69,13 +69,7 @@ abstract class AbstractDialect implements Dialect
             $defs[] = 'PRIMARY KEY (' . $this->quoteList($primary) . ')';
         }
         foreach ($blueprint->foreignKeys as $fk) {
-            $defs[] = sprintf(
-                'FOREIGN KEY (%s) REFERENCES %s (%s) ON DELETE %s',
-                $this->quote($fk['column']),
-                $this->quote($prefix . $fk['table']),
-                $this->quote($fk['references']),
-                strtoupper($fk['onDelete']),
-            );
+            $defs[] = 'FOREIGN KEY (' . $this->quote($fk['column']) . ') ' . $this->referencesSql($fk, $prefix);
         }
         $create = 'CREATE TABLE ' . $this->quote($table) . " (\n  " . implode(",\n  ", $defs) . "\n)" . $this->tableSuffix();
 
@@ -85,12 +79,37 @@ abstract class AbstractDialect implements Dialect
     public function alterTable(Blueprint $blueprint, string $prefix): array
     {
         $table = $prefix . $blueprint->table;
+        $foreignKeys = [];
+        foreach ($blueprint->foreignKeys as $fk) {
+            $foreignKeys[$fk['column']] = $fk;
+        }
         $sql = [];
         foreach ($blueprint->columns as $column) {
-            $sql[] = 'ALTER TABLE ' . $this->quote($table) . ' ADD COLUMN ' . $this->columnSql($column);
+            $sql[] = $this->addColumnSql($this->quote($table), $column, $foreignKeys[$column->name] ?? null, $prefix);
         }
 
         return [...$sql, ...$this->indexSql($blueprint, $table)];
+    }
+
+    /**
+     * @param string $table already prefixed and quoted
+     * @param array{column: string, table: string, references: string, onDelete: string}|null $foreignKey
+     */
+    protected function addColumnSql(string $table, Column $column, ?array $foreignKey, string $prefix): string
+    {
+        return 'ALTER TABLE ' . $table . ' ADD COLUMN ' . $this->columnSql($column)
+            . ($foreignKey === null ? '' : ' ' . $this->referencesSql($foreignKey, $prefix));
+    }
+
+    /** @param array{column: string, table: string, references: string, onDelete: string} $fk */
+    protected function referencesSql(array $fk, string $prefix): string
+    {
+        return sprintf(
+            'REFERENCES %s (%s) ON DELETE %s',
+            $this->quote($prefix . $fk['table']),
+            $this->quote($fk['references']),
+            strtoupper($fk['onDelete']),
+        );
     }
 
     public function dropTableSql(string $table): string

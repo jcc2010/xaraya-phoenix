@@ -9,6 +9,7 @@ use DateTimeZone;
 use InvalidArgumentException;
 use JsonException;
 use RuntimeException;
+use Xaraya\Kernel\Auth\Access;
 use Xaraya\Kernel\Config\Config;
 use Xaraya\Kernel\Events\EventDispatcher;
 use Xaraya\Kernel\Events\ItemCreated;
@@ -46,6 +47,7 @@ final class PostWriter
         private readonly ItemSerializer $serializer,
         private readonly EventDispatcher $events,
         private readonly Config $config,
+        private readonly Access $access,
     ) {}
 
     /** @param array<array-key, mixed> $item */
@@ -64,7 +66,7 @@ final class PostWriter
         $item['date_published'] ??= $now->format(DATE_ATOM);
         $id = Ulid::generate();
         $itemId = $this->appUrl() . '/s/' . $id;
-        $this->posts->insert($blog->id, $id, $this->record($item, $itemId, $id, null, $now), $now);
+        $this->posts->insert($blog->id, $id, $this->record($item, $itemId, $id, null, $now), $now, $this->access->user()?->id);
         $this->events->dispatch(new ItemCreated('blog', 'post', $id, ['blog' => $blog->handle, 'item_id' => $itemId]));
 
         return $this->posts->find($id) ?? throw new RuntimeException("Post {$id} vanished after insert");

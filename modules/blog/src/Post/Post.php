@@ -29,6 +29,7 @@ final class Post
         public readonly array $doc,
         public readonly array $tags,
         public readonly ?DateTimeImmutable $updatedAt = null,
+        public readonly ?string $ownerId = null,
     ) {}
 
     /**
@@ -59,6 +60,7 @@ final class Post
             is_array($doc) ? $doc : [],
             $tags,
             $updated === null ? null : new DateTimeImmutable($updated, $utc),
+            $s('owner_id'),
         );
     }
 }

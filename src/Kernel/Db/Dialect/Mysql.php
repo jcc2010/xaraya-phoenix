@@ -48,6 +48,13 @@ final class Mysql extends AbstractDialect
         ));
     }
 
+    /** MySQL parses an inline REFERENCES and ignores it, so the foreign key is a separate clause. */
+    protected function addColumnSql(string $table, Column $column, ?array $foreignKey, string $prefix): string
+    {
+        return 'ALTER TABLE ' . $table . ' ADD COLUMN ' . $this->columnSql($column)
+            . ($foreignKey === null ? '' : ', ADD FOREIGN KEY (' . $this->quote($column->name) . ') ' . $this->referencesSql($foreignKey, $prefix));
+    }
+
     protected function defaultSql(Column $column): string
     {
         $literal = parent::defaultSql($column);

@@ -250,4 +250,42 @@ final class SchemaTest extends DbTestCase
     {
         self::assertSame($this->db, $this->db->schema()->connection());
     }
+
+    public function testTableAddsANullableForeignKeyColumnInPlace(): void
+    {
+        $s = $this->db->schema();
+        $s->create('people', function (Blueprint $t): void {
+            $t->ulid('id')->primary();
+        });
+        $s->create('notes', function (Blueprint $t): void {
+            $t->ulid('id')->primary();
+        });
+        $s->create('note_tags', function (Blueprint $t): void {
+            $t->ulid('note_id');
+            $t->foreign('note_id', 'notes');
+        });
+        $this->db->insert('people', ['id' => 'p1']);
+        $this->db->insert('notes', ['id' => 'n1']);
+        $this->db->insert('note_tags', ['note_id' => 'n1']);
+        $s->table('notes', function (Blueprint $t): void {
+            $t->ulid('owner_id')->nullable();
+            $t->foreign('owner_id', 'people', 'id', 'set null');
+        });
+        $this->db->update('notes', ['owner_id' => 'p1'], ['id' => 'n1']);
+        $this->db->delete('people', ['id' => 'p1']);
+        self::assertNull($this->db->fetchValue('SELECT owner_id FROM {notes}'));
+        self::assertSame(1, (int) $this->db->fetchValue('SELECT COUNT(*) FROM {note_tags}'), 'rows that reference the table survive');
+        $this->expectException(PDOException::class);
+        $this->db->update('notes', ['owner_id' => 'nobody'], ['id' => 'n1']);
+    }
+
+    public function testTableRefusesAForeignKeyOnANewNotNullColumn(): void
+    {
+        $this->createAllTypes();
+        $this->expectExceptionMessage('Schema::table() can only add a foreign key on a new nullable column');
+        $this->db->schema()->table('things', function (Blueprint $t): void {
+            $t->ulid('owner_id');
+            $t->foreign('owner_id', 'things');
+        });
+    }
 }
