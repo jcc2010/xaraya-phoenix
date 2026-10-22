@@ -15,14 +15,16 @@ Status: early development on the `next` branch. Release codenames follow the X-M
 
 ```sh
 composer install
-cp .env.example .env
-bin/xar migrate
-bin/xar asset:publish
+bin/xar install        # asks for the first administrator; or --admin=<handle> --email=<email> --password-stdin
 MODULE_PATHS=modules,examples bin/xar module:enable hello   # optional: the example module
 bin/xar serve
 ```
 
-Set `MODULE_PATHS` in `.env` to keep the example module discoverable. With `APP_DEBUG=false`
+`bin/xar install` checks PHP, writes `.env` from `.env.example` when it is missing (mode 0600; an existing `.env` is
+never touched), creates the SQLite file (or checks `DB_DSN`), runs the migrations, seeds the roles and grants,
+creates the administrator and publishes the theme's assets. It refuses a database that already has users; `--force`
+repeats the steps (an existing administrator is left as it is). Give the password with `--password-stdin`;
+`--password=` works but shows in the process list and shell history. Set `MODULE_PATHS` in `.env` to keep the example module discoverable. With `APP_DEBUG=false`
 (production), config and routes are cached under `var/cache`; config is rebuilt when
 `config/app.php` or `.env` changes. `bin/xar cache:clear` removes the config and route caches, the file
 cache entries (`var/cache/data`) and the compiled Twig templates (`var/cache/twig`).
@@ -43,9 +45,13 @@ Templates exist as `.php` or `.twig` (Twig is optional: `composer require twig/t
   `$x->url()`, `$x->asset()`, `$x->blocks('sidebar')`, `$x->hooks('item.display', $item)`, `$x->render()`.
   Twig has the same helpers as functions and escapes automatically.
 - Blocks live in `xar_blocks` and render in theme regions. Modules ship block types (`"blocks"`) and
-  seed instances on first install (`"blockDefaults"`). Built-in types: `text`, `menu`, `recent-items`.
+  seed instances on first install (`"blockDefaults"`). Built-in types: `text`, `menu`, `login`, `recent-items`.
   **Security:** `text` blocks with format `html` (the default) output their content as raw, trusted HTML.
-  Only trusted administrators may edit block content until users and auth arrive in kernel Plan 3.
+  Only trusted administrators may edit block content.
+  A block's `visibility` may list `roles` (`{"roles": ["Members"]}`): it shows only to a request that has one of
+  them. Guests have `Anonymous`; signed-in users also have `Members` and their own roles. A malformed rule hides
+  the block, and `"roles": []` means no restriction. The built-in `login` block shows a "Log in" link to guests and
+  the user's name with a logout button otherwise.
 - Display hooks: a module's `"displayHooks"` add HTML to other modules' items, bound in `xar_hooks`.
   Toggle a binding with `bin/xar hook:disable <observer> <subject> [itemtype]` / `hook:enable`.
 - `bin/xar asset:publish` links `modules/*/assets` and `themes/*/assets` into `public/assets`.
@@ -55,6 +61,58 @@ Templates exist as `.php` or `.twig` (Twig is optional: `composer require twig/t
 
 Try it with the examples: `MODULE_PATHS=modules,examples bin/xar module:enable hello`, then
 `module:enable hello-hooks`, and open `/hello`.
+
+## Users, roles and sign-in
+
+Users sign in at `/login` with their handle or email and leave with the logout button (a POST to `/logout`).
+`/password/forgot` mails a link to `/password/reset/<token>` that works once, for 60 minutes; the page answers the
+same whether or not the address has an account. `bin/xar user:create <handle> --email=<email> [--role=Editors]`
+adds a user and `bin/xar user:password <handle>` sets a password from the shell. Both ask for the password; use
+`--password-stdin` to read it from a pipe. `--password=<password>` is accepted but unsafe: it shows in the process
+list and shell history. A password is at least 8 characters and at most 72 bytes (bcrypt ignores the rest, so longer ones are
+refused) and cannot contain a NUL character. Changing a password ends that user's sessions everywhere. The paths `/login`,
+`/logout` and `/password/*` belong to the kernel; a module cannot register them.
+
+- **Roles:** Administrators (admin on everything), Editors (delete on every module whose manifest sets
+  `"content": true`), Authors, Members and Anonymous (read on everything). A role may have a parent and gets its grants.
+  Modules seed their own grants on `module:enable` with `"grants": [{"role", "component", "instance", "level"}]`;
+  re-enabling restores a deleted default grant but keeps a changed level. There is no admin UI yet: roles, parents
+  and grants are changed in the database.
+- **Checks:** `$x->can('edit', 'blog', 'post', $item)` in templates, `Auth::can()` in code, `auth` (signed in)
+  or `auth:<module>.<component>.<level>` on routes. An `own` grant matches an item whose `owner_id` is the user's
+  id. Blog posts have no owner yet, so the Authors grants on `blog.post.own` have no effect until a later plan adds one.
+  **`auth:<module>.<component>.<level>` checks the component only, with no item,** so an `own`-only user passes it for
+  every item. A controller that loads an item must check again with that item (`can(level, module, component,
+  $item)`), or one user can act on another's items. A guest who fails a route check is sent to `/login?next=…`
+  from an HTML page and gets a 401 elsewhere (JSON on `.json`, `/api` and JSON-accepting requests); a signed-in
+  user gets a 403.
+- **Sessions:** a database row (`xar_sessions`) keyed by the sha256 of an HttpOnly, SameSite=Lax cookie
+  (`xar_session`), so the cookie value is never stored. The cookie is Secure unless `APP_DEBUG=true` and the request
+  is plain HTTP. A session expires after `SESSION_LIFETIME` idle minutes (default 120) and, whatever its activity,
+  `SESSION_MAX_LIFETIME` seconds after creation or the last login (default 86400, so users sign in daily). The id
+  changes at login and logout. A session whose row is gone (logout, expiry, password change) is dead: it is never
+  resurrected, even by a request that was already in flight. Any response that sets a session cookie is sent with
+  `Cache-Control: private, no-cache`.
+- **CSRF:** every POST, PUT, PATCH and DELETE needs the session's token, from `$x->csrf()` (a hidden `_csrf` field)
+  or an `X-CSRF-Token` header (the field wins if both are sent), unless its route is marked `csrf:off`. Token
+  routes are marked `csrf:off`, because a bearer token is not sent by the browser on its own. A missing or wrong
+  token is a 403.
+- **Throttling:** 5 failed logins in 15 minutes lock a client out of that account. The key is the client's IP plus
+  the account (a handle and its email count together); an IPv6 address counts as its /64. `throttle:<key>,<max>,<seconds>`
+  limits any route per IP (429 with `Retry-After`). The IP is `REMOTE_ADDR`. **Behind a reverse proxy, set
+  `TRUSTED_PROXIES`** to the proxy's address so `X-Forwarded-For` is used; without it every client shares the
+  proxy's IP and therefore one throttle bucket, so a few failed logins lock everyone out of an account. Only exact
+  IP addresses are supported, not CIDR ranges.
+- **Mail:** `MAIL_DRIVER=log` (the default) writes each message to `var/mail/*.eml` instead of sending it;
+  `MAIL_DRIVER=mail` sends with PHP's `mail()`. **Set `MAIL_DRIVER=mail` in production:** the `log` driver stores
+  live reset links on disk. `MAIL_FROM` defaults to `phoenix@<host of APP_URL>`, or `phoenix@example.invalid` when
+  that host has no dot. There is no SMTP client yet: use the server's MTA. `APP_URL` must be set, because reset links
+  are built from it; without it the `/password/*` pages answer 500. A failure to send is logged and the page answers
+  as usual.
+
+**Upgrading an install that has no users yet** (one that predates sign-in): run `bin/xar install`. It runs the new
+migrations, seeds the roles and the grants of the enabled modules, and creates the administrator; nothing else
+changes.
 
 ## Development
 
@@ -140,8 +198,14 @@ bin/xar token:create --name=phone --scopes=blog:write,media:write --blog=notes -
 ```
 
 `token:create` prints the token (`xar_` and 40 letters and digits) once; only its sha256 is stored.
-`bin/xar token:list` shows ids, scopes, blog and last use (never a token), and `bin/xar token:revoke <id>`
-deletes one. A token made with `--blog` can only write to that blog. Send it as `Authorization: Bearer xar_…`;
+`bin/xar token:list` shows ids, scopes, blog, user and last use (never a token), and `bin/xar token:revoke <id>`
+deletes one. A token made with `--blog` can only write to that blog (the pin is checked only while the blog module is
+enabled; the `tokens` module no longer requires blog). A token made with `--user=<handle>` acts as that user (route
+checks and `can()` use the user's roles) and is refused (401) once the user is disabled or deleted; a token without a
+user acts as a guest, only through its scopes. A token's scopes decide which token routes it may call; `can()`
+applies only where a controller calls it. Modules add scopes with `"scopes": ["<module>:<name>"]` in `module.json`
+(the hello example declares `hello:write`). A request authenticated by a token never creates or saves a session (no
+cookie) and its response is sent with `Cache-Control: private, no-store`. Send it as `Authorization: Bearer xar_…`;
 a token in a query string is ignored. The two Micropub routes (`/micropub` and `/micropub/media`) also accept it
 as an `access_token` form field, but not both that and the header; no other route does.
 

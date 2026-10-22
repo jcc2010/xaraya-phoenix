@@ -67,7 +67,7 @@ Every task's code was built and run on SQLite and MySQL in a throwaway worktree 
    - `token:create --user=<handle>` sets it.
    - A token whose user is disabled, pending or deleted is answered as an invalid token (401).
    - Modules declare extra scopes in their manifest (`"scopes": ["hello:write"]`, always `<module>:<name>`). `TokenRepository::scopes()` is `Token::SCOPES` plus the scopes of the enabled modules.
-   - `token:create` and `token:revoke` stay module commands and keep their Plan B names. `tokens` still requires `blog` (see Open questions).
+   - `token:create` and `token:revoke` stay module commands and keep their Plan B names. `tokens` no longer requires `blog` (Task 14 decouples it; the blog pin is checked only while blog is enabled). The remaining loose ends are in `2026-10-21-phoenix-kernel-auth-followups.md`.
 2. **Token identity.** On a `token:` route the token decides the request's identity, whatever session cookie came with it. A token with a user makes `Auth` that user, so `can()` uses that user's roles. A token without a user makes the request a guest (Anonymous); it acts only through its scopes.
 3. **Sessions (spec addition).** Sessions live in a kernel table, `xar_sessions`, which §4.1 does not list:
    - `id` is the sha256 of the cookie value, so the cookie value itself is never stored.
