@@ -58,6 +58,7 @@ use Xaraya\Kernel\Mail\LogMailer;
 use Xaraya\Kernel\Mail\Mailer;
 use Xaraya\Kernel\Mail\MailFunctionMailer;
 use Xaraya\Kernel\Mail\MemoryMailer;
+use Xaraya\Kernel\Mail\SmtpMailer;
 use Xaraya\Kernel\Module\Manifest;
 use Xaraya\Kernel\Module\ModuleException;
 use Xaraya\Kernel\Module\ModuleRegistry;
@@ -159,7 +160,8 @@ final class App
                 'log' => new LogMailer($this->path((string) $config->get('mail.path', 'var/mail')), $from),
                 'mail' => new MailFunctionMailer($from),
                 'memory' => new MemoryMailer(),
-                default => throw new LogicException('mail.driver must be "log", "mail" or "memory"'),
+                'smtp' => $this->smtpMailer($config, $from),
+                default => throw new LogicException('mail.driver must be "log", "mail", "smtp" or "memory"'),
             };
         });
         $c->set(EventDispatcher::class, fn(Container $c): EventDispatcher => new EventDispatcher($c));
@@ -322,6 +324,37 @@ final class App
     public function root(): string
     {
         return $this->root;
+    }
+
+    /** The "smtp" driver from mail.smtp.*: the port defaults by encryption (tls 587, ssl 465, none 25). */
+    private function smtpMailer(Config $config, string $from): SmtpMailer
+    {
+        $host = (string) $config->get('mail.smtp.host', '');
+        if ($host === '') {
+            throw new LogicException('mail.driver "smtp" needs mail.smtp.host (MAIL_HOST)');
+        }
+        $encryption = (string) $config->get('mail.smtp.encryption', 'tls');
+        $port = (string) $config->get('mail.smtp.port', '');
+        if ($port !== '' && !ctype_digit($port)) {
+            throw new LogicException('mail.smtp.port (MAIL_PORT) must be a number');
+        }
+        $appHost = parse_url((string) $config->get('app.url', ''), PHP_URL_HOST);
+        $helo = is_string($appHost) && preg_match('/^[A-Za-z0-9](?:[A-Za-z0-9.-]*[A-Za-z0-9])?$/', $appHost) === 1 ? $appHost : 'localhost';
+        $user = (string) $config->get('mail.smtp.username', '');
+        $password = (string) $config->get('mail.smtp.password', '');
+
+        return new SmtpMailer(
+            $host,
+            $port !== '' ? (int) $port : match ($encryption) {
+                'ssl' => 465, 'none' => 25, default => 587
+            },
+            $encryption,
+            $from,
+            $user !== '' ? $user : null,
+            $password !== '' ? $password : null,
+            $helo,
+            (float) $config->get('mail.smtp.timeout', 10),
+        );
     }
 
     public function path(string $relative): string

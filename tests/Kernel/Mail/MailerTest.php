@@ -135,7 +135,7 @@ final class MailerTest extends AppTestCase
         self::assertCount(1, $memory->sent);
         self::assertSame('ada@example.com', $memory->sent[0]->to);
         $this->expectException(LogicException::class);
-        $this->boot([], ['mail.driver' => 'smtp'])->container()->get(Mailer::class);
+        $this->boot([], ['mail.driver' => 'pigeon'])->container()->get(Mailer::class);
     }
 
     public function testTheDefaultFromIsAValidAddressDerivedFromTheAppUrl(): void

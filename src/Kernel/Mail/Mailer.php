@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Xaraya\Kernel\Mail;
 
-/** Sends mail (config mail.driver: "log" by default, or "mail" for PHP's mail()). */
+/** Sends mail (config mail.driver: "log" by default, "mail" for PHP's mail(), or "smtp"). */
 interface Mailer
 {
     /**

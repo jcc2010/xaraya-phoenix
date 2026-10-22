@@ -40,12 +40,23 @@ return [
         'url' => env('ASSET_URL', '/assets'),
     ],
     'mail' => [
-        // "log" writes each message to mail.path as an .eml file (development only); "mail" sends with PHP's mail().
+        // "log" writes each message to mail.path as an .eml file (development only); "mail" sends with PHP's mail();
+        // "smtp" sends through mail.smtp.
         // "memory" discards mail (it only keeps it in process) and is meant for tests.
         'driver' => env('MAIL_DRIVER', 'log'),
         // Empty means phoenix@<host of app.url>, or phoenix@example.invalid when that host has no dot.
         'from' => env('MAIL_FROM', ''),
         'path' => $root . '/var/mail',
+        // For mail.driver "smtp". Encryption is "tls" (STARTTLS, required), "ssl" (port 465) or "none" (a local relay;
+        // credentials are refused without TLS). An empty port means 587, 465 or 25 by encryption.
+        'smtp' => [
+            'host' => env('MAIL_HOST', ''),
+            'port' => env('MAIL_PORT', ''),
+            'encryption' => env('MAIL_ENCRYPTION', 'tls'),
+            'username' => env('MAIL_USERNAME', ''),
+            'password' => env('MAIL_PASSWORD', ''),
+            'timeout' => env('MAIL_TIMEOUT', '10'),
+        ],
     ],
     'session' => [
         'cookie' => env('SESSION_COOKIE', 'xar_session'),

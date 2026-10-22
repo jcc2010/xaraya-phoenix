@@ -114,11 +114,16 @@ refused) and cannot contain a NUL character. Changing a password ends that user'
   proxy's IP and therefore one throttle bucket, so a few failed logins lock everyone out of an account. Only exact
   IP addresses are supported, not CIDR ranges.
 - **Mail:** `MAIL_DRIVER=log` (the default) writes each message to `var/mail/*.eml` instead of sending it;
-  `MAIL_DRIVER=mail` sends with PHP's `mail()`. **Set `MAIL_DRIVER=mail` in production:** the `log` driver stores
-  live reset links on disk. `MAIL_FROM` defaults to `phoenix@<host of APP_URL>`, or `phoenix@example.invalid` when
-  that host has no dot. There is no SMTP client yet: use the server's MTA. `APP_URL` must be set, because reset links
+  `MAIL_DRIVER=mail` sends with PHP's `mail()`, and `MAIL_DRIVER=smtp` sends through an SMTP server. **Set `mail` or
+  `smtp` in production:** the `log` driver stores live reset links on disk. `MAIL_FROM` defaults to
+  `phoenix@<host of APP_URL>`, or `phoenix@example.invalid` when that host has no dot. `APP_URL` must be set, because reset links
   are built from it; without it the `/password/*` pages answer 500. A failure to send is logged and the page answers
   as usual.
+- **SMTP:** `MAIL_HOST` (required), `MAIL_PORT`, `MAIL_ENCRYPTION`, `MAIL_USERNAME`, `MAIL_PASSWORD` and
+  `MAIL_TIMEOUT` (seconds, default 10). `MAIL_ENCRYPTION` is `tls` (the default: STARTTLS, and a server that doesn't
+  offer it is an error), `ssl` (TLS from the start, usually port 465) or `none` (plain text, for a local relay such as
+  Mailpit; credentials are refused without TLS). An empty `MAIL_PORT` means 587, 465 or 25 to match. Certificates are
+  always verified; AUTH uses PLAIN or LOGIN. The HELO name is the `APP_URL` host.
 
 Migrations: `Schema::table()` can add a foreign key, but only on a new nullable column without a default, added by
 the same call.
