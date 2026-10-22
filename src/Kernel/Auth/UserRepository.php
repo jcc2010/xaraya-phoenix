@@ -113,12 +113,16 @@ final class UserRepository
         return $row === null ? null : User::fromRow($row);
     }
 
-    /** Checks the password; when it is right and the hash is outdated (algorithm or options), stores a new hash. */
+    /**
+     * Checks the password; when it is right and the hash is outdated (algorithm or options), stores a new hash. A
+     * password with a NUL or longer than MAX_PASSWORD_BYTES is always wrong.
+     */
     public function verifyPassword(User $user, #[SensitiveParameter] string $password): bool
     {
         $hash = (string) $this->db->fetchValue('SELECT password_hash FROM {users} WHERE id = ?', [$user->id]);
-        if (str_contains($password, "\0")) {
-            // Still one full check, so a NUL password costs the same as any wrong password (and as verifyNothing()).
+        if (str_contains($password, "\0") || strlen($password) > self::MAX_PASSWORD_BYTES) {
+            // Never valid (bcrypt would truncate an over-long one to 72 bytes and could accept it), but still one
+            // full check, so it costs the same as any wrong password (and as verifyNothing()).
             ($this->verify)('', $hash);
 
             return false;
@@ -137,7 +141,7 @@ final class UserRepository
     public function verifyNothing(#[SensitiveParameter] string $password): void
     {
         static $dummy = [];
-        if (str_contains($password, "\0")) {
+        if (str_contains($password, "\0") || strlen($password) > self::MAX_PASSWORD_BYTES) {
             $password = '';
         }
         $key = json_encode($this->hashOptions);

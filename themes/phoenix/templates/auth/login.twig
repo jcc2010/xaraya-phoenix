@@ -1,0 +1,20 @@
+<h1>{{ t('Log in') }}</h1>
+{% if notice %}
+<p class="form-notice" role="status">{{ t(notice) }}</p>
+{% endif %}
+{% if error %}
+<p class="form-error" id="login-error" role="alert">{{ t(error, {minutes: minutes}) }}</p>
+{% endif %}
+<form class="auth-form" method="post" action="{{ url('auth.login.submit') }}">
+{{ csrf() }}
+<input type="hidden" name="next" value="{{ next }}">
+<p>
+<label for="login">{{ t('Handle or email') }}</label>
+<input id="login" name="login" value="{{ login }}" autocomplete="username" autocapitalize="none" spellcheck="false" required{% if error %} aria-invalid="true" aria-describedby="login-error"{% endif %}>
+</p>
+<p>
+<label for="password">{{ t('Password') }}</label>
+<input id="password" name="password" type="password" autocomplete="current-password" required>
+</p>
+<p><button type="submit">{{ t('Log in') }}</button></p>
+</form>

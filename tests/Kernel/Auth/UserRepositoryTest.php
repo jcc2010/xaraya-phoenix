@@ -127,6 +127,14 @@ final class UserRepositoryTest extends AuthTestCase
         self::assertFalse($users->verifyPassword($ada, 'wrong password'));
         self::assertCount(3, $calls);
         self::assertTrue($users->verifyPassword($ada, self::PASSWORD));
+        self::assertCount(4, $calls);
+
+        // bcrypt reads only 72 bytes, so a stored 72-byte password plus anything would otherwise verify.
+        $max = $this->user($app, 'max', password: str_repeat('a', 72));
+        self::assertFalse($users->verifyPassword($max, str_repeat('a', 72) . 'b'));
+        self::assertCount(5, $calls, 'an over-long password still runs one full check');
+        self::assertSame('', $calls[4]);
+        self::assertTrue($users->verifyPassword($max, str_repeat('a', 72)));
 
         UserRepository::checkPassword(str_repeat('a', 72));
         $this->expectException(InvalidArgumentException::class);

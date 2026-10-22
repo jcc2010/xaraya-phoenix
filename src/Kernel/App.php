@@ -16,6 +16,7 @@ use Xaraya\Kernel\Assets\AssetUrls;
 use Xaraya\Kernel\Auth\Access;
 use Xaraya\Kernel\Auth\Auth;
 use Xaraya\Kernel\Auth\Grants;
+use Xaraya\Kernel\Auth\Http\AuthRoutes;
 use Xaraya\Kernel\Auth\SessionStore;
 use Xaraya\Kernel\Auth\Throttle;
 use Xaraya\Kernel\Auth\UserRepository;
@@ -324,6 +325,7 @@ final class App
             }
             $provider->routes($collector);
         }
+        (new AuthRoutes())->routes($collector);
 
         $claimed = false;
         foreach ($collector->routes() as $route) {

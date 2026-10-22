@@ -46,6 +46,15 @@ final class Browser
         return $this->send($request->withParsedBody($fields));
     }
 
+    /** Opens the login page, then posts the form (with its CSRF token and the "next" it carries). */
+    public function login(string $login, string $password, string $next = ''): ResponseInterface
+    {
+        $this->get('/login' . ($next === '' ? '' : '?next=' . rawurlencode($next)));
+        $field = preg_match('/name="next" value="([^"]*)"/', $this->body(), $m) === 1 ? html_entity_decode($m[1], ENT_QUOTES) : '/';
+
+        return $this->post('/login', ['login' => $login, 'password' => $password, 'next' => $field]);
+    }
+
     /** @param array<string, string> $headers */
     public function request(string $method, string $path, array $headers = [], string $body = ''): ServerRequestInterface
     {
