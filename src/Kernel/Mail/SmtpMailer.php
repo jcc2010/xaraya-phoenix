@@ -25,8 +25,10 @@ final class SmtpMailer implements Mailer
     private float $deadline = 0.0;
 
     /** @param array<string, mixed> $tls extra `ssl` stream-context options (tests pass a cafile and peer_name) */
+    private readonly string $host;
+
     public function __construct(
-        private readonly string $host,
+        string $host,
         private readonly int $port,
         private readonly string $encryption,
         private readonly string $from,
@@ -37,7 +39,8 @@ final class SmtpMailer implements Mailer
         private readonly float $timeout = 10.0,
         private readonly array $tls = [],
     ) {
-        if ($host === '' || preg_match('/[\s\/\x00-\x1f\x7f]/', $host) === 1) {
+        $this->host = str_starts_with($host, '[') && str_ends_with($host, ']') ? substr($host, 1, -1) : $host;
+        if ($this->host === '' || preg_match('/[\s\/\[\]\x00-\x1f\x7f]/', $this->host) === 1) {
             throw new InvalidArgumentException('mail.smtp.host must be a host name or IP address');
         }
         if ($port < 1 || $port > 65535) {
@@ -47,8 +50,9 @@ final class SmtpMailer implements Mailer
             throw new InvalidArgumentException('mail.smtp.encryption must be "tls", "ssl" or "none"');
         }
         Address::assert($from, 'mail.from');
-        if (preg_match('/^(?:[A-Za-z0-9](?:[A-Za-z0-9-]*[A-Za-z0-9])?)(?:\.[A-Za-z0-9](?:[A-Za-z0-9-]*[A-Za-z0-9])?)*$/', $helo) !== 1) {
-            throw new InvalidArgumentException('The SMTP HELO name must be a host name');
+        if (preg_match('/^(?:[A-Za-z0-9](?:[A-Za-z0-9-]*[A-Za-z0-9])?)(?:\.[A-Za-z0-9](?:[A-Za-z0-9-]*[A-Za-z0-9])?)*$/', $helo) !== 1
+            && preg_match('/^\[(?:[0-9.]+|IPv6:[0-9A-Fa-f:.]+)\]$/', $helo) !== 1) {
+            throw new InvalidArgumentException('The SMTP HELO name must be a host name or an address literal');
         }
         if (($username ?? '') === '' xor ($password ?? '') === '') {
             throw new InvalidArgumentException('mail.smtp.username and mail.smtp.password go together');
@@ -73,6 +77,11 @@ final class SmtpMailer implements Mailer
                     throw new MailException("The SMTP server {$this->host} does not offer STARTTLS");
                 }
                 $this->command('STARTTLS', 220, 'STARTTLS');
+                // Bytes already buffered after the 220 arrived in plain text; reading them after the handshake would
+                // let an on-path attacker inject replies (CVE-2011-0411 style), so refuse.
+                if (stream_get_meta_data($this->socket())['unread_bytes'] > 0) {
+                    throw new MailException("The SMTP server {$this->host} sent data after STARTTLS before the TLS handshake");
+                }
                 $this->startTls();
                 $extensions = $this->ehlo();
             }
@@ -120,6 +129,7 @@ final class SmtpMailer implements Mailer
             'allow_self_signed' => false,
             'peer_name' => $this->host,
             'SNI_enabled' => true,
+            'crypto_method' => STREAM_CRYPTO_METHOD_TLSv1_2_CLIENT | STREAM_CRYPTO_METHOD_TLSv1_3_CLIENT,
             ...$this->tls,
         ];
     }
@@ -198,7 +208,7 @@ final class SmtpMailer implements Mailer
      * @param int|list<int> $codes
      * @return list<string> the reply lines, without their codes
      */
-    private function command(string $line, int|array $codes, string $label): array
+    private function command(#[SensitiveParameter] string $line, int|array $codes, string $label): array
     {
         $this->write($line . "\r\n");
 
@@ -227,25 +237,26 @@ final class SmtpMailer implements Mailer
         $code = 0;
         do {
             stream_set_timeout($socket, $this->remaining());
-            $line = fgets($socket, 4096);
+            $line = fgets($socket, 65536);
             if ($line === false) {
                 $timedOut = stream_get_meta_data($socket)['timed_out'];
                 throw new MailException($timedOut ? "The SMTP server {$this->host} timed out" : "The SMTP server {$this->host} closed the connection");
             }
-            if (preg_match('/^(\d{3})([ -])(.*?)\r?\n?$/s', $line, $m) !== 1 || ($lines !== [] && (int) $m[1] !== $code)) {
+            // A reply line is "<code> text", "<code>-text" (more lines follow) or a bare "<code>" (RFC 5321 4.2).
+            if (preg_match('/^(\d{3})(?:([ -])(.*?))?\r?\n$/s', $line, $m) !== 1 || ($lines !== [] && (int) $m[1] !== $code)) {
                 throw new MailException("The SMTP server {$this->host} sent a malformed reply");
             }
             $code = (int) $m[1];
-            $lines[] = $m[3];
+            $lines[] = $m[3] ?? '';
             if (count($lines) > 100) {
                 throw new MailException("The SMTP server {$this->host} sent too long a reply");
             }
-        } while ($m[2] === '-');
+        } while (($m[2] ?? ' ') === '-');
 
         return [$code, $lines];
     }
 
-    private function write(string $data): void
+    private function write(#[SensitiveParameter] string $data): void
     {
         $socket = $this->socket();
         while ($data !== '') {
@@ -258,7 +269,10 @@ final class SmtpMailer implements Mailer
         }
     }
 
-    /** Whole seconds left before the deadline (at least 1, so a slow last step still gets a chance to fail cleanly). */
+    /**
+     * Whole seconds left before the deadline (at least 1, so a slow last step still gets a chance to fail cleanly).
+     * The deadline bounds each read and write, not a server that trickles bytes, and DNS lookup isn't covered.
+     */
     private function remaining(): int
     {
         $left = $this->deadline - microtime(true);

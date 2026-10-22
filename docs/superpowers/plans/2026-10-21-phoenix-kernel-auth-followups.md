@@ -5,7 +5,7 @@ definition of done. Items tagged (final wave) were flagged as candidates for the
 
 ## Worth doing next
 
-- [Done] **SMTP.** `mail.driver=smtp` (`SmtpMailer`), tested against `tests/Support/fake-smtp-server.php` on a loopback port, STARTTLS and implicit TLS included. Not done: a client certificate, XOAUTH2, pipelining, a CA-file setting (the system store is used), and an IDN/IPv6 HELO.
+- [Done] **SMTP.** `mail.driver=smtp` (`SmtpMailer`), tested against `tests/Support/fake-smtp-server.php` on a loopback port, STARTTLS and implicit TLS included. Not done: a client certificate, XOAUTH2, pipelining, a CA-file setting (the system store is used), an IDN HELO, a HELO fallback when EHLO is refused, and a hard total deadline (the timeout bounds each read and write; a server that trickles bytes, and DNS, can run past it).
 - **Blog delete path must revoke pinned tokens.** Tokens pinned with `--blog` keep a plain nullable `blog_id` (the FK was dropped when tokens were decoupled from blog), and ids are never reused. Blog has no delete path today; when one is added it must revoke the tokens pinned to that blog, or they linger until revoked by hand.
 - **Move the blog pin check fully into the blog module.** Tokens no longer require blog, but a pinned token with blog disabled is not failed closed (ruling: the pin is a blog concept; scopes still gate routes).
 - **Session changes are lost when the handler throws.** `SessionMiddleware` saves after a normal return only. A session started while rendering an error page (say, a CSRF field in a block on a 403 page) is not stored, so that page's token will not validate. Related (F11): a disabled user's session row lingers when a route throws.

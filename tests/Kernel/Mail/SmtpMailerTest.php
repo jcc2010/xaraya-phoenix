@@ -264,4 +264,57 @@ final class SmtpMailerTest extends AppTestCase
         $this->expectExceptionMessage('mail.smtp.host');
         $this->boot([], ['mail.driver' => 'smtp'])->container()->get(Mailer::class);
     }
+
+    public function testPlainTextAfterTheStartTlsReplyIsRefused(): void
+    {
+        $port = $this->server(['tls' => 'starttls', 'inject_after_starttls' => true]);
+        $this->expectException(MailException::class);
+        $this->expectExceptionMessage('sent data after STARTTLS before the TLS handshake');
+        $this->mailer($port, 'tls')->send(self::message());
+    }
+
+    public function testCredentialsStayOutOfStackTraces(): void
+    {
+        foreach (['AUTH PLAIN', 'AUTH LOGIN'] as $mechanism) {
+            $port = $this->server(['tls' => 'starttls', 'ext' => [$mechanism], 'user' => self::USER, 'password' => 'other']);
+            try {
+                $this->mailer($port, 'tls', self::USER, self::PASSWORD)->send(self::message());
+                self::fail('sent with bad credentials');
+            } catch (MailException $e) {
+                $trace = $e->getTraceAsString() . print_r($e->getTrace(), true);
+                foreach ([self::PASSWORD, base64_encode(self::PASSWORD), base64_encode("\0" . self::USER . "\0" . self::PASSWORD)] as $secret) {
+                    self::assertStringNotContainsString(substr($secret, 0, 8), $trace, $mechanism);
+                }
+            }
+            $this->transcript();
+        }
+    }
+
+    public function testABareReplyCodeIsValid(): void
+    {
+        $this->mailer($this->server(['reply' => ['MAIL' => '250']]))->send(self::message());
+        self::assertStringContainsString("MAIL FROM:<site@example.com>\r\n", $this->transcript());
+    }
+
+    public function testABracketedIpv6HostAndAddressLiteralHelo(): void
+    {
+        new SmtpMailer('[::1]', 587, 'tls', 'a@example.com', helo: '[IPv6:::1]');
+        new SmtpMailer('::1', 587, 'tls', 'a@example.com', helo: '[192.0.2.1]');
+        $this->expectException(InvalidArgumentException::class);
+        new SmtpMailer('[::1', 587, 'tls', 'a@example.com');
+    }
+
+    public function testAnIpAppUrlGivesAnAddressLiteralHelo(): void
+    {
+        $port = $this->server();
+        $this->boot([], [
+            'app.url' => 'http://127.0.0.1:8080',
+            'mail.driver' => 'smtp',
+            'mail.from' => 'site@example.com',
+            'mail.smtp.host' => '127.0.0.1',
+            'mail.smtp.port' => (string) $port,
+            'mail.smtp.encryption' => 'none',
+        ])->container()->get(Mailer::class)->send(self::message());
+        self::assertStringStartsWith("EHLO [127.0.0.1]\r\n", $this->transcript());
+    }
 }

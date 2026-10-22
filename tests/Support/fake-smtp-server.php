@@ -6,7 +6,7 @@
  * Prints the port it listens on (127.0.0.1, random port), serves one connection and writes everything the client sent
  * to options.transcript. Options: ext (EHLO lines after the first), tls ("none", "starttls" or "ssl") with cert and
  * key, user and password (AUTH must match them), reply (a map of command verb to a canned reply line), silent (never
- * greet), hangup_on_quit.
+ * greet), hangup_on_quit, inject_after_starttls (plain-text bytes after the STARTTLS 220).
  */
 
 declare(strict_types=1);
@@ -82,7 +82,7 @@ while (($line = fgets($client)) !== false) {
             }
             break;
         case 'STARTTLS':
-            $say('220 go ahead');
+            $say('220 go ahead' . (!empty($options['inject_after_starttls']) ? "\r\n250 INJECTED" : ''));
             stream_context_set_option($client, 'ssl', 'local_cert', $options['cert']);
             stream_context_set_option($client, 'ssl', 'local_pk', $options['key']);
             if (!stream_socket_enable_crypto($client, true, STREAM_CRYPTO_METHOD_TLS_SERVER)) {

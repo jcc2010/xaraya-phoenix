@@ -339,14 +339,20 @@ final class App
             throw new LogicException('mail.smtp.port (MAIL_PORT) must be a number');
         }
         $appHost = parse_url((string) $config->get('app.url', ''), PHP_URL_HOST);
-        $helo = is_string($appHost) && preg_match('/^[A-Za-z0-9](?:[A-Za-z0-9.-]*[A-Za-z0-9])?$/', $appHost) === 1 ? $appHost : 'localhost';
+        $helo = match (true) {
+            !is_string($appHost) || $appHost === '' => 'localhost',
+            filter_var($appHost, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4) !== false => "[{$appHost}]",
+            filter_var(trim($appHost, '[]'), FILTER_VALIDATE_IP, FILTER_FLAG_IPV6) !== false => '[IPv6:' . trim($appHost, '[]') . ']',
+            preg_match('/^[A-Za-z0-9](?:[A-Za-z0-9.-]*[A-Za-z0-9])?$/', $appHost) === 1 => $appHost,
+            default => 'localhost',
+        };
         $user = (string) $config->get('mail.smtp.username', '');
         $password = (string) $config->get('mail.smtp.password', '');
 
         return new SmtpMailer(
             $host,
             $port !== '' ? (int) $port : match ($encryption) {
-                'ssl' => 465, 'none' => 25, default => 587
+                'ssl' => 465, 'none' => 25, default => 587,
             },
             $encryption,
             $from,

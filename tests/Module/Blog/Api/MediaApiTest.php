@@ -256,5 +256,9 @@ final class MediaApiTest extends ApiTestCase
         $response = $this->upload(['file' => self::file($this->png())], $this->token('media:write', ['--user=mo']));
         self::assertSame(403, $response->getStatusCode());
         self::assertSame(0, $this->mediaRows());
+
+        $this->app()->container()->get(UserRepository::class)->create('ada', 'ada@example.com', 'correct horse battery', 'Ada', 'active', ['Authors']);
+        $response = $this->upload(['file' => self::file($this->png())], $this->token('media:write', ['--user=ada']));
+        self::assertSame(201, $response->getStatusCode(), 'an Author may upload');
     }
 }
