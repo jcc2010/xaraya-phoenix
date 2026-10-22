@@ -35,11 +35,10 @@ final class ThrottleRequests implements MiddlewareInterface
     {
         $now = new DateTimeImmutable('now', new DateTimeZone('UTC'));
         $key = 'route:' . $this->key . '|' . ClientIp::bucket($this->ip->of($request));
-        $retryAfter = $this->throttle->retryAfter($key, $this->max, $now);
-        if ($retryAfter > 0) {
-            throw new TooManyRequests($retryAfter);
+        // Count first, then compare: the increment is atomic, so a concurrent burst cannot slip past max.
+        if ($this->throttle->hit($key, $this->seconds, $now) > $this->max) {
+            throw new TooManyRequests(max(1, $this->throttle->retryAfter($key, $this->max, $now)));
         }
-        $this->throttle->hit($key, $this->seconds, $now);
 
         return $handler->handle($request);
     }

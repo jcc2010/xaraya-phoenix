@@ -8,6 +8,7 @@ use DateTimeImmutable;
 use DateTimeZone;
 use LogicException;
 use Nyholm\Psr7\ServerRequest;
+use PDOException;
 use Xaraya\Kernel\Auth\Throttle;
 use Xaraya\Kernel\Http\ClientIp;
 use Xaraya\Kernel\Http\Middleware\ThrottleRequests;
@@ -101,6 +102,47 @@ final class ThrottleTest extends AuthTestCase
         self::assertSame('10.0.0.1', $ip->of($request('192.0.2.9, junk, 10.0.0.2')), 'a malformed hop ends the walk');
         self::assertSame('10.0.0.1', $ip->of($request('10.0.0.2')));
         self::assertSame('10.0.0.1', $ip->of(new ServerRequest('GET', '/', [], null, '1.1', ['REMOTE_ADDR' => '10.0.0.1'])));
+    }
+
+    public function testRetryAfterIsRightForANonUtcClock(): void
+    {
+        $app = $this->installed();
+        $throttle = $app->container()->get(Throttle::class);
+        $now = new DateTimeImmutable('2026-10-21 12:00:00', new DateTimeZone('America/Denver'));
+        $throttle->hit('tz', 900, $now);
+        $throttle->hit('tz', 900, $now);
+        self::assertSame(900, $throttle->retryAfter('tz', 2, $now));
+        self::assertSame(600, $throttle->retryAfter('tz', 2, $now->modify('+5 minutes')));
+    }
+
+    public function testOnlyIntegrityViolationsAreRetriedAndOtherErrorsPropagate(): void
+    {
+        self::assertTrue(Throttle::isIntegrityViolation(new PDOException('dup', 23000)));
+        $mysql = new PDOException('dup');
+        $mysql->errorInfo = ['23000', 1062, 'Duplicate entry'];
+        self::assertTrue(Throttle::isIntegrityViolation($mysql));
+        $pg = new PDOException('dup');
+        $pg->errorInfo = ['23505', 7, 'unique_violation'];
+        self::assertTrue(Throttle::isIntegrityViolation($pg));
+        $other = new PDOException('gone');
+        $other->errorInfo = ['HY000', 1, 'no such table'];
+        self::assertFalse(Throttle::isIntegrityViolation($other));
+
+        $app = $this->installed();
+        $throttle = $app->container()->get(Throttle::class);
+        $this->db($app)->query('DROP TABLE {throttle}');
+        $this->expectException(PDOException::class);
+        $throttle->hit('k', 60, new DateTimeImmutable());
+    }
+
+    public function testClientIpNormalisesIpv6Notation(): void
+    {
+        $request = static fn(string $remote, string $xff): ServerRequest => new ServerRequest('GET', '/', ['X-Forwarded-For' => $xff], null, '1.1', ['REMOTE_ADDR' => $remote]);
+        $ip = new ClientIp(['2001:0DB8:0000:0000:0000:0000:0000:0001', '2001:db8::2']);
+        self::assertSame('192.0.2.9', $ip->of($request('2001:db8::1', '192.0.2.9')));
+        self::assertSame('192.0.2.9', $ip->of($request('2001:DB8::1', '192.0.2.9, 2001:0db8:0:0:0:0:0:2')));
+        self::assertSame('2001:db8::99', $ip->of($request('2001:db8::1', '2001:DB8:0::99')));
+        self::assertSame('2001:db8::3', $ip->of($request('2001:db8::3', '192.0.2.9')));
     }
 
     public function testAMalformedSpecIsAProgrammingError(): void

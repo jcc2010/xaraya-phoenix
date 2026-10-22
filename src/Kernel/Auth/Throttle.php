@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace Xaraya\Kernel\Auth;
 
 use DateTimeImmutable;
+use DateTimeZone;
 use PDOException;
+use RuntimeException;
 use Xaraya\Kernel\Db\Connection;
 
 /**
@@ -24,7 +26,7 @@ final class Throttle
             return 0;
         }
 
-        return max(1, (new DateTimeImmutable((string) $row['reset_at'], $now->getTimezone()))->getTimestamp() - $now->getTimestamp());
+        return max(1, (new DateTimeImmutable((string) $row['reset_at'], new DateTimeZone('UTC')))->getTimestamp() - $now->getTimestamp());
     }
 
     /**
@@ -51,12 +53,23 @@ final class Throttle
                 $this->db->insert('throttle', ['key' => $id, 'hits' => 1, 'reset_at' => $reset]);
 
                 return 1;
-            } catch (PDOException) {
+            } catch (PDOException $e) {
+                if (!self::isIntegrityViolation($e)) {
+                    throw $e;
+                }
                 // a concurrent request created the row first: count against it
             }
         }
 
-        return (int) $this->db->fetchValue("SELECT hits FROM {throttle} WHERE {$column} = ?", [$id]);
+        throw new RuntimeException('The throttle counter could not be updated');
+    }
+
+    /** SQLSTATE class 23: a unique-key violation, i.e. a concurrent request inserted the row first. */
+    public static function isIntegrityViolation(PDOException $e): bool
+    {
+        $state = (string) ($e->errorInfo[0] ?? $e->getCode());
+
+        return str_starts_with($state, '23');
     }
 
     public function clear(string $key): void

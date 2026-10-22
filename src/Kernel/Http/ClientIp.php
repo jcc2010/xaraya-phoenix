@@ -12,14 +12,27 @@ use Psr\Http\Message\ServerRequestInterface;
  */
 final class ClientIp
 {
-    /** @param list<string> $trustedProxies exact addresses of reverse proxies */
-    public function __construct(private readonly array $trustedProxies = []) {}
+    /** @var list<string> canonical addresses */
+    private readonly array $trustedProxies;
+
+    /** @param list<string> $trustedProxies addresses of reverse proxies, in any notation */
+    public function __construct(array $trustedProxies = [])
+    {
+        $this->trustedProxies = array_map(self::canonical(...), $trustedProxies);
+    }
+
+    private static function canonical(string $ip): string
+    {
+        $packed = filter_var($ip, FILTER_VALIDATE_IP) === false ? false : inet_pton($ip);
+
+        return $packed === false ? $ip : (string) inet_ntop($packed);
+    }
 
     public function of(ServerRequestInterface $request): string
     {
         $remote = $request->getServerParams()['REMOTE_ADDR'] ?? '';
         $remote = is_string($remote) ? $remote : '';
-        if (!in_array($remote, $this->trustedProxies, true)) {
+        if (!in_array(self::canonical($remote), $this->trustedProxies, true)) {
             return $remote;
         }
         foreach (array_reverse(explode(',', $request->getHeaderLine('X-Forwarded-For'))) as $hop) {
@@ -27,6 +40,7 @@ final class ClientIp
             if (filter_var($hop, FILTER_VALIDATE_IP) === false) {
                 break;
             }
+            $hop = self::canonical($hop);
             if (!in_array($hop, $this->trustedProxies, true)) {
                 return $hop;
             }
