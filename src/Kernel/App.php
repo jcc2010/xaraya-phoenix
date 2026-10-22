@@ -14,7 +14,9 @@ use Psr\Log\LoggerInterface;
 use Xaraya\Kernel\Assets\AssetPublisher;
 use Xaraya\Kernel\Assets\AssetUrls;
 use Xaraya\Kernel\Auth\Access;
+use Xaraya\Kernel\Auth\Grants;
 use Xaraya\Kernel\Auth\GuestAccess;
+use Xaraya\Kernel\Auth\UserRepository;
 use Xaraya\Kernel\Blocks\BlockRenderer;
 use Xaraya\Kernel\Blocks\BlockRepository;
 use Xaraya\Kernel\Blocks\BlockTypes;
@@ -114,6 +116,7 @@ final class App
             );
             $registry->onEnable(static function (Manifest $manifest, bool $firstInstall) use ($c): void {
                 $c->get(HookBindings::class)->seed($manifest);
+                $c->get(Grants::class)->seed($manifest);
                 if ($firstInstall) {
                     $c->get(BlockRepository::class)->seed($manifest);
                 }
@@ -121,6 +124,10 @@ final class App
 
             return $registry;
         });
+        $c->set(UserRepository::class, fn(Container $c): UserRepository => new UserRepository(
+            $c->get(Connection::class),
+            (array) $config->get('auth.password_options', []),
+        ));
         $c->set(EventDispatcher::class, fn(Container $c): EventDispatcher => new EventDispatcher($c));
         $c->set(MiddlewareRegistry::class, function (Container $c): MiddlewareRegistry {
             $registry = new MiddlewareRegistry($c);

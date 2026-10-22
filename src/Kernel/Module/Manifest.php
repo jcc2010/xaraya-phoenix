@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Xaraya\Kernel\Module;
 
 use JsonException;
+use Xaraya\Kernel\Auth\Access;
+use Xaraya\Kernel\Auth\Grants;
 use Xaraya\Kernel\Blocks\BlockInstance;
 use Xaraya\Kernel\Hooks\DisplayHook;
 use Xaraya\Kernel\Hooks\HookBindings;
@@ -202,6 +204,33 @@ final class Manifest
                 'visibility' => $visibility,
                 'sort' => (int) ($default['sort'] ?? 0),
             ];
+        }
+
+        return $out;
+    }
+
+    /**
+     * Default grants seeded on enable, for this module: [{"role", "component", "instance" (default "*"), "level"}].
+     *
+     * @return list<array{role: string, component: string, instance: string, level: string}>
+     */
+    public function grants(): array
+    {
+        $out = [];
+        foreach ((array) ($this->data['grants'] ?? []) as $i => $grant) {
+            $role = is_array($grant) ? ($grant['role'] ?? null) : null;
+            $component = is_array($grant) ? ($grant['component'] ?? null) : null;
+            $instance = is_array($grant) ? ($grant['instance'] ?? '*') : null;
+            $level = is_array($grant) ? ($grant['level'] ?? null) : null;
+            if (
+                !is_string($role) || preg_match('/^[A-Za-z][A-Za-z0-9 _-]{0,63}$/D', $role) !== 1
+                || !is_string($component) || !Grants::isValidPart($component)
+                || !is_string($instance) || !Grants::isValidPart($instance)
+                || !is_string($level) || !isset(Access::LEVELS[$level])
+            ) {
+                throw new ModuleException("{$this->name}: grants[{$i}] needs a \"role\", a \"component\", an optional \"instance\" and a \"level\" (" . implode(', ', array_keys(Access::LEVELS)) . ')');
+            }
+            $out[] = ['role' => $role, 'component' => $component, 'instance' => $instance, 'level' => $level];
         }
 
         return $out;

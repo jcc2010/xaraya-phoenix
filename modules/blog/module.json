@@ -6,6 +6,10 @@
   "provider": "Xaraya\\Module\\Blog\\BlogServiceProvider",
   "routes": "Xaraya\\Module\\Blog\\Routes",
   "migrations": "migrations",
+  "grants": [
+    { "role": "Authors", "component": "post", "instance": "own", "level": "delete" },
+    { "role": "Authors", "component": "post", "instance": "*", "level": "read" }
+  ],
   "subscribers": [
     { "event": "Xaraya\\Kernel\\Events\\ItemCreated", "listener": "Xaraya\\Module\\Blog\\Search\\SearchIndexer" },
     { "event": "Xaraya\\Kernel\\Events\\ItemUpdated", "listener": "Xaraya\\Module\\Blog\\Search\\SearchIndexer" },
