@@ -37,6 +37,7 @@ use Xaraya\Kernel\Hooks\HookBindings;
 use Xaraya\Kernel\Http\CallableHandler;
 use Xaraya\Kernel\Http\Emitter;
 use Xaraya\Kernel\Http\HomeController;
+use Xaraya\Kernel\Http\Middleware\Authenticate;
 use Xaraya\Kernel\Http\Middleware\ConditionalGet;
 use Xaraya\Kernel\Http\Middleware\Cors;
 use Xaraya\Kernel\Http\Middleware\ErrorHandler;
@@ -72,7 +73,7 @@ final class App
     private ?array $routes = null;
 
     /** @var list<string> after ErrorHandler, before the router (kernel spec §3.3); pushMiddleware() appends */
-    private array $globalMiddleware = [SessionMiddleware::class];
+    private array $globalMiddleware = [SessionMiddleware::class, Authenticate::class];
 
     /**
      * @param array<string, mixed> $overrides
@@ -333,6 +334,10 @@ final class App
 
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
+        // Every request starts as a guest, including those (404, 405) that never reach the Authenticate middleware.
+        if ($this->container->resolved(Auth::class)) {
+            $this->container->get(Auth::class)->actAs(null);
+        }
         $final = new CallableHandler(function (ServerRequestInterface $request): ResponseInterface {
             $stack = [];
             foreach ($this->globalMiddleware as $class) {

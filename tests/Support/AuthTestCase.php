@@ -8,11 +8,15 @@ use Xaraya\Kernel\App;
 use Xaraya\Kernel\Auth\User;
 use Xaraya\Kernel\Auth\UserRepository;
 use Xaraya\Kernel\Db\Connection;
+use Xaraya\Kernel\Module\ModuleRegistry;
 
 /** Boots the app with the phoenix theme and cheap password hashes; installed() also runs the kernel migrations. */
 abstract class AuthTestCase extends AppTestCase
 {
     public const PASSWORD = 'correct horse battery';
+
+    /** The fixture module "probe": routes that expose the session and the identity. */
+    public const PROBE = __DIR__ . '/../fixtures/auth';
 
     /**
      * @param array<string, mixed> $overrides
@@ -39,6 +43,19 @@ abstract class AuthTestCase extends AppTestCase
         $this->migrateKernel($app);
 
         return $app;
+    }
+
+    /**
+     * An installed app with the probe module enabled and session garbage collection off.
+     *
+     * @param array<string, mixed> $overrides
+     */
+    protected function probeApp(array $overrides = []): App
+    {
+        $overrides = ['session.gc_probability' => 0, ...$overrides];
+        $this->installed($overrides, [self::PROBE])->container()->get(ModuleRegistry::class)->enable('probe');
+
+        return $this->app($overrides, [self::PROBE]);
     }
 
     protected function users(App $app): UserRepository

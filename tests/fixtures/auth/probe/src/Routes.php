@@ -7,6 +7,7 @@ namespace Xaraya\Module\Probe;
 use Nyholm\Psr7\Response;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use Xaraya\Kernel\Auth\Auth;
 use Xaraya\Kernel\Auth\Session;
 use Xaraya\Kernel\Auth\SessionStore;
 use Xaraya\Kernel\Routing\RouteCollector;
@@ -15,10 +16,14 @@ use Xaraya\Kernel\Routing\RouteProvider;
 /** Test routes that expose the session and identity machinery. */
 final class Routes implements RouteProvider
 {
-    public function __construct(private readonly SessionStore $store) {}
+    public function __construct(private readonly SessionStore $store, private readonly Auth $auth) {}
 
     public function routes(RouteCollector $routes): void
     {
+        $routes->get('/probe/whoami', fn(): ResponseInterface => new Response(200, [], (string) json_encode([
+            'user' => $this->auth->user()?->handle,
+            'roles' => $this->auth->roles(),
+        ])), 'probe.whoami');
         $routes->get('/probe/plain', static fn(): ResponseInterface => new Response(200, [], 'plain'), 'probe.plain');
         $routes->get('/probe/count', static function (ServerRequestInterface $r): ResponseInterface {
             $session = self::session($r);

@@ -39,6 +39,12 @@ final class Container
         return array_key_exists($id, $this->instances) || isset($this->factories[$id]) || class_exists($id);
     }
 
+    /** True once $id has been built (or set with instance()). */
+    public function resolved(string $id): bool
+    {
+        return array_key_exists($id, $this->instances);
+    }
+
     /**
      * @template T of object
      * @param class-string<T>|string $id
