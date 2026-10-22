@@ -44,6 +44,7 @@ final class Routes implements RouteProvider
 
             return new Response(200, [], 'deleted');
         }, 'probe.note')->middleware('auth:probe.note.delete');
+        $routes->get('/probe/limited', static fn(): ResponseInterface => new Response(200, [], 'ok'), 'probe.limited')->middleware('throttle:probe,2,60');
         $routes->get('/probe/plain', static fn(): ResponseInterface => new Response(200, [], 'plain'), 'probe.plain');
         $routes->get('/probe/count', static function (ServerRequestInterface $r): ResponseInterface {
             $session = self::session($r);

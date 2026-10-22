@@ -47,6 +47,10 @@ return [
         'max_lifetime' => (int) env('SESSION_MAX_LIFETIME', 86400),
         'gc_probability' => 0.01,
     ],
+    'http' => [
+        // Reverse proxies (exact IPs, comma-separated) whose X-Forwarded-For is believed. Empty: use REMOTE_ADDR only.
+        'trusted_proxies' => array_values(array_filter(array_map('trim', explode(',', (string) env('TRUSTED_PROXIES', ''))))),
+    ],
     'log' => [
         'path' => $root . '/var/logs',
         'level' => env('LOG_LEVEL', 'info'),

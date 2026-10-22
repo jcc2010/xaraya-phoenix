@@ -17,6 +17,7 @@ use Xaraya\Kernel\Auth\Access;
 use Xaraya\Kernel\Auth\Auth;
 use Xaraya\Kernel\Auth\Grants;
 use Xaraya\Kernel\Auth\SessionStore;
+use Xaraya\Kernel\Auth\Throttle;
 use Xaraya\Kernel\Auth\UserRepository;
 use Xaraya\Kernel\Blocks\BlockRenderer;
 use Xaraya\Kernel\Blocks\BlockRepository;
@@ -35,6 +36,7 @@ use Xaraya\Kernel\Db\Migrations\Migrator;
 use Xaraya\Kernel\Events\EventDispatcher;
 use Xaraya\Kernel\Hooks\HookBindings;
 use Xaraya\Kernel\Http\CallableHandler;
+use Xaraya\Kernel\Http\ClientIp;
 use Xaraya\Kernel\Http\Emitter;
 use Xaraya\Kernel\Http\HomeController;
 use Xaraya\Kernel\Http\Middleware\Authenticate;
@@ -44,6 +46,7 @@ use Xaraya\Kernel\Http\Middleware\ErrorHandler;
 use Xaraya\Kernel\Http\Middleware\RequireAuth;
 use Xaraya\Kernel\Http\Middleware\SecureHtml;
 use Xaraya\Kernel\Http\Middleware\SessionMiddleware;
+use Xaraya\Kernel\Http\Middleware\ThrottleRequests;
 use Xaraya\Kernel\Http\Middleware\VerifyCsrf;
 use Xaraya\Kernel\Http\MiddlewareRegistry;
 use Xaraya\Kernel\Http\Pipeline;
@@ -133,6 +136,8 @@ final class App
             $c->get(Connection::class),
             (array) $config->get('auth.password_options', []),
         ));
+        $c->set(Throttle::class, static fn(Container $c): Throttle => new Throttle($c->get(Connection::class)));
+        $c->set(ClientIp::class, fn(): ClientIp => new ClientIp(array_values(array_filter((array) $config->get('http.trusted_proxies', []), 'is_string'))));
         $c->set(EventDispatcher::class, fn(Container $c): EventDispatcher => new EventDispatcher($c));
         $c->set(MiddlewareRegistry::class, function (Container $c): MiddlewareRegistry {
             $registry = new MiddlewareRegistry($c);
@@ -140,6 +145,7 @@ final class App
             $registry->register('conditional', ConditionalGet::class);
             $registry->register('secureHtml', SecureHtml::class);
             $registry->register('auth', RequireAuth::class);
+            $registry->register('throttle', ThrottleRequests::class);
             $registry->registerMarker('csrf');
             foreach ($c->get(ModuleRegistry::class)->enabled() as $manifest) {
                 try {
