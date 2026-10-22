@@ -14,7 +14,7 @@ definition of done. Items tagged (final wave) were flagged as candidates for the
 - **Handle-to-email 429 pairing oracle** at login (inherent to the hit-then-check ruling): a handle and its email share a bucket.
 - **Password from files or the environment.** `--password-stdin` exists; add `--password-file=` or an environment variable for Docker secrets. `--password-stdin` on a TTY echoes; `user:create` prompts for the password before validating handle and email; the real `stty` path is untested.
 - **Trusted proxies.** No CIDR support (exact IPs only); an `X-Forwarded-For` hop with a port or zone id ends the walk. Secure cookie is off behind a TLS proxy in debug mode (honour a trusted `X-Forwarded-Proto` later).
-- **No admin UI** for users, roles or grants.
+- **No admin UI** for users, roles or grants. (The blog now has admin screens; see the blog admin follow-ups. The Authors `own` grant on `blog.post.own` now matches, since posts have owners.)
 - **Kernel auth paths are reserved:** a module that registers `/login` makes FastRoute fail at boot. Give it a clear error.
 - **Grants are re-seeded on every `module:enable`** (accepted ruling), so a default grant an administrator deleted comes back. Track seeded grants if that matters once there is an admin UI.
 - **Throttle rows** are collected on 1% of new windows; there is no command. Session GC runs on dirty saves only (about 1 in 100); there is no GC command either.

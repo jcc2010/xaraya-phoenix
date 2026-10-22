@@ -52,6 +52,9 @@ Templates exist as `.php` or `.twig` (Twig is optional: `composer require twig/t
   them. Guests have `Anonymous`; signed-in users also have `Members` and their own roles. A malformed rule hides
   the block, and `"roles": []` means no restriction. The built-in `login` block shows a "Log in" link to guests and
   the user's name with a logout button otherwise.
+- Admin links: a module's manifest may list `"admin": [{"route", "label", "component", "level"}]`. `Helpers::adminLinks()`
+  (`$x->adminLinks()` in templates) returns the links the signed-in user may use, and the theme header shows them as a
+  nav. The route must take no parameters; a link whose route does not resolve is skipped and logged.
 - Display hooks: a module's `"displayHooks"` add HTML to other modules' items, bound in `xar_hooks`.
   Toggle a binding with `bin/xar hook:disable <observer> <subject> [itemtype]` / `hook:enable`.
 - `bin/xar asset:publish` links `modules/*/assets` and `themes/*/assets` into `public/assets`.
@@ -78,11 +81,11 @@ refused) and cannot contain a NUL character. Changing a password ends that user'
   Anonymous, signed in or not. Authors and Members hold no seeded grants beyond blog's Authors grants (below).
   A role may have a parent and gets its grants.
   Modules seed their own grants on `module:enable` with `"grants": [{"role", "component", "instance", "level"}]`;
-  re-enabling restores a deleted default grant but keeps a changed level. There is no admin UI yet: roles, parents
-  and grants are changed in the database.
+  re-enabling restores a deleted default grant but keeps a changed level. There is no admin UI for users, roles or grants yet: roles, parents
+  and grants are changed in the database. (The blog has its own admin screens, below.)
 - **Checks:** `$x->can('edit', 'blog', 'post', $item)` in templates, `Auth::can()` in code, `auth` (signed in)
   or `auth:<module>.<component>.<level>` on routes. An `own` grant matches an item whose `owner_id` is the user's
-  id. Blog posts have no owner yet, so the Authors grants on `blog.post.own` have no effect until a later plan adds one.
+  id. Blog posts now have an owner (see Admin screens), so the Authors grants on `blog.post.own` take effect.
   **`auth:<module>.<component>.<level>` checks the component only, with no item,** so an `own`-only user passes it for
   every item. A controller that loads an item must check again with that item (`can(level, module, component,
   $item)`), or one user can act on another's items. A guest who fails a route check is sent to `/login?next=…`
@@ -97,6 +100,9 @@ refused) and cannot contain a NUL character. Changing a password ends that user'
   `Cache-Control: private, no-cache`, and an error page for a request with a session cookie or a signed-in user
   (session or token) with `Cache-Control: private, no-store`. An error page saves nothing to the session, but its
   forms (the logout button) carry the session's token.
+- **Flash messages:** `Session::flash($message, $kind = 'status')` queues a plain-text message for the next page, and
+  `Session::takeFlash()` returns and clears the queue. The page that shows it escapes it. Admin actions answer with a
+  303 redirect and a flash message.
 - **CSRF:** every POST, PUT, PATCH and DELETE needs the session's token, from `$x->csrf()` (a hidden `_csrf` field)
   or an `X-CSRF-Token` header (the field wins if both are sent), unless its route is marked `csrf:off`. Token
   routes are marked `csrf:off`, because a bearer token is not sent by the browser on its own. A missing or wrong
@@ -113,6 +119,8 @@ refused) and cannot contain a NUL character. Changing a password ends that user'
   that host has no dot. There is no SMTP client yet: use the server's MTA. `APP_URL` must be set, because reset links
   are built from it; without it the `/password/*` pages answer 500. A failure to send is logged and the page answers
   as usual.
+
+Migrations: `Schema::table()` can add a foreign key, but only on a new nullable column added by the same call.
 
 **Upgrading an install that has no users yet** (one that predates sign-in): run `bin/xar install`. It runs the new
 migrations, seeds the roles and the grants of the enabled modules, and creates the administrator; nothing else
@@ -189,6 +197,43 @@ partial with `render()`, so an override in either engine is found.
 Search uses its own index (`xar_post_search`), kept current by sync. `bin/xar blog:reindex <handle>|--all`
 rebuilds it. **Upgrading an install that already has blogs:** run `bin/xar migrate`, then
 `bin/xar blog:reindex --all` once, or older posts won't be found.
+
+### Admin screens
+
+The blog module has admin screens at `/admin/blog`. They need a login (a guest is sent to `/login?next=…`), and the
+header shows a "Blog admin" link to anyone who may edit posts. Admin pages are never cached: every admin response is
+`Cache-Control: private, no-store`, and every admin form carries a CSRF token.
+
+| Role | Can do |
+| --- | --- |
+| Administrators | Everything: all posts, pinning, blog settings, new native blogs, "Sync now" on mirrors |
+| Editors | Create, edit, delete and pin any post |
+| Authors | Create posts; edit or delete their own. The published tab lists all posts, but the scheduled and deleted tabs show only their own. They cannot pin |
+| Members, guests | No access |
+
+Pinning a post needs Editor (edit on `blog · blog`). Blog settings and new blogs need Administrator.
+
+Posts have an owner, `owner_id`: the signed-in user who created the post in the admin, or the user a token acts as for
+the JSON API and Micropub. It decides which posts an Author may change. It never appears in the JSON or RSS feeds.
+
+The post form covers:
+
+- the kind, a title, the content, and a tags field (comma separated, so a tag name cannot contain a comma). HTML is
+  stored as given and sanitised when it is rendered;
+- the date, a `datetime-local` field read in `app.timezone` (`APP_TIMEZONE`); a date in the future schedules the post;
+- the pin checkbox, shown to Editors and Administrators only;
+- an image upload: images only, up to 10 MB. PHP's `post_max_size` must be larger than 10 MB, for example `12M`
+  (and `upload_max_filesize` likewise), or PHP drops the whole form;
+- a remove-image option on a post that has an image;
+- Preview, which renders the post as it would appear and never saves it (a file chosen on a preview is ignored).
+
+Deleting the pinned post unpins it; undeleting it does not pin it again, so pin it again by hand.
+
+Mirror blogs are read-only: no new-post link and no edit or delete controls. An Administrator gets a "Sync now"
+button. A mirror's settings show the fields the source sets (title, description, author, language) read-only; only the
+post URL pattern and the media setting can be edited, so a sync never silently undoes an edit. Administrators create
+native blogs and edit blog settings in the admin. Switching a blog's mode and creating a mirror stay with
+`bin/xar blog:mode` and `bin/xar blog:create`.
 
 ### Writing natively: tokens, the JSON API and Micropub
 
