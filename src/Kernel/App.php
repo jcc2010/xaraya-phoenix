@@ -14,8 +14,8 @@ use Psr\Log\LoggerInterface;
 use Xaraya\Kernel\Assets\AssetPublisher;
 use Xaraya\Kernel\Assets\AssetUrls;
 use Xaraya\Kernel\Auth\Access;
+use Xaraya\Kernel\Auth\Auth;
 use Xaraya\Kernel\Auth\Grants;
-use Xaraya\Kernel\Auth\GuestAccess;
 use Xaraya\Kernel\Auth\UserRepository;
 use Xaraya\Kernel\Blocks\BlockRenderer;
 use Xaraya\Kernel\Blocks\BlockRepository;
@@ -208,7 +208,7 @@ final class App
             );
         });
 
-        $c->set(Access::class, fn(): Access => new GuestAccess());
+        $c->set(Access::class, fn(Container $c): Access => $c->get(Auth::class));
         $c->set(TwigEngine::class, fn(Container $c): TwigEngine => new TwigEngine(
             $c->get(TemplateLocator::class),
             $this->cacheDir() . '/twig',

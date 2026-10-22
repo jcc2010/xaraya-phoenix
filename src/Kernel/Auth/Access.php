@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Xaraya\Kernel\Auth;
 
-/** Privilege checks for the current request (kernel spec §4.3). Plan 3 binds the real implementation. */
+/** Privilege checks for the current request (kernel spec §4.3). The container binds it to Auth. */
 interface Access
 {
     public const LEVELS = [

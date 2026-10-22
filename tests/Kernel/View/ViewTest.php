@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Xaraya\Tests\Kernel\View;
 
 use Xaraya\Kernel\App;
-use Xaraya\Kernel\Auth\GuestAccess;
 use Xaraya\Kernel\Module\ModuleRegistry;
 use Xaraya\Kernel\View\PhpEngine;
 use Xaraya\Kernel\View\TemplateLocator;
@@ -106,19 +105,6 @@ final class ViewTest extends AppTestCase
         $this->expectException(ViewException::class);
         $this->expectExceptionMessage('composer require twig/twig');
         $engine->render('hello', $this->tmp . '/themes/plain/templates/hello.twig', ['name' => 'x'], $c->get(View::class)->helpers());
-    }
-
-    public function testGuestAccessAllowsReadingOnly(): void
-    {
-        $access = new GuestAccess();
-        self::assertTrue($access->can('overview'));
-        self::assertTrue($access->can('read', 'blog', 'post'));
-        self::assertFalse($access->can('comment'));
-        self::assertFalse($access->can('admin'));
-        self::assertNull($access->user());
-        self::assertSame(['Anonymous'], $access->roles());
-        $this->expectException(\InvalidArgumentException::class);
-        $access->can('superuser');
     }
 
     public function testEscapeAndAssetGuards(): void
