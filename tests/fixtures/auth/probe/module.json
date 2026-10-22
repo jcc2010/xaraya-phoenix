@@ -1,0 +1,5 @@
+{
+  "name": "probe",
+  "version": "1.0.0",
+  "routes": "Xaraya\\Module\\Probe\\Routes"
+}

@@ -39,6 +39,12 @@ return [
         'path' => $root . '/public/assets',
         'url' => env('ASSET_URL', '/assets'),
     ],
+    'session' => [
+        'cookie' => env('SESSION_COOKIE', 'xar_session'),
+        // Idle minutes before a session expires; expired rows are deleted on about 1 in 100 session writes.
+        'lifetime' => (int) env('SESSION_LIFETIME', 120),
+        'gc_probability' => 0.01,
+    ],
     'log' => [
         'path' => $root . '/var/logs',
         'level' => env('LOG_LEVEL', 'info'),

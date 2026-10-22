@@ -1,0 +1,77 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Xaraya\Kernel\Http\Middleware;
+
+use DateTimeImmutable;
+use DateTimeZone;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
+use Psr\Http\Server\MiddlewareInterface;
+use Psr\Http\Server\RequestHandlerInterface;
+use Xaraya\Kernel\Auth\Session;
+use Xaraya\Kernel\Auth\SessionStore;
+use Xaraya\Kernel\Config\Config;
+
+/**
+ * Global middleware: loads the session named by the cookie (session.cookie, default "xar_session") into the
+ * Session::class request attribute, and after the response saves it, renews the cookie or expires it. The cookie
+ * is HttpOnly and SameSite=Lax, and Secure unless app.debug is on and the request came over plain HTTP.
+ * A response that used a session is marked Cache-Control: private, no-cache.
+ */
+final class SessionMiddleware implements MiddlewareInterface
+{
+    public function __construct(private readonly SessionStore $store, private readonly Config $config) {}
+
+    public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
+    {
+        $now = new DateTimeImmutable('now', new DateTimeZone('UTC'));
+        $name = $this->cookieName();
+        $cookie = $request->getCookieParams()[$name] ?? null;
+        $session = (is_string($cookie) ? $this->store->load($cookie, $now) : null) ?? Session::fresh();
+        $response = $handler->handle($request->withAttribute(Session::class, $session));
+
+        $lifetime = 60 * max(1, (int) $this->config->get('session.lifetime', 120));
+        if ($session->isDirty() && $session->isEmpty()) {
+            $this->store->forget($session);
+            if (is_string($cookie)) {
+                $response = $response->withAddedHeader('Set-Cookie', $this->cookie($request, $name, '', 0));
+            }
+        } elseif ($session->isDirty()) {
+            $this->store->save($session, $now, $lifetime);
+            $response = $response->withAddedHeader('Set-Cookie', $this->cookie($request, $name, (string) $session->id(), null));
+            $this->maybeCollectGarbage($now);
+        } else {
+            $this->store->touch($session, $now, $lifetime);
+        }
+        if ($session->id() !== null && !str_contains($response->getHeaderLine('Cache-Control'), 'no-store')) {
+            $response = $response->withHeader('Cache-Control', 'private, no-cache');
+        }
+
+        return $response;
+    }
+
+    private function cookieName(): string
+    {
+        $name = (string) $this->config->get('session.cookie', 'xar_session');
+
+        return preg_match('/^[A-Za-z0-9_-]{1,64}$/D', $name) === 1 ? $name : 'xar_session';
+    }
+
+    private function cookie(ServerRequestInterface $request, string $name, string $value, ?int $maxAge): string
+    {
+        $secure = $request->getUri()->getScheme() === 'https' || $this->config->get('app.debug', false) !== true;
+
+        return $name . '=' . $value . '; Path=/' . ($maxAge === null ? '' : '; Max-Age=' . $maxAge)
+            . '; HttpOnly; SameSite=Lax' . ($secure ? '; Secure' : '');
+    }
+
+    private function maybeCollectGarbage(DateTimeImmutable $now): void
+    {
+        $probability = (float) $this->config->get('session.gc_probability', 0.01);
+        if ($probability > 0 && random_int(1, 1_000_000) <= (int) ($probability * 1_000_000)) {
+            $this->store->gc($now);
+        }
+    }
+}

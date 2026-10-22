@@ -40,6 +40,7 @@ use Xaraya\Kernel\Http\Middleware\ConditionalGet;
 use Xaraya\Kernel\Http\Middleware\Cors;
 use Xaraya\Kernel\Http\Middleware\ErrorHandler;
 use Xaraya\Kernel\Http\Middleware\SecureHtml;
+use Xaraya\Kernel\Http\Middleware\SessionMiddleware;
 use Xaraya\Kernel\Http\MiddlewareRegistry;
 use Xaraya\Kernel\Http\Pipeline;
 use Xaraya\Kernel\Http\RouteHandler;
@@ -69,8 +70,8 @@ final class App
     /** @var list<Route>|null */
     private ?array $routes = null;
 
-    /** @var list<string> */
-    private array $globalMiddleware = [];
+    /** @var list<string> after ErrorHandler, before the router (kernel spec §3.3); pushMiddleware() appends */
+    private array $globalMiddleware = [SessionMiddleware::class];
 
     /**
      * @param array<string, mixed> $overrides
