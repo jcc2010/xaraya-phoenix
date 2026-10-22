@@ -44,7 +44,7 @@ final class HelloModuleTest extends AppTestCase
     /** @param array<string, string> $body */
     private function greet(App $app, string $name, array $body = []): string
     {
-        $request = new ServerRequest('POST', '/hello/' . $name);
+        $request = $this->withCsrf($app, new ServerRequest('POST', '/hello/' . $name));
         if ($body !== []) {
             $request = $request->withParsedBody($body);
         }
@@ -111,6 +111,14 @@ final class HelloModuleTest extends AppTestCase
         self::assertSame('GET', $wrongMethod->getHeaderLine('Allow'));
 
         self::assertSame(404, $app->handle(new ServerRequest('POST', '/hello/Not-Lowercase'))->getStatusCode());
+    }
+
+    public function testCreatingAGreetingNeedsTheCsrfToken(): void
+    {
+        $this->enableHello();
+        $app = $this->app();
+        self::assertSame(403, $app->handle(new ServerRequest('POST', '/hello/ada'))->getStatusCode());
+        self::assertSame(['greetings' => []], json_decode((string) $app->handle(new ServerRequest('GET', '/hello.json'))->getBody(), true));
     }
 
     public function testUrlGeneration(): void

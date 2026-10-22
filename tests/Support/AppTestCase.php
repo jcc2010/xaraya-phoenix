@@ -5,7 +5,10 @@ declare(strict_types=1);
 namespace Xaraya\Tests\Support;
 
 use PHPUnit\Framework\TestCase;
+use Psr\Http\Message\ServerRequestInterface;
 use Xaraya\Kernel\App;
+use Xaraya\Kernel\Auth\Session;
+use Xaraya\Kernel\Auth\SessionStore;
 use Xaraya\Kernel\Db\Migrations\Migrator;
 
 abstract class AppTestCase extends TestCase
@@ -41,6 +44,19 @@ abstract class AppTestCase extends TestCase
             DbTestCase::dropAll(DbTestCase::connect());
         }
         self::rmdir($this->tmp);
+    }
+
+    /**
+     * Gives $request a stored session and its CSRF token (cookie and X-CSRF-Token header), as a page with a
+     * form would have. The kernel migrations must have run.
+     */
+    protected function withCsrf(App $app, ServerRequestInterface $request): ServerRequestInterface
+    {
+        $session = Session::fresh();
+        $token = $session->token();
+        $app->container()->get(SessionStore::class)->save($session, new \DateTimeImmutable(), 3600);
+
+        return $request->withCookieParams(['xar_session' => (string) $session->id()])->withHeader('X-CSRF-Token', $token);
     }
 
     protected function migrateKernel(App $app): void

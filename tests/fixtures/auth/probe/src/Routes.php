@@ -12,11 +12,12 @@ use Xaraya\Kernel\Auth\Session;
 use Xaraya\Kernel\Auth\SessionStore;
 use Xaraya\Kernel\Routing\RouteCollector;
 use Xaraya\Kernel\Routing\RouteProvider;
+use Xaraya\Kernel\View\View;
 
 /** Test routes that expose the session and identity machinery. */
 final class Routes implements RouteProvider
 {
-    public function __construct(private readonly SessionStore $store, private readonly Auth $auth) {}
+    public function __construct(private readonly SessionStore $store, private readonly Auth $auth, private readonly View $view) {}
 
     public function routes(RouteCollector $routes): void
     {
@@ -24,6 +25,11 @@ final class Routes implements RouteProvider
             'user' => $this->auth->user()?->handle,
             'roles' => $this->auth->roles(),
         ])), 'probe.whoami');
+        $routes->any('/probe/form', fn(ServerRequestInterface $r): ResponseInterface => new Response(
+            200,
+            [],
+            $r->getMethod() === 'GET' ? '<form method="post">' . $this->view->helpers($r)->csrf() . '</form>' : 'ok ' . $r->getMethod(),
+        ), 'probe.form');
         $routes->get('/probe/plain', static fn(): ResponseInterface => new Response(200, [], 'plain'), 'probe.plain');
         $routes->get('/probe/count', static function (ServerRequestInterface $r): ResponseInterface {
             $session = self::session($r);

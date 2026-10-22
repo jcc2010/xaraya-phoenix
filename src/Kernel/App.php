@@ -43,6 +43,7 @@ use Xaraya\Kernel\Http\Middleware\Cors;
 use Xaraya\Kernel\Http\Middleware\ErrorHandler;
 use Xaraya\Kernel\Http\Middleware\SecureHtml;
 use Xaraya\Kernel\Http\Middleware\SessionMiddleware;
+use Xaraya\Kernel\Http\Middleware\VerifyCsrf;
 use Xaraya\Kernel\Http\MiddlewareRegistry;
 use Xaraya\Kernel\Http\Pipeline;
 use Xaraya\Kernel\Http\RouteHandler;
@@ -73,7 +74,7 @@ final class App
     private ?array $routes = null;
 
     /** @var list<string> after ErrorHandler, before the router (kernel spec §3.3); pushMiddleware() appends */
-    private array $globalMiddleware = [SessionMiddleware::class, Authenticate::class];
+    private array $globalMiddleware = [SessionMiddleware::class, Authenticate::class, VerifyCsrf::class];
 
     /**
      * @param array<string, mixed> $overrides

@@ -9,10 +9,12 @@ use Psr\Http\Message\ServerRequestInterface;
 use Stringable;
 use Xaraya\Kernel\Assets\AssetUrls;
 use Xaraya\Kernel\Auth\Access;
+use Xaraya\Kernel\Auth\Session;
 use Xaraya\Kernel\Blocks\BlockRenderer;
 use Xaraya\Kernel\Config\Config;
 use Xaraya\Kernel\Container\Container;
 use Xaraya\Kernel\Hooks\DisplayHooks;
+use Xaraya\Kernel\Http\Middleware\VerifyCsrf;
 use Xaraya\Kernel\Routing\UrlGenerator;
 
 /**
@@ -84,10 +86,14 @@ final class Helpers
         return $this->container->get(BlockRenderer::class)->region($region, $this);
     }
 
-    /** The CSRF hidden field. A stub until Plan 3 adds sessions: it returns ''. */
+    /** The CSRF hidden field for a form that posts back to this site ('' outside a request). */
     public function csrf(): string
     {
-        return '';
+        $session = $this->request?->getAttribute(Session::class);
+
+        return $session instanceof Session
+            ? '<input type="hidden" name="' . VerifyCsrf::FIELD . '" value="' . $this->e($session->token()) . '">'
+            : '';
     }
 
     /** @param array<string, mixed> $params */
