@@ -7,6 +7,7 @@ namespace Xaraya\Module\Micropub;
 use Nyholm\Psr7\Response;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use Xaraya\Kernel\Auth\Access;
 use Xaraya\Kernel\Config\Config;
 use Xaraya\Kernel\Http\Controller;
 use Xaraya\Kernel\Http\Exception\HttpException;
@@ -31,6 +32,7 @@ final class MicropubController extends Controller
         private readonly ItemSerializer $items,
         private readonly UrlGenerator $urls,
         private readonly Config $config,
+        private readonly Access $access,
     ) {}
 
     /** GET /micropub?q=config|source|syndicate-to */
@@ -89,7 +91,7 @@ final class MicropubController extends Controller
         if ($input->json === []) {
             throw new HttpException(400, 'Send updates as JSON');
         }
-        [$blog, $post] = $this->locate($request, $input);
+        [$blog, $post] = $this->locate($request, $input, 'edit');
         $current = $this->items->item($blog, $post, $this->appUrl());
         $properties = $this->mapper->fromItem($current, PostWriter::hasDerivedTitle($post));
         $touched = [];
@@ -130,7 +132,7 @@ final class MicropubController extends Controller
 
     private function delete(ServerRequestInterface $request, MicropubInput $input): ResponseInterface
     {
-        [, $post] = $this->locate($request, $input);
+        [, $post] = $this->locate($request, $input, 'delete');
         $this->writer->delete($post);
 
         return new Response(204);
@@ -138,7 +140,7 @@ final class MicropubController extends Controller
 
     private function undelete(ServerRequestInterface $request, MicropubInput $input): ResponseInterface
     {
-        [, $post] = $this->locate($request, $input);
+        [, $post] = $this->locate($request, $input, 'delete');
         $this->writer->undelete($post);
 
         return new Response(204);
@@ -172,14 +174,21 @@ final class MicropubController extends Controller
         return ['properties' => (object) array_intersect_key($properties, array_flip($wanted))];
     }
 
-    /** @return array{0: Blog, 1: Post} the post the url names and its blog, once the token may write to that blog */
-    private function locate(ServerRequestInterface $request, MicropubInput $input): array
+    /**
+     * The post the url names and its blog, once the token may write to that blog and, for a token that acts as a
+     * user, that user may $level ("edit" or "delete") the post, as in the admin.
+     *
+     * @return array{0: Blog, 1: Post}
+     */
+    private function locate(ServerRequestInterface $request, MicropubInput $input, string $level): array
     {
         if ($input->url === null) {
             throw new HttpException(400, "action={$input->action} needs a url");
         }
+        [$blog, $post] = $this->find($request, $input->url);
+        ApiAccess::allowPost($request, $blog, $post, $this->access, $level);
 
-        return $this->find($request, $input->url);
+        return [$blog, $post];
     }
 
     /** @return array{0: Blog, 1: Post} */

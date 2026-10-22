@@ -326,4 +326,33 @@ final class PostApiTest extends ApiTestCase
         $id = basename((string) self::json($response)['id']);
         self::assertSame($ada->id, $this->app()->container()->get(PostRepository::class)->find($id)?->ownerId);
     }
+
+    public function testAUserBoundTokenChangesOnlyPostsItsUserMayChangeInTheAdmin(): void
+    {
+        $users = $this->site->container()->get(UserRepository::class);
+        $users->create('ada', 'ada@example.com', 'correct horse battery', 'Ada', 'active', ['Authors']);
+        $users->create('bob', 'bob@example.com', 'correct horse battery', 'Bob', 'active', ['Authors']);
+        $ada = $this->token('blog:write', ['--user=ada']);
+        $bob = $this->token('blog:write', ['--user=bob']);
+        $theirs = basename((string) self::json($this->api('POST', '/api/blogs/notes/posts', $bob, ['content_html' => '<p>Bob</p>']))['id']);
+        $mine = basename((string) self::json($this->api('POST', '/api/blogs/notes/posts', $ada, ['content_html' => '<p>Ada</p>']))['id']);
+
+        self::assertSame(200, $this->api('GET', "/api/posts/{$theirs}", $ada)->getStatusCode(), 'reading stays open');
+        self::assertSame(403, $this->api('PATCH', "/api/posts/{$theirs}", $ada, ['title' => 'Ada was here'])->getStatusCode());
+        self::assertSame(403, $this->api('PUT', "/api/posts/{$theirs}", $ada, ['content_html' => '<p>Ada</p>'])->getStatusCode());
+        self::assertSame(403, $this->api('DELETE', "/api/posts/{$theirs}", $ada)->getStatusCode());
+        self::assertSame(204, $this->api('DELETE', "/api/posts/{$theirs}", $this->token)->getStatusCode(), 'a scope-only token is unchanged');
+        $undelete = $this->api('POST', "/api/posts/{$theirs}/undelete", $ada);
+        self::assertSame(403, $undelete->getStatusCode());
+        self::assertSame('application/json', $undelete->getHeaderLine('Content-Type'));
+        $post = $this->app()->container()->get(PostRepository::class)->find($theirs);
+        self::assertSame(['<p>Bob</p>', 'deleted'], [$post?->contentHtml, $post?->status]);
+        self::assertSame(200, $this->api('POST', "/api/posts/{$theirs}/undelete", $this->token)->getStatusCode());
+        self::assertSame(200, $this->api('PATCH', "/api/posts/{$theirs}", $this->token, ['title' => 'Edited'])->getStatusCode());
+
+        self::assertSame(200, $this->api('PATCH', "/api/posts/{$mine}", $ada, ['title' => 'Mine'])->getStatusCode());
+        self::assertSame(200, $this->api('PUT', "/api/posts/{$mine}", $ada, ['content_html' => '<p>Still mine</p>'])->getStatusCode());
+        self::assertSame(204, $this->api('DELETE', "/api/posts/{$mine}", $ada)->getStatusCode());
+        self::assertSame(200, $this->api('POST', "/api/posts/{$mine}/undelete", $ada)->getStatusCode());
+    }
 }

@@ -9,6 +9,7 @@ use DateTimeZone;
 use Nyholm\Psr7\Response;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use Xaraya\Kernel\Auth\Access;
 use Xaraya\Kernel\Config\Config;
 use Xaraya\Kernel\Http\Controller;
 use Xaraya\Kernel\Http\Exception\NotFound;
@@ -34,6 +35,7 @@ final class PostApiController extends Controller
         private readonly PostWriter $writer,
         private readonly ItemSerializer $items,
         private readonly Config $config,
+        private readonly Access $access,
     ) {}
 
     /** @param array<string, string> $params */
@@ -59,7 +61,7 @@ final class PostApiController extends Controller
     /** @param array<string, string> $params */
     public function replace(ServerRequestInterface $request, array $params): ResponseInterface
     {
-        [$blog, $post] = $this->load($request, $params['id']);
+        [$blog, $post] = $this->load($request, $params['id'], 'edit');
         PostWriter::assertNative($blog);
 
         return $this->item($blog, $this->writer->replace($post, JsonBody::decode($request)));
@@ -68,7 +70,7 @@ final class PostApiController extends Controller
     /** @param array<string, string> $params */
     public function patch(ServerRequestInterface $request, array $params): ResponseInterface
     {
-        [$blog, $post] = $this->load($request, $params['id']);
+        [$blog, $post] = $this->load($request, $params['id'], 'edit');
         PostWriter::assertNative($blog);
         $partial = JsonBody::decode($request, self::PATCH_TYPES);
 
@@ -78,7 +80,7 @@ final class PostApiController extends Controller
     /** @param array<string, string> $params */
     public function delete(ServerRequestInterface $request, array $params): ResponseInterface
     {
-        [, $post] = $this->load($request, $params['id']);
+        [, $post] = $this->load($request, $params['id'], 'delete');
         $this->writer->delete($post);
 
         return new Response(204, ['Cache-Control' => 'no-store']);
@@ -87,18 +89,21 @@ final class PostApiController extends Controller
     /** @param array<string, string> $params */
     public function undelete(ServerRequestInterface $request, array $params): ResponseInterface
     {
-        [$blog, $post] = $this->load($request, $params['id']);
+        [$blog, $post] = $this->load($request, $params['id'], 'delete');
 
         return $this->item($blog, $this->writer->undelete($post));
     }
 
-    /** @return array{0: Blog, 1: Post} */
-    private function load(ServerRequestInterface $request, string $id): array
+    /**
+     * @param ?string $level the write about to happen ("edit" or "delete"), checked against the token's user; null to read
+     * @return array{0: Blog, 1: Post}
+     */
+    private function load(ServerRequestInterface $request, string $id, ?string $level = null): array
     {
         $post = $this->posts->find($id) ?? throw new NotFound('Unknown post');
         $blog = $this->blogs->findById($post->blogId) ?? throw new NotFound('Unknown post');
         // The {id} route has no {handle}, so the token middleware cannot check a blog pin: check it here.
-        ApiAccess::allow($request, $blog);
+        $level === null ? ApiAccess::allow($request, $blog) : ApiAccess::allowPost($request, $blog, $post, $this->access, $level);
 
         return [$blog, $post];
     }

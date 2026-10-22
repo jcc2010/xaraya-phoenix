@@ -7,6 +7,7 @@ namespace Xaraya\Tests\Module\Micropub;
 use Nyholm\Psr7\ServerRequest;
 use Nyholm\Psr7\Stream;
 use Psr\Http\Message\ResponseInterface;
+use Xaraya\Kernel\Auth\UserRepository;
 use Xaraya\Kernel\Events\EventDispatcher;
 use Xaraya\Kernel\Events\ItemEvent;
 use Xaraya\Kernel\Events\ItemUpdated;
@@ -292,5 +293,29 @@ final class MicropubUpdateTest extends MicropubTestCase
         $this->form(['action' => 'delete', 'url' => $url]);
         self::assertMicropubError($this->postJson(['action' => 'undelete', 'url' => $url], $pinned), 403, 'forbidden');
         self::assertSame('deleted', $this->post($url)->status);
+    }
+
+    public function testAUserBoundTokenChangesOnlyPostsItsUserMayChangeInTheAdmin(): void
+    {
+        $users = $this->app()->container()->get(UserRepository::class);
+        $users->create('ada', 'ada@example.com', 'correct horse battery', 'Ada', 'active', ['Authors']);
+        $users->create('bob', 'bob@example.com', 'correct horse battery', 'Bob', 'active', ['Authors']);
+        $ada = $this->token('blog:write', ['--user=ada']);
+        $theirs = $this->form(['content' => 'Bob'], $this->token('blog:write', ['--user=bob']))->getHeaderLine('Location');
+        $mine = $this->form(['content' => 'Ada'], $ada)->getHeaderLine('Location');
+
+        self::assertMicropubError($this->update($theirs, ['replace' => ['content' => ['Ada was here']]], $ada), 403, 'forbidden');
+        self::assertMicropubError($this->form(['action' => 'delete', 'url' => $theirs], $ada), 403, 'forbidden');
+        self::assertSame(['<p>Bob</p>', 'published'], [$this->post($theirs)->contentHtml, $this->post($theirs)->status]);
+        self::assertSame(204, $this->form(['action' => 'delete', 'url' => $theirs])->getStatusCode(), 'a scope-only token is unchanged');
+        self::assertMicropubError($this->postJson(['action' => 'undelete', 'url' => $theirs], $ada), 403, 'forbidden');
+        self::assertSame('deleted', $this->post($theirs)->status);
+        self::assertSame(204, $this->postJson(['action' => 'undelete', 'url' => $theirs])->getStatusCode());
+        self::assertSame(204, $this->update($theirs, ['replace' => ['content' => ['Edited']]])->getStatusCode());
+
+        self::assertSame(204, $this->update($mine, ['replace' => ['content' => ['Still mine']]], $ada)->getStatusCode());
+        self::assertSame(204, $this->form(['action' => 'delete', 'url' => $mine], $ada)->getStatusCode());
+        self::assertSame(204, $this->postJson(['action' => 'undelete', 'url' => $mine], $ada)->getStatusCode());
+        self::assertSame('published', $this->post($mine)->status);
     }
 }
