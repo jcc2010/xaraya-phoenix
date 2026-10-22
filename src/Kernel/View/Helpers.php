@@ -10,6 +10,7 @@ use Stringable;
 use Xaraya\Kernel\Assets\AssetUrls;
 use Xaraya\Kernel\Auth\Access;
 use Xaraya\Kernel\Auth\Session;
+use Xaraya\Kernel\Auth\User;
 use Xaraya\Kernel\Blocks\BlockRenderer;
 use Xaraya\Kernel\Config\Config;
 use Xaraya\Kernel\Container\Container;
@@ -114,7 +115,8 @@ final class Helpers
         return htmlspecialchars((string) $value, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
     }
 
-    public function user(): ?object
+    /** The signed-in user (a guest: null). Templates read ->handle, ->name, ->email or ->displayName(). */
+    public function user(): ?User
     {
         return $this->container->get(Access::class)->user();
     }

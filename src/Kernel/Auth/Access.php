@@ -15,7 +15,7 @@ interface Access
     public function can(string $level, string $module = '*', string $component = '*', mixed $item = null): bool;
 
     /** The signed-in user, or null for a guest. */
-    public function user(): ?object;
+    public function user(): ?User;
 
     /** @return list<string> the current request's role names (block visibility uses them) */
     public function roles(): array;

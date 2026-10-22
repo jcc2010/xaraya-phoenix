@@ -23,6 +23,7 @@ use Xaraya\Kernel\Auth\UserRepository;
 use Xaraya\Kernel\Blocks\BlockRenderer;
 use Xaraya\Kernel\Blocks\BlockRepository;
 use Xaraya\Kernel\Blocks\BlockTypes;
+use Xaraya\Kernel\Blocks\LoginBlock;
 use Xaraya\Kernel\Blocks\MenuBlock;
 use Xaraya\Kernel\Blocks\RecentItemsBlock;
 use Xaraya\Kernel\Blocks\TextBlock;
@@ -264,6 +265,7 @@ final class App
             $types = new BlockTypes($c, [
                 'text' => TextBlock::class,
                 'menu' => MenuBlock::class,
+                'login' => LoginBlock::class,
                 'recent-items' => RecentItemsBlock::class,
             ]);
             foreach ($c->get(ModuleRegistry::class)->enabled() as $manifest) {
