@@ -96,6 +96,26 @@ final class PostRepository
     }
 
     /**
+     * The admin tabs' counts: published (live now), scheduled (published, dated in the future) and deleted.
+     *
+     * @return array{published: int, scheduled: int, deleted: int}
+     */
+    public function adminCounts(int $blogId, DateTimeImmutable $now): array
+    {
+        $live = fn(string $op): int => $this->db->select('posts')
+            ->where('blog_id', '=', $blogId)
+            ->where('status', '=', 'published')
+            ->where('date_published', $op, $now)
+            ->count();
+
+        return [
+            'published' => $live('<='),
+            'scheduled' => $live('>'),
+            'deleted' => $this->db->select('posts')->where('blog_id', '=', $blogId)->where('status', '=', 'deleted')->count(),
+        ];
+    }
+
+    /**
      * @param array{0: DateTimeImmutable, 1: string}|null $before
      * @return list<Post>
      */

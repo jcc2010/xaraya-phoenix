@@ -126,3 +126,16 @@ a:focus-visible { outline: 3px solid var(--focus, #ff9e1b); outline-offset: 2px;
   .post-title a, .post-permalink, .video-play, .search-form button { transition: none; }
   .video-link:hover .video-play, .video-link:focus-visible .video-play { transform: translate(-50%, -50%); }
 }
+
+.admin-flash { margin: 0 0 1rem; padding: 0.5rem 0.75rem; border-left: 4px solid #2f6f3e; background: #e8f4ea; color: #12301a; }
+.admin-flash-error { border-color: #a12622; background: #fbe9e8; color: #4a0f0d; }
+.admin-blogs { width: 100%; border-collapse: collapse; }
+.admin-blogs th, .admin-blogs td { padding: 0.5rem; border-bottom: 1px solid #d8d8de; text-align: left; vertical-align: top; }
+.admin-actions a { margin-right: 0.75rem; }
+.admin-empty { color: var(--muted, #5c5c66); }
+
+@media (prefers-color-scheme: dark) {
+  .admin-flash { background: #14301b; color: #cfe9d4; border-color: #5fb673; }
+  .admin-flash-error { background: #3d1513; color: #f6cfcc; border-color: #e0807b; }
+  .admin-blogs th, .admin-blogs td { border-color: #3a3a44; }
+}

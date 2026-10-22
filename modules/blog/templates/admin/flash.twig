@@ -1,0 +1,3 @@
+{% for message in flash %}
+<p class="admin-flash admin-flash-{{ message.kind }}" role="{{ message.kind == 'error' ? 'alert' : 'status' }}">{{ message.message }}</p>
+{% endfor %}

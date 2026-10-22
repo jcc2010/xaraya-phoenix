@@ -7,6 +7,7 @@ namespace Xaraya\Module\Blog;
 use Xaraya\Kernel\Module\ModuleRegistry;
 use Xaraya\Kernel\Routing\RouteCollector;
 use Xaraya\Kernel\Routing\RouteProvider;
+use Xaraya\Module\Blog\Admin\AdminRoutes;
 use Xaraya\Module\Blog\Http\AboutController;
 use Xaraya\Module\Blog\Http\Api\MediaApiController;
 use Xaraya\Module\Blog\Http\Api\PostApiController;
@@ -33,6 +34,8 @@ final class Routes implements RouteProvider
         $routes->get('/s/{id:[0-9a-hjkmnp-tv-z]{26}}.json', [PostController::class, 'show'], 'blog.post.json')
             ->middleware('cors', 'conditional');
         $routes->get('/media/{id:[0-9a-hjkmnp-tv-z]{26}}.{ext:[a-z0-9]{2,5}}', [MediaController::class, 'show'], 'blog.media');
+
+        AdminRoutes::define($routes);
 
         // HTML pages.
         $routes->get('/blog/{handle:[a-z0-9_-]{2,32}}', [BlogPagesController::class, 'home'], 'blog.home')

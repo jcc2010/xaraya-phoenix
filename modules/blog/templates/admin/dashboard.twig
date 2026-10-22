@@ -1,0 +1,27 @@
+{{ render('blog::admin/flash', {flash: flash}) }}
+<h1>{{ t('Blog admin') }}</h1>
+{% if blogs is empty %}
+<p class="admin-empty">{{ t('No blogs yet.') }}</p>
+{% else %}
+<table class="admin-blogs">
+<thead><tr><th scope="col">{{ t('Blog') }}</th><th scope="col">{{ t('Mode') }}</th><th scope="col">{{ t('Posts') }}</th><th scope="col">{{ t('Actions') }}</th></tr></thead>
+<tbody>
+{% for b in blogs %}
+<tr id="blog-{{ b.handle }}">
+<td><strong>{{ b.title }}</strong> <code>{{ b.handle }}</code></td>
+<td>{{ b.mode }}</td>
+<td>{{ t('{n} published', {n: b.counts.published}) }}, {{ t('{n} scheduled', {n: b.counts.scheduled}) }}, {{ t('{n} deleted', {n: b.counts.deleted}) }}</td>
+<td class="admin-actions">
+<a href="{{ b.publicUrl }}">{{ t('View blog') }}</a>
+{% if b.postsUrl %} <a href="{{ b.postsUrl }}">{{ t('Posts') }}</a>{% endif %}
+{% if b.newPostUrl %} <a href="{{ b.newPostUrl }}">{{ t('New post') }}</a>{% endif %}
+{% if b.settingsUrl %} <a href="{{ b.settingsUrl }}">{{ t('Settings') }}</a>{% endif %}
+</td>
+</tr>
+{% endfor %}
+</tbody>
+</table>
+{% endif %}
+{% if newBlogUrl %}
+<p><a href="{{ newBlogUrl }}">{{ t('New blog') }}</a></p>
+{% endif %}

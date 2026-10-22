@@ -6,6 +6,8 @@
   "provider": "Xaraya\\Module\\Blog\\BlogServiceProvider",
   "routes": "Xaraya\\Module\\Blog\\Routes",
   "migrations": "migrations",
+  "middleware": { "noStore": "Xaraya\\Module\\Blog\\Admin\\Http\\NoStore" },
+  "admin": [{ "route": "admin.blog", "label": "Blog admin", "component": "post", "level": "edit" }],
   "grants": [
     { "role": "Authors", "component": "post", "instance": "own", "level": "delete" },
     { "role": "Authors", "component": "post", "instance": "*", "level": "read" }
