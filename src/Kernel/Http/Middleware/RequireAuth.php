@@ -17,8 +17,9 @@ use Xaraya\Kernel\Http\Exception\Unauthorized;
 
 /**
  * Route middleware "auth" (require a signed-in user) and "auth:<module>.<component>.<level>" (require that level
- * for the component). The component check has no item, so it passes when the user holds the level on ANY instance:
- * a user with only an "own" grant passes "auth:blog.post.delete". Item-level checks belong in the controller, which
+ * for the component; "none" is refused, as it would let everyone in). The component check has no item, so it
+ * passes when the user holds the level on ANY instance: a user with only an "own" grant passes
+ * "auth:blog.post.delete". Item-level checks belong in the controller, which
  * calls Access::can() with the item (id, owner_id) it is about to touch; this middleware is never enough for that.
  *
  * A guest who fails is sent to the login page on an HTML GET or HEAD and gets a 401 otherwise (JSON on JSON
@@ -36,7 +37,7 @@ final class RequireAuth implements MiddlewareInterface
     {
         $spec = implode(',', $args);
         $parts = explode('.', $spec);
-        if ($spec !== '' && (count($parts) !== 3 || !isset(Access::LEVELS[$parts[2]]) || in_array('', $parts, true))) {
+        if ($spec !== '' && (count($parts) !== 3 || !isset(Access::LEVELS[$parts[2]]) || $parts[2] === 'none' || in_array('', $parts, true))) {
             throw new LogicException("The auth middleware takes <module>.<component>.<level>, not '{$spec}'");
         }
         $this->required = $spec === '' ? null : [$parts[0], $parts[1], $parts[2]];

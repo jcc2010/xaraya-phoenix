@@ -105,7 +105,7 @@ final class RequireAuthTest extends AuthTestCase
     public function testAMalformedSpecIsAProgrammingError(): void
     {
         $auth = $this->installed()->container()->get(Auth::class);
-        foreach ([['blog'], ['blog.post'], ['blog.post.superuser'], ['.post.read'], ['a.b.c.read']] as $args) {
+        foreach ([['blog'], ['blog.post'], ['blog.post.superuser'], ['blog.post.none'], ['.post.read'], ['a.b.c.read']] as $args) {
             try {
                 new RequireAuth($auth, $args);
                 self::fail('accepted ' . $args[0]);
