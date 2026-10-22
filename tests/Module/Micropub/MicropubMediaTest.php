@@ -7,6 +7,7 @@ namespace Xaraya\Tests\Module\Micropub;
 use Nyholm\Psr7\ServerRequest;
 use Nyholm\Psr7\UploadedFile;
 use Psr\Http\Message\ResponseInterface;
+use Xaraya\Kernel\Auth\UserRepository;
 use Xaraya\Tests\Module\Blog\Media\MediaStoreTest;
 
 final class MicropubMediaTest extends MicropubTestCase
@@ -85,5 +86,13 @@ final class MicropubMediaTest extends MicropubTestCase
         self::assertSame(201, $this->upload(['file' => $this->png()], [], $pinned)->getStatusCode());
         self::assertCount(1, glob($this->tmp . '/uploads/other/*.png') ?: []);
         self::assertMicropubError($this->upload(['file' => $this->png()], ['mp-destination' => 'notes'], $pinned), 403, 'forbidden');
+    }
+
+    public function testAUserBoundTokenNeedsAddToUpload(): void
+    {
+        $this->app()->container()->get(UserRepository::class)->create('mo', 'mo@example.com', 'correct horse battery', 'Mo', 'active', []);
+        $response = $this->upload(['file' => $this->png()], [], $this->token('media:write', ['--user=mo']));
+        self::assertSame(403, $response->getStatusCode());
+        self::assertSame([], glob($this->tmp . '/uploads/notes/*') ?: []);
     }
 }

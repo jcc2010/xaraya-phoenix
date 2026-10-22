@@ -355,4 +355,13 @@ final class PostApiTest extends ApiTestCase
         self::assertSame(204, $this->api('DELETE', "/api/posts/{$mine}", $ada)->getStatusCode());
         self::assertSame(200, $this->api('POST', "/api/posts/{$mine}/undelete", $ada)->getStatusCode());
     }
+
+    public function testAUserBoundTokenNeedsAddToCreate(): void
+    {
+        $this->app()->container()->get(UserRepository::class)->create('mo', 'mo@example.com', 'correct horse battery', 'Mo', 'active', []);
+        $response = $this->api('POST', '/api/blogs/notes/posts', $this->token('blog:write', ['--user=mo']), ['content_html' => '<p>Hi</p>']);
+        self::assertSame(403, $response->getStatusCode());
+        self::assertSame('application/json', $response->getHeaderLine('Content-Type'));
+        self::assertSame(0, $this->app()->container()->get(PostRepository::class)->countLive($this->blogs($this->app())->find('notes')?->id ?? 0));
+    }
 }

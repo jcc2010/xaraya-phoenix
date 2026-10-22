@@ -42,7 +42,7 @@ final class PostApiController extends Controller
     public function create(ServerRequestInterface $request, array $params): ResponseInterface
     {
         $blog = $this->blogs->find($params['handle']) ?? throw new NotFound("Unknown blog '{$params['handle']}'");
-        ApiAccess::allow($request, $blog);
+        ApiAccess::allowCreate(ApiAccess::allow($request, $blog), $this->access);
         // A mirror is a 409 whatever the body, so check it before the body is read.
         PostWriter::assertNative($blog);
         $post = $this->writer->create($blog, JsonBody::decode($request));

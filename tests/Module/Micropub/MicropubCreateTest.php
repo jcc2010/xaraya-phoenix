@@ -8,6 +8,7 @@ use Nyholm\Psr7\ServerRequest;
 use Nyholm\Psr7\Stream;
 use Nyholm\Psr7\UploadedFile;
 use RuntimeException;
+use Xaraya\Kernel\Auth\UserRepository;
 use Xaraya\Kernel\Events\EventDispatcher;
 use Xaraya\Kernel\Events\ItemCreated;
 use Xaraya\Kernel\Http\Exception\HttpException;
@@ -211,5 +212,11 @@ final class MicropubCreateTest extends MicropubTestCase
     {
         self::assertSame('<p>a &amp; b</p>', Mf2Mapper::textToHtml(" a & b \n"));
         self::assertSame('', Mf2Mapper::textToHtml("\n\n"));
+    }
+
+    public function testAUserBoundTokenNeedsAddToCreate(): void
+    {
+        $this->app()->container()->get(UserRepository::class)->create('mo', 'mo@example.com', 'correct horse battery', 'Mo', 'active', []);
+        self::assertMicropubError($this->form(['h' => 'entry', 'content' => 'Hi'], $this->token('blog:write', ['--user=mo'])), 403, 'forbidden');
     }
 }

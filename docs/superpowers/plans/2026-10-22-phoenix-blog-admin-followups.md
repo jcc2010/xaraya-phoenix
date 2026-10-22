@@ -71,4 +71,4 @@ Other:
 
 ## From the final re-review
 
-- User-bound tokens can create posts through API/Micropub on `blog:write` scope alone; the admin also requires `can(add, blog, post)`. Add the role-level add check for user-bound tokens, or document that create is scope-gated (tokens are minted by admins only).
+- [Done] User-bound tokens need `can(add, blog, post)` to create posts or upload media (JSON API and Micropub).

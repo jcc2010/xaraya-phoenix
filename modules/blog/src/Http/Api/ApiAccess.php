@@ -28,6 +28,21 @@ final class ApiAccess
     }
 
     /**
+     * For a token that acts as a user, the admin's create check: add on blog · post. Uploading media counts as
+     * writing a post, so it needs the same. A scope-only token (no user) is not checked further.
+     *
+     * @throws Forbidden when the token's user may not add posts
+     */
+    public static function allowCreate(Token $token, Access $access): Token
+    {
+        if ($token->userId !== null && !$access->can('add', 'blog', 'post')) {
+            throw new Forbidden("This token's user may not add posts");
+        }
+
+        return $token;
+    }
+
+    /**
      * allow(), plus for a token that acts as a user the same item check as the admin: $level is "edit" (replace,
      * patch, Micropub update) or "delete" (delete, undelete). A scope-only token (no user) is not checked further.
      *

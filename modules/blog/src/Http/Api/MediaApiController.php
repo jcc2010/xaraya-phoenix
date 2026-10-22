@@ -8,6 +8,7 @@ use DateTimeImmutable;
 use DateTimeZone;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use Xaraya\Kernel\Auth\Access;
 use Xaraya\Kernel\Http\Controller;
 use Xaraya\Kernel\Http\Exception\NotFound;
 use Xaraya\Module\Blog\BlogRepository;
@@ -17,13 +18,17 @@ use Xaraya\Module\Blog\Write\PostWriter;
 /** POST /api/blogs/{handle}/media (scope media:write): stores one upload, 201 with the absolute media URL. */
 final class MediaApiController extends Controller
 {
-    public function __construct(private readonly BlogRepository $blogs, private readonly MediaUploader $uploader) {}
+    public function __construct(
+        private readonly BlogRepository $blogs,
+        private readonly MediaUploader $uploader,
+        private readonly Access $access,
+    ) {}
 
     /** @param array<string, string> $params */
     public function upload(ServerRequestInterface $request, array $params): ResponseInterface
     {
         $blog = $this->blogs->find($params['handle']) ?? throw new NotFound("Unknown blog '{$params['handle']}'");
-        ApiAccess::allow($request, $blog);
+        ApiAccess::allowCreate(ApiAccess::allow($request, $blog), $this->access);
         PostWriter::assertNative($blog);
         $row = $this->uploader->upload($blog, $request, new DateTimeImmutable('now', new DateTimeZone('UTC')));
         $url = $this->uploader->url($row);

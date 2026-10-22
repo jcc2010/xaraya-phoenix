@@ -224,7 +224,8 @@ keeps the owner, so a mirror blog can be assigned before it is switched to nativ
 
 The same per-post rules hold for a token that acts as a user (`token:create --user=<handle>`): its JSON API
 `PUT`/`PATCH` and Micropub `action=update` need edit on that post, and `DELETE`, undelete and Micropub
-`action=delete`/`undelete` need delete on it, exactly as in the admin; otherwise the answer is a 403. A scope-only
+`action=delete`/`undelete` need delete on it, exactly as in the admin; creating a post or uploading media (JSON API
+or Micropub) needs add on `blog · post`, as the admin's New post does. Otherwise the answer is a 403. A scope-only
 token (no `--user`) is not checked per post (see below).
 
 The post form covers:

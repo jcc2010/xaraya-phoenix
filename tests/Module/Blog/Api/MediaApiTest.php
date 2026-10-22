@@ -11,6 +11,7 @@ use Psr\Http\Message\ResponseInterface;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
 use SplFileInfo;
+use Xaraya\Kernel\Auth\UserRepository;
 use Xaraya\Module\Blog\Media\MediaStore;
 use Xaraya\Tests\Module\Blog\Media\MediaStoreTest;
 
@@ -247,5 +248,13 @@ final class MediaApiTest extends ApiTestCase
         self::assertSame("Blog 'src' is a mirror: its posts come from its source", self::error($mirror)['message']);
         self::assertSame(0, $this->mediaRows());
         self::assertSame([], $this->uploadedFiles());
+    }
+
+    public function testAUserBoundTokenNeedsAddToUpload(): void
+    {
+        $this->app()->container()->get(UserRepository::class)->create('mo', 'mo@example.com', 'correct horse battery', 'Mo', 'active', []);
+        $response = $this->upload(['file' => self::file($this->png())], $this->token('media:write', ['--user=mo']));
+        self::assertSame(403, $response->getStatusCode());
+        self::assertSame(0, $this->mediaRows());
     }
 }

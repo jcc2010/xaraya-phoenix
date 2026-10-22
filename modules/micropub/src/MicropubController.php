@@ -76,7 +76,8 @@ final class MicropubController extends Controller
         if ($request->getUploadedFiles() !== []) {
             throw new HttpException(400, 'Upload files to the media endpoint');
         }
-        $blog = $this->destination->choose($input->command('mp-destination'), Token::fromRequest($request));
+        $token = ApiAccess::allowCreate(Token::fromRequest($request), $this->access);
+        $blog = $this->destination->choose($input->command('mp-destination'), $token);
         $post = $this->writer->create($blog, $this->mapper->toItem($input->properties));
 
         return new Response(201, ['Location' => $this->items->url($blog, $post, $this->appUrl())]);
