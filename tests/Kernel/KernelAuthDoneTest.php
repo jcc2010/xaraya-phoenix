@@ -54,12 +54,15 @@ final class KernelAuthDoneTest extends AuthTestCase
     public function testItem2LoginThrottlingCsrfResetAndUserPassword(): void
     {
         $this->cli('install', '--admin=admin', '--email=admin@example.com', '--password=' . self::PASSWORD);
+        $this->cli('module:enable', 'hello');
         $app = $this->site();
 
         $admin = new Browser($app);
         self::assertSame(303, $admin->login('admin', self::PASSWORD)->getStatusCode());
+        self::assertSame(200, $admin->get('/hello/admin')->getStatusCode(), 'signed in after login');
         $admin->get('/login');
         self::assertSame(303, $admin->post('/logout')->getStatusCode());
+        self::assertSame(302, $admin->get('/hello/admin')->getStatusCode(), 'signed out after logout');
 
         self::assertSame(403, (new Browser($app))->post('/login', ['login' => 'admin', 'password' => self::PASSWORD])->getStatusCode(), 'CSRF');
 
@@ -99,7 +102,13 @@ final class KernelAuthDoneTest extends AuthTestCase
         $admin->login('admin', self::PASSWORD);
         self::assertSame(200, $admin->get('/hello/admin')->getStatusCode());
         self::assertStringContainsString('<h1>Greetings admin</h1>', $admin->body());
-        self::assertSame(302, (new Browser($app))->get('/hello/admin')->getStatusCode());
+        $guest = (new Browser($app))->get('/hello/admin');
+        self::assertSame(302, $guest->getStatusCode());
+        self::assertStringStartsWith('/login?next=%2Fhello%2Fadmin', $guest->getHeaderLine('Location'));
+        self::assertSame(401, (new Browser($app))->get('/hello/admin', ['Accept' => 'application/json'])->getStatusCode());
+
+        // The token route is not registered while the tokens module is disabled.
+        self::assertContains($this->api($app, 'xar_anything', 'ada')->getStatusCode(), [404, 405]);
 
         // The blog module stays disabled: the tokens module no longer depends on it.
         $this->cli('module:enable', 'tokens');
@@ -108,11 +117,18 @@ final class KernelAuthDoneTest extends AuthTestCase
         $lines = explode("\n", trim($this->cli('token:create', '--name=other', '--scopes=blog:write')));
         $otherScope = (string) end($lines);
 
+        $revokedOut = $this->cli('token:create', '--name=revoked', '--scopes=hello:write');
+        $lines = explode("\n", trim($revokedOut));
+        $revoked = (string) end($lines);
+        self::assertSame(1, preg_match('/^Created token (\S+) /', $lines[0], $m), $revokedOut);
+        $this->cli('token:revoke', $m[1]);
+
         $app = $this->site();
         $created = $this->api($app, $writer, 'ada');
         self::assertSame(201, $created->getStatusCode(), (string) $created->getBody());
         self::assertSame(403, $this->api($app, $otherScope, 'bob')->getStatusCode());
         self::assertSame(401, $this->api($app, null, 'bob')->getStatusCode());
+        self::assertSame(401, $this->api($app, $revoked, 'bob')->getStatusCode(), 'revoked');
         self::assertSame(422, $this->api($app, $writer, 'Not Valid')->getStatusCode());
         self::assertSame(['greetings' => ['ada']], json_decode((string) $app->handle(new ServerRequest('GET', '/hello.json'))->getBody(), true));
     }
