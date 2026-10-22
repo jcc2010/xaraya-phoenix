@@ -11,6 +11,7 @@ use Xaraya\Kernel\Cli\Commands\AssetPublishCommand;
 use Xaraya\Kernel\Cli\Commands\CacheClearCommand;
 use Xaraya\Kernel\Cli\Commands\HookDisableCommand;
 use Xaraya\Kernel\Cli\Commands\HookEnableCommand;
+use Xaraya\Kernel\Cli\Commands\InstallCommand;
 use Xaraya\Kernel\Cli\Commands\MigrateCommand;
 use Xaraya\Kernel\Cli\Commands\MigrateRollbackCommand;
 use Xaraya\Kernel\Cli\Commands\MigrateStatusCommand;
@@ -25,6 +26,7 @@ use Xaraya\Kernel\Module\ModuleRegistry;
 final class Application
 {
     private const KERNEL_COMMANDS = [
+        InstallCommand::class,
         MigrateCommand::class,
         MigrateRollbackCommand::class,
         MigrateStatusCommand::class,
