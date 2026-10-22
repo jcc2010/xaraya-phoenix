@@ -43,6 +43,8 @@ return [
         'cookie' => env('SESSION_COOKIE', 'xar_session'),
         // Idle minutes before a session expires; expired rows are deleted on about 1 in 100 session writes.
         'lifetime' => (int) env('SESSION_LIFETIME', 120),
+        // Seconds after creation (or the last login) when a session ends whatever its activity.
+        'max_lifetime' => (int) env('SESSION_MAX_LIFETIME', 86400),
         'gc_probability' => 0.01,
     ],
     'log' => [

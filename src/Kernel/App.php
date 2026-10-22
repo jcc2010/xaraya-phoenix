@@ -16,6 +16,7 @@ use Xaraya\Kernel\Assets\AssetUrls;
 use Xaraya\Kernel\Auth\Access;
 use Xaraya\Kernel\Auth\Auth;
 use Xaraya\Kernel\Auth\Grants;
+use Xaraya\Kernel\Auth\SessionStore;
 use Xaraya\Kernel\Auth\UserRepository;
 use Xaraya\Kernel\Blocks\BlockRenderer;
 use Xaraya\Kernel\Blocks\BlockRepository;
@@ -210,6 +211,10 @@ final class App
         });
 
         $c->set(Access::class, fn(Container $c): Access => $c->get(Auth::class));
+        $c->set(SessionStore::class, static fn(Container $c): SessionStore => new SessionStore(
+            $c->get(Connection::class),
+            max(60, (int) $config->get('session.max_lifetime', 86400)),
+        ));
         $c->set(TwigEngine::class, fn(Container $c): TwigEngine => new TwigEngine(
             $c->get(TemplateLocator::class),
             $this->cacheDir() . '/twig',

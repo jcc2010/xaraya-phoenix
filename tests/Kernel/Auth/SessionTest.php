@@ -6,9 +6,14 @@ namespace Xaraya\Tests\Kernel\Auth;
 
 use DateTimeImmutable;
 use DateTimeZone;
+use Nyholm\Psr7\Response;
+use Psr\Http\Message\ServerRequestInterface;
 use Xaraya\Kernel\App;
 use Xaraya\Kernel\Auth\Session;
 use Xaraya\Kernel\Auth\SessionStore;
+use Xaraya\Kernel\Config\Config;
+use Xaraya\Kernel\Http\CallableHandler;
+use Xaraya\Kernel\Http\Middleware\SessionMiddleware;
 use Xaraya\Kernel\Module\ModuleRegistry;
 use Xaraya\Tests\Support\AuthTestCase;
 use Xaraya\Tests\Support\Browser;
@@ -224,6 +229,137 @@ final class SessionTest extends AuthTestCase
         self::assertStringNotContainsString($id, $log);
         self::assertStringNotContainsString(hash('sha256', $id), $log);
         self::assertStringNotContainsString('session-secret-value', $log);
+    }
+
+    public function testAWriteNeverResurrectsASessionEndedByAnotherRequest(): void
+    {
+        $app = $this->probeApp();
+        $ada = $this->user($app, 'ada');
+        $browser = new Browser($app);
+        $browser->post('/probe/login/' . $ada->id);
+        $response = $browser->get('/probe/race');
+        self::assertSame('raced', (string) $response->getBody());
+        self::assertSame(0, $this->rows($app), 'deleteForUser sticks');
+        self::assertSame(['xar_session=; Path=/; Max-Age=0; HttpOnly; SameSite=Lax'], $response->getHeader('Set-Cookie'));
+        self::assertSame('private, no-cache', $response->getHeaderLine('Cache-Control'));
+        self::assertArrayNotHasKey('xar_session', $browser->cookies);
+    }
+
+    public function testStoreSaveOnlyUpdatesRowsThatStillExist(): void
+    {
+        $app = $this->probeApp();
+        $ada = $this->user($app, 'ada');
+        $store = $app->container()->get(SessionStore::class);
+        $now = new DateTimeImmutable('now', new DateTimeZone('UTC'));
+
+        $session = Session::fresh();
+        $session->login($ada->id);
+        self::assertTrue($store->save($session, $now, 3600));
+        $id = (string) $session->id();
+        self::assertTrue($store->save($store->load($id, $now) ?? self::fail('loads'), $now, 3600), 'an unchanged update in the same second still counts as stored');
+
+        foreach (['set' => fn(Session $s) => $s->set('n', 1), 'regenerate' => fn(Session $s) => $s->regenerate()] as $change => $apply) {
+            $loaded = $store->load($id, $now) ?? self::fail('loads');
+            self::assertSame(1, $store->deleteForUser($ada->id));
+            $apply($loaded);
+            self::assertFalse($store->save($loaded, $now, 3600), $change);
+            self::assertSame(0, $this->rows($app), $change);
+            $session = Session::fresh();
+            $session->login($ada->id);
+            $store->save($session, $now, 3600);
+            $id = (string) $session->id();
+        }
+
+        $loaded = $store->load($id, $now) ?? self::fail('loads');
+        $store->deleteForUser($ada->id);
+        $loaded->login($ada->id);
+        self::assertTrue($store->save($loaded, $now, 3600), 'a login is a new authentication, so it may start a new row');
+        self::assertSame(1, $this->rows($app));
+    }
+
+    public function testNothingIsStoredOrSentBeforeTheSessionsTableExists(): void
+    {
+        $app = $this->app();
+        $store = $app->container()->get(SessionStore::class);
+        $middleware = new SessionMiddleware($store, $app->container()->get(Config::class));
+        $browser = new Browser($app);
+        $response = $middleware->process($browser->request('GET', '/'), new CallableHandler(static function (ServerRequestInterface $r): Response {
+            $session = $r->getAttribute(Session::class);
+            self::assertInstanceOf(Session::class, $session);
+            $session->token();
+
+            return new Response(200, [], 'ok');
+        }));
+        self::assertSame(200, $response->getStatusCode());
+        self::assertFalse($response->hasHeader('Set-Cookie'));
+        self::assertFalse($this->db($app)->hasTable('sessions'));
+    }
+
+    public function testEmptyingASessionDeletesItsRowAndExpiresAPrivateCookie(): void
+    {
+        $app = $this->probeApp();
+        $browser = new Browser($app);
+        $browser->get('/probe/count');
+        $id = $browser->cookies['xar_session'];
+        $response = $browser->get('/probe/forget');
+        self::assertSame('xar_session=; Path=/; Max-Age=0; HttpOnly; SameSite=Lax', $response->getHeaderLine('Set-Cookie'));
+        self::assertSame('private, no-cache', $response->getHeaderLine('Cache-Control'), 'a shared cache must never replay a Set-Cookie');
+        self::assertSame(0, $this->rows($app));
+        self::assertNull($app->container()->get(SessionStore::class)->load($id, new DateTimeImmutable()));
+    }
+
+    public function testAnUnchangedSessionStillMakesTheResponsePrivate(): void
+    {
+        $app = $this->probeApp();
+        $browser = new Browser($app);
+        self::assertSame('public, max-age=60', $browser->get('/probe/public')->getHeaderLine('Cache-Control'), 'no session, no override');
+        $browser->get('/probe/count');
+        $response = $browser->get('/probe/public');
+        self::assertFalse($response->hasHeader('Set-Cookie'));
+        self::assertSame('private, no-cache', $response->getHeaderLine('Cache-Control'));
+    }
+
+    public function testASessionEndsAtItsAbsoluteLifetimeWhateverItsActivity(): void
+    {
+        $app = $this->probeApp(['session.max_lifetime' => 3600]);
+        $browser = new Browser($app);
+        $browser->get('/probe/count');
+        $id = $browser->cookies['xar_session'];
+        $now = new DateTimeImmutable('now', new DateTimeZone('UTC'));
+        $expires = new DateTimeImmutable((string) $this->db($app)->fetchValue('SELECT expires_at FROM {sessions}'), new DateTimeZone('UTC'));
+        self::assertLessThanOrEqual($now->modify('+3601 seconds'), $expires, 'the 120-minute idle expiry is capped at the absolute lifetime');
+
+        // Active a moment ago, but created over an hour ago: dead, in SQL, whatever expires_at says.
+        $this->db($app)->query('UPDATE {sessions} SET created_at = ?, last_activity = ?, expires_at = ?', [
+            $now->modify('-3601 seconds'), $now->modify('-5 seconds'), $now->modify('+1 hour'),
+        ]);
+        self::assertNull($app->container()->get(SessionStore::class)->load($id, $now));
+        self::assertSame('1', (string) $browser->get('/probe/count')->getBody());
+        self::assertNotSame($id, $browser->cookies['xar_session']);
+    }
+
+    public function testRegenerateKeepsTheAbsoluteLifetimeAndLoginStartsANewOne(): void
+    {
+        $app = $this->probeApp();
+        $ada = $this->user($app, 'ada');
+        $store = $app->container()->get(SessionStore::class);
+        $now = new DateTimeImmutable('now', new DateTimeZone('UTC'));
+        $created = fn(): string => (string) $this->db($app)->fetchValue('SELECT created_at FROM {sessions}');
+
+        $session = Session::fresh();
+        $session->set('n', 1);
+        $store->save($session, $now->modify('-30 minutes'), 7200);
+        $start = $created();
+
+        $session = $store->load((string) $session->id(), $now) ?? self::fail('loads');
+        $session->regenerate();
+        $store->save($session, $now, 7200);
+        self::assertSame($start, $created(), 'regenerate never extends a session');
+
+        $session->login($ada->id);
+        $store->save($session, $now, 7200);
+        self::assertSame($now->format('Y-m-d H:i:s'), $created(), 'login starts a new absolute lifetime');
+        self::assertSame(1, $this->rows($app));
     }
 
     public function testSessionTokens(): void

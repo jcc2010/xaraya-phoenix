@@ -6,7 +6,7 @@ use Xaraya\Kernel\Db\Migrations\Migration;
 use Xaraya\Kernel\Db\Schema\Blueprint;
 use Xaraya\Kernel\Db\Schema\Schema;
 
-/** Sessions keyed by the sha256 of their cookie value (the cookie itself is never stored). */
+/** Sessions keyed by the sha256 of their cookie value (the cookie itself is never stored), with idle and absolute expiry. */
 return new class extends Migration {
     public function up(Schema $schema): void
     {
@@ -16,6 +16,8 @@ return new class extends Migration {
             $t->text('data');
             $t->datetime('last_activity');
             $t->datetime('expires_at');
+            // The start of the absolute lifetime (session.max_lifetime): creation, or the user's last login.
+            $t->datetime('created_at');
             $t->index('expires_at');
             $t->index('user_id');
             $t->foreign('user_id', 'users');

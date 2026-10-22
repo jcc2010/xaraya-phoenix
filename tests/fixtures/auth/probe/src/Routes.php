@@ -8,12 +8,15 @@ use Nyholm\Psr7\Response;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Xaraya\Kernel\Auth\Session;
+use Xaraya\Kernel\Auth\SessionStore;
 use Xaraya\Kernel\Routing\RouteCollector;
 use Xaraya\Kernel\Routing\RouteProvider;
 
 /** Test routes that expose the session and identity machinery. */
 final class Routes implements RouteProvider
 {
+    public function __construct(private readonly SessionStore $store) {}
+
     public function routes(RouteCollector $routes): void
     {
         $routes->get('/probe/plain', static fn(): ResponseInterface => new Response(200, [], 'plain'), 'probe.plain');
@@ -38,6 +41,20 @@ final class Routes implements RouteProvider
 
             return new Response(204);
         }, 'probe.logout')->middleware('csrf:off');
+        $routes->get('/probe/public', static fn(): ResponseInterface => new Response(200, ['Cache-Control' => 'public, max-age=60'], 'public'), 'probe.public');
+        $routes->get('/probe/forget', static function (ServerRequestInterface $r): ResponseInterface {
+            self::session($r)->forget('n');
+
+            return new Response(200, ['Cache-Control' => 'public, max-age=60'], 'forgot');
+        }, 'probe.forget');
+        // Another request ends this user's sessions while this one is still running, then this one writes.
+        $routes->get('/probe/race', function (ServerRequestInterface $r): ResponseInterface {
+            $session = self::session($r);
+            $this->store->deleteForUser((string) $session->userId());
+            $session->set('n', 99);
+
+            return new Response(200, [], 'raced');
+        }, 'probe.race');
         $routes->get('/probe/boom', static function (ServerRequestInterface $r): never {
             self::session($r)->set('secret', 'session-secret-value');
 

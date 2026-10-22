@@ -20,23 +20,34 @@ final class Session
 
     private ?string $replaced = null;
 
-    /** @param array<string, mixed> $data */
+    /**
+     * @param array<string, mixed> $data
+     * @param ?DateTimeImmutable $createdAt when the session's absolute lifetime started; null until it is first saved
+     *                                      and again after login(), which starts a new one
+     */
     private function __construct(
         private ?string $id,
         private ?string $userId,
         private array $data,
         public readonly ?DateTimeImmutable $lastActivity,
+        private ?DateTimeImmutable $createdAt,
     ) {}
 
     public static function fresh(): self
     {
-        return new self(null, null, [], null);
+        return new self(null, null, [], null, null);
     }
 
     /** @param array<string, mixed> $data */
-    public static function loaded(#[SensitiveParameter] string $id, ?string $userId, array $data, DateTimeImmutable $lastActivity): self
-    {
-        return new self($id, $userId, $data, $lastActivity);
+    public static function loaded(
+        #[SensitiveParameter]
+        string $id,
+        ?string $userId,
+        array $data,
+        DateTimeImmutable $lastActivity,
+        ?DateTimeImmutable $createdAt = null,
+    ): self {
+        return new self($id, $userId, $data, $lastActivity, $createdAt ?? $lastActivity);
     }
 
     public static function newId(): string
@@ -59,6 +70,12 @@ final class Session
     public function userId(): ?string
     {
         return $this->userId;
+    }
+
+    /** The start of the absolute lifetime (session.max_lifetime), or null when the next save starts a new one. */
+    public function createdAt(): ?DateTimeImmutable
+    {
+        return $this->createdAt;
     }
 
     public function get(string $key, mixed $default = null): mixed
@@ -97,12 +114,16 @@ final class Session
         return $token;
     }
 
-    /** Signs $userId in under a new session id, with fresh data (and so a fresh CSRF token). */
+    /**
+     * Signs $userId in under a new session id, with fresh data (and so a fresh CSRF token). A login is a new
+     * authentication, so it also starts a new absolute lifetime.
+     */
     public function login(string $userId): void
     {
         $this->regenerate();
         $this->userId = $userId;
         $this->data = [];
+        $this->createdAt = null;
     }
 
     /** Signs out: the stored session is deleted and the cookie expired. */
@@ -113,7 +134,10 @@ final class Session
         $this->data = [];
     }
 
-    /** Gives the session a new id when it is next saved; the old row is deleted. */
+    /**
+     * Gives the session a new id when it is next saved; the old row is deleted. The absolute lifetime carries
+     * over, so regenerating never extends a session.
+     */
     public function regenerate(): void
     {
         if ($this->id !== null) {
@@ -140,9 +164,10 @@ final class Session
     }
 
     /** @internal SessionStore assigns the id of a newly saved session. */
-    public function saved(#[SensitiveParameter] string $id): void
+    public function saved(#[SensitiveParameter] string $id, DateTimeImmutable $createdAt): void
     {
         $this->id = $id;
+        $this->createdAt = $createdAt;
         $this->dirty = false;
         $this->replaced = null;
     }

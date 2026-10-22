@@ -18,7 +18,7 @@ use Xaraya\Kernel\Config\Config;
  * Global middleware: loads the session named by the cookie (session.cookie, default "xar_session") into the
  * Session::class request attribute, and after the response saves it, renews the cookie or expires it. The cookie
  * is HttpOnly and SameSite=Lax, and Secure unless app.debug is on and the request came over plain HTTP.
- * A response that used a session is marked Cache-Control: private, no-cache.
+ * A response that used a session or sets its cookie is marked Cache-Control: private, no-cache.
  */
 final class SessionMiddleware implements MiddlewareInterface
 {
@@ -33,19 +33,28 @@ final class SessionMiddleware implements MiddlewareInterface
         $response = $handler->handle($request->withAttribute(Session::class, $session));
 
         $lifetime = 60 * max(1, (int) $this->config->get('session.lifetime', 120));
+        $expire = false;
+        $sent = false;
         if ($session->isDirty() && $session->isEmpty()) {
             $this->store->forget($session);
-            if (is_string($cookie)) {
-                $response = $response->withAddedHeader('Set-Cookie', $this->cookie($request, $name, '', 0));
-            }
+            $expire = is_string($cookie);
         } elseif ($session->isDirty()) {
-            $this->store->save($session, $now, $lifetime);
-            $response = $response->withAddedHeader('Set-Cookie', $this->cookie($request, $name, (string) $session->id(), null));
-            $this->maybeCollectGarbage($now);
+            if ($this->store->save($session, $now, $lifetime)) {
+                $response = $response->withAddedHeader('Set-Cookie', $this->cookie($request, $name, (string) $session->id(), null));
+                $sent = true;
+                $this->maybeCollectGarbage($now);
+            } else {
+                // Ended by another request meanwhile (or no sessions table yet): never re-issue it.
+                $expire = is_string($cookie);
+            }
         } else {
             $this->store->touch($session, $now, $lifetime);
         }
-        if ($session->id() !== null && !str_contains($response->getHeaderLine('Cache-Control'), 'no-store')) {
+        if ($expire) {
+            $response = $response->withAddedHeader('Set-Cookie', $this->cookie($request, $name, '', 0));
+        }
+        // Any response that used a session or sets a cookie must never be replayed by a shared cache.
+        if (($sent || $expire || $session->id() !== null) && !str_contains($response->getHeaderLine('Cache-Control'), 'no-store')) {
             $response = $response->withHeader('Cache-Control', 'private, no-cache');
         }
 
