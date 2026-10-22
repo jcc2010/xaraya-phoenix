@@ -1,0 +1,35 @@
+{{ render('blog::admin/flash', {flash: flash}) }}
+<h1>{{ t('Posts') }} <small>{{ blog.title }}</small></h1>
+{% if actions is not empty %}
+<p class="admin-actions">{{ render('blog::admin/actions', {actions: actions}) }}</p>
+{% endif %}
+<nav class="admin-tabs" aria-label="{{ t('Post status') }}">
+{% for tb in tabs %}
+<a href="{{ tb.url }}"{% if tb.current %} aria-current="page"{% endif %}>{{ t(tb.label) }} ({{ tb.count }})</a>
+{% endfor %}
+</nav>
+<form class="admin-search" method="get" role="search">
+<label for="admin-q">{{ t('Search titles') }}</label>
+<input type="search" id="admin-q" name="q" value="{{ q }}" maxlength="200">
+{% if tab != 'published' %}<input type="hidden" name="tab" value="{{ tab }}">{% endif %}
+<button type="submit">{{ t('Search') }}</button>
+</form>
+{% if rows is empty %}
+<p class="admin-empty">{{ t('No posts.') }}</p>
+{% else %}
+<table class="admin-posts">
+<thead><tr><th scope="col">{{ t('Title') }}</th><th scope="col">{{ t('Owner') }}</th><th scope="col">{{ t('Date') }}</th><th scope="col">{{ t('Status') }}</th><th scope="col">{{ t('Actions') }}</th></tr></thead>
+<tbody>
+{% for row in rows %}
+<tr id="post-{{ row.id }}">
+<td class="admin-title">{{ row.title }}{% for tag in row.tags %} <span class="admin-tag">{{ tag }}</span>{% endfor %}</td>
+<td class="admin-owner">{{ row.owner }}</td>
+<td><time datetime="{{ row.dateIso }}">{{ row.dateDisplay }}</time></td>
+<td>{{ t(row.status) }}</td>
+<td class="admin-actions">{{ render('blog::admin/actions', {actions: row.actions}) }}</td>
+</tr>
+{% endfor %}
+</tbody>
+</table>
+{% endif %}
+{{ render('blog::partials/pager', {pager: pager}) }}

@@ -1,0 +1,13 @@
+{% for action in actions %}
+{% if action.method == 'post' %}
+<form class="admin-action" method="post" action="{{ action.url }}">
+{% if action.csrf %}{{ csrf() }}{% endif %}
+{% for name, value in action.fields %}
+<input type="hidden" name="{{ name }}" value="{{ value }}">
+{% endfor %}
+<button type="submit">{{ t(action.label) }}</button>
+</form>
+{% else %}
+<a href="{{ action.url }}">{{ t(action.label) }}</a>
+{% endif %}
+{% endfor %}

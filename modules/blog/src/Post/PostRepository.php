@@ -5,9 +5,11 @@ declare(strict_types=1);
 namespace Xaraya\Module\Blog\Post;
 
 use DateTimeImmutable;
+use InvalidArgumentException;
 use Xaraya\Kernel\Db\Connection;
 use Xaraya\Kernel\Db\Select;
 use Xaraya\Kernel\Support\Ulid;
+use Xaraya\Module\Blog\Search\LikeSearchIndex;
 
 /**
  * Posts of every blog.
@@ -18,6 +20,9 @@ use Xaraya\Kernel\Support\Ulid;
 final class PostRepository
 {
     private const CHUNK = 500;
+
+    /** The admin list's tabs, in display order. */
+    public const ADMIN_TABS = ['published', 'scheduled', 'deleted'];
 
     public function __construct(private readonly Connection $db) {}
 
@@ -120,6 +125,49 @@ final class PostRepository
                 ->where('date_published', '>', $now))->count(),
             'deleted' => $scope($this->db->select('posts')->where('blog_id', '=', $blogId)->where('status', '=', 'deleted'))->count(),
         ];
+    }
+
+    /**
+     * One page of the admin list for a tab, optionally narrowed by a case-insensitive title substring (wildcards
+     * match literally). With $ownerId, the private tabs (scheduled, deleted) list only that owner's posts.
+     *
+     * @return array{total: int, posts: list<Post>}
+     */
+    public function adminPage(int $blogId, string $tab, string $title, DateTimeImmutable $now, int $limit, int $offset, ?string $ownerId = null): array
+    {
+        $where = ['blog_id = ?'];
+        $params = [$blogId];
+        switch ($tab) {
+            case 'published':
+                array_push($where, 'status = ?', 'date_published <= ?');
+                array_push($params, 'published', $now);
+                break;
+            case 'scheduled':
+                array_push($where, 'status = ?', 'date_published > ?');
+                array_push($params, 'published', $now);
+                break;
+            case 'deleted':
+                $where[] = 'status = ?';
+                $params[] = 'deleted';
+                break;
+            default:
+                throw new InvalidArgumentException("Unknown tab '{$tab}'");
+        }
+        if ($ownerId !== null && $tab !== 'published') {
+            $where[] = 'owner_id = ?';
+            $params[] = $ownerId;
+        }
+        if ($title !== '') {
+            $where[] = "LOWER(title) LIKE ? ESCAPE '!'";
+            $params[] = '%' . LikeSearchIndex::escapeLike(mb_strtolower($title)) . '%';
+        }
+        $from = 'FROM {posts} WHERE ' . implode(' AND ', $where);
+        $rows = $this->db->fetchAll(
+            "SELECT * {$from} ORDER BY date_published DESC, id DESC LIMIT " . max(0, $limit) . ' OFFSET ' . max(0, $offset),
+            $params,
+        );
+
+        return ['total' => (int) $this->db->fetchValue("SELECT COUNT(*) {$from}", $params), 'posts' => $this->hydrate($rows)];
     }
 
     /**
