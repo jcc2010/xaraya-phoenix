@@ -93,6 +93,40 @@ final class PostRepository
         )->rowCount() > 0;
     }
 
+    /**
+     * Ids of a blog's posts (every status) for an owner backfill: the ownerless ones, or all of them with $all.
+     *
+     * @return list<string>
+     */
+    public function ownerTargets(int $blogId, bool $all): array
+    {
+        $query = $this->db->select('posts')->columns('id')->where('blog_id', '=', $blogId);
+        if (!$all) {
+            $query->whereNull('owner_id');
+        }
+
+        return array_map(static fn(array $row): string => (string) $row['id'], $query->orderBy('id')->all());
+    }
+
+    /**
+     * Sets the owner of the given posts in one transaction. Ownership isn't part of a post's content, so updated_at
+     * stays as it is; returns the number of posts assigned.
+     *
+     * @param list<string> $ids
+     */
+    public function assignOwner(array $ids, string $ownerId): int
+    {
+        return $this->db->transaction(function () use ($ids, $ownerId): int {
+            $count = 0;
+            foreach (array_chunk($ids, self::CHUNK) as $chunk) {
+                $marks = implode(', ', array_fill(0, count($chunk), '?'));
+                $count += $this->db->query("UPDATE {posts} SET owner_id = ? WHERE id IN ({$marks})", [$ownerId, ...$chunk])->rowCount();
+            }
+
+            return $count;
+        });
+    }
+
     public function find(string $id): ?Post
     {
         $row = $this->db->select('posts')->where('id', '=', $id)->first();

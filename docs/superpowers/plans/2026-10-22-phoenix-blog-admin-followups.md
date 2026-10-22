@@ -15,9 +15,7 @@ be fixed by the final review instead of waiting here.
 ## Data and migration
 
 - The owner migration has no `down()`, and re-running it after a manual rollback fails.
-- **Owner backfill CLI.** Posts that predate ownership (or come from a scope-only token or a sync) have no owner, so
-  only Editors and Administrators can manage them. Add `bin/xar blog:owner <handle> --user=<handle>` (optionally
-  limited to ownerless posts or an id list) to assign one.
+- [Done] **Owner backfill CLI**: `bin/xar blog:owner <handle> --user=<user> [--all | --ids=…] [--dry-run]`.
 - No `replace()` owner pin; no Micropub owner test; PostApiTest mixes container handles; no migration-level test that
   real posts, `post_tags` and `post_search` survive the owner migration.
 - Tag names cannot contain commas in the form.

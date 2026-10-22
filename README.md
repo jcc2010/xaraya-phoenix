@@ -217,8 +217,10 @@ Pinning a post needs Editor (edit on `blog · blog`). Blog settings and new blog
 Posts have an owner, `owner_id`: the signed-in user who created the post in the admin, or the user a token acts as for
 the JSON API and Micropub. It decides which posts an Author may change. It never appears in the JSON or RSS feeds.
 Posts created before ownership existed (synced, imported or written by a scope-only token) have no owner, so only
-Editors and Administrators can manage them; an Author's "own" grant never matches an ownerless post. There is no
-backfill command yet.
+Editors and Administrators can manage them; an Author's "own" grant never matches an ownerless post. Assign them
+with `bin/xar blog:owner <handle> --user=<user>`: by default it takes the blog's ownerless posts (every status, deleted
+included), `--all` reassigns every post and `--ids=<id,...>` just the listed ones; `--dry-run` only counts. A sync
+keeps the owner, so a mirror blog can be assigned before it is switched to native.
 
 The same per-post rules hold for a token that acts as a user (`token:create --user=<handle>`): its JSON API
 `PUT`/`PATCH` and Micropub `action=update` need edit on that post, and `DELETE`, undelete and Micropub

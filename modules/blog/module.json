@@ -22,6 +22,7 @@
     "Xaraya\\Module\\Blog\\Cli\\BlogCreateCommand",
     "Xaraya\\Module\\Blog\\Cli\\BlogListCommand",
     "Xaraya\\Module\\Blog\\Cli\\BlogModeCommand",
+    "Xaraya\\Module\\Blog\\Cli\\BlogOwnerCommand",
     "Xaraya\\Module\\Blog\\Cli\\BlogReindexCommand",
     "Xaraya\\Module\\Blog\\Cli\\BlogSyncCommand",
     "Xaraya\\Module\\Blog\\Cli\\MediaLocalizeCommand"
