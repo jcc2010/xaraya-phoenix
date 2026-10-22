@@ -24,9 +24,9 @@ final class SmtpMailer implements Mailer
     private $socket = null;
     private float $deadline = 0.0;
 
-    /** @param array<string, mixed> $tls extra `ssl` stream-context options (tests pass a cafile and peer_name) */
     private readonly string $host;
 
+    /** @param array<string, mixed> $tls extra `ssl` stream-context options (tests pass a cafile and peer_name) */
     public function __construct(
         string $host,
         private readonly int $port,
