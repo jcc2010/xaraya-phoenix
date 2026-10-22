@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace Xaraya\Tests\Kernel\Auth;
 
+use Nyholm\Psr7\ServerRequest;
 use Xaraya\Kernel\App;
 use Xaraya\Kernel\Auth\Auth;
 use Xaraya\Kernel\Blocks\BlockRepository;
+use Xaraya\Kernel\View\Helpers;
 use Xaraya\Kernel\View\View;
 use Xaraya\Tests\Support\AuthTestCase;
 use Xaraya\Tests\Support\Browser;
@@ -97,6 +99,28 @@ final class BlocksAndHelpersTest extends AuthTestCase
             self::assertSame('guest reader reads', $view->render('who'), $engine);
             $app->container()->get(Auth::class)->actAs($this->users($app)->findByHandle('root') ?? $this->user($app, 'root', ['Administrators']));
             self::assertSame('root admin reads', $view->render('who'), $engine);
+        }
+    }
+
+    public function testAdminLinksShowOnlyToUsersWhoMayUseThem(): void
+    {
+        foreach (['php', 'twig'] as $engine) {
+            $app = $this->probeApp(['view.engine' => $engine]);
+            $helpers = new Helpers($app->container()->get(View::class), $app->container());
+            self::assertSame([], $helpers->adminLinks(), "{$engine}: guest");
+            $guestHome = (string) $app->handle(new ServerRequest('GET', '/'))->getBody();
+            self::assertStringNotContainsString('admin-links', $guestHome);
+
+            $app->container()->get(Auth::class)->actAs($this->users($app)->findByHandle('mia') ?? $this->user($app, 'mia'));
+            self::assertSame([], $helpers->adminLinks(), "{$engine}: member");
+
+            $root = $this->users($app)->findByHandle('root') ?? $this->user($app, 'root', ['Administrators']);
+            $app->container()->get(Auth::class)->actAs($root);
+            self::assertSame([['url' => '/probe/admin', 'label' => 'Probe admin']], $helpers->adminLinks(), "{$engine}: the missing route is skipped");
+
+            $browser = new Browser($app);
+            $browser->login('root', self::PASSWORD);
+            self::assertStringContainsString('<nav class="admin-links" aria-label="Admin"><ul><li><a href="/probe/admin">Probe admin</a></li></ul></nav>', Html::normalize((string) $browser->get('/')->getBody()));
         }
     }
 }

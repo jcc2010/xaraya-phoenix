@@ -37,6 +37,7 @@ main:focus { outline: none; }
 .site-title { margin: 0; font-size: 1.375rem; font-weight: 700; }
 .site-title a { color: inherit; text-decoration: none; }
 .site-tagline { margin: 0.25rem 0 0; color: var(--muted); }
+.admin-links ul { display: flex; flex-wrap: wrap; gap: 0.75rem; margin: 0.5rem 0 0; padding: 0; list-style: none; font-size: 0.875rem; }
 .site-body { display: grid; gap: 2rem; }
 @media (min-width: 60rem) {
   .site-body { grid-template-columns: minmax(0, 1fr) 18rem; }

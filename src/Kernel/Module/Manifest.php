@@ -237,6 +237,34 @@ final class Manifest
     }
 
     /**
+     * Links shown in the site header to users who hold $level on $component of this module:
+     * [{"route", "label", "component", "level"}].
+     *
+     * @return list<array{route: string, label: string, component: string, level: string}>
+     */
+    public function adminLinks(): array
+    {
+        $out = [];
+        foreach ((array) ($this->data['admin'] ?? []) as $i => $link) {
+            $route = is_array($link) ? ($link['route'] ?? null) : null;
+            $label = is_array($link) ? ($link['label'] ?? null) : null;
+            $component = is_array($link) ? ($link['component'] ?? null) : null;
+            $level = is_array($link) ? ($link['level'] ?? null) : null;
+            if (
+                !is_string($route) || $route === ''
+                || !is_string($label) || $label === ''
+                || !is_string($component) || !Grants::isValidPart($component)
+                || !is_string($level) || !isset(Access::LEVELS[$level])
+            ) {
+                throw new ModuleException("{$this->name}: admin[{$i}] needs a \"route\", a \"label\", a \"component\" and a \"level\" (" . implode(', ', array_keys(Access::LEVELS)) . ')');
+            }
+            $out[] = ['route' => $route, 'label' => $label, 'component' => $component, 'level' => $level];
+        }
+
+        return $out;
+    }
+
+    /**
      * Bearer-token scopes this module adds to the tokens module's base set, each "<module>:<name>".
      *
      * @return list<string>

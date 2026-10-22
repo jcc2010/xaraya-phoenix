@@ -25,6 +25,14 @@
 {% if settings.tagline|default('') %}
 <p class="site-tagline">{{ settings.tagline }}</p>
 {% endif %}
+{% set adminLinks = adminLinks() %}
+{% if adminLinks|length > 0 %}
+<nav class="admin-links" aria-label="Admin"><ul>
+{% for link in adminLinks %}
+<li><a href="{{ link.url }}">{{ link.label }}</a></li>
+{% endfor %}
+</ul></nav>
+{% endif %}
 {{ blocks('header') }}
 </header>
 <div class="site-body">

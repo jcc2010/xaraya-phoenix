@@ -25,6 +25,14 @@
 <?php if ($settings['tagline'] ?? ''): ?>
 <p class="site-tagline"><?= $x->e($settings['tagline']) ?></p>
 <?php endif ?>
+<?php $adminLinks = $x->adminLinks(); ?>
+<?php if ($adminLinks !== []): ?>
+<nav class="admin-links" aria-label="Admin"><ul>
+<?php foreach ($adminLinks as $link): ?>
+<li><a href="<?= $x->e($link['url']) ?>"><?= $x->e($link['label']) ?></a></li>
+<?php endforeach ?>
+</ul></nav>
+<?php endif ?>
 <?= $x->blocks('header') ?>
 </header>
 <div class="site-body">

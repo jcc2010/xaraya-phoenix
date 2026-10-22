@@ -1,5 +1,9 @@
 {
   "name": "probe",
   "version": "1.0.0",
-  "routes": "Xaraya\\Module\\Probe\\Routes"
+  "routes": "Xaraya\\Module\\Probe\\Routes",
+  "admin": [
+    {"route": "probe.admin", "label": "Probe admin", "component": "secret", "level": "admin"},
+    {"route": "probe.missing", "label": "Gone", "component": "secret", "level": "read"}
+  ]
 }

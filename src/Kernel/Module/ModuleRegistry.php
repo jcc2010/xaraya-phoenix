@@ -116,6 +116,7 @@ final class ModuleRegistry
         $manifest->middleware();
         $manifest->grants();
         $manifest->scopes();
+        $manifest->adminLinks();
         // Kernel and module migrations run as separate batches so a rollback
         // of the module never takes the kernel tables with it.
         $this->migrator->migrate(['kernel' => $this->kernelMigrations]);

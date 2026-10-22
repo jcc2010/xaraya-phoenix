@@ -105,4 +105,19 @@ final class ManifestTest extends TestCase
 
         return $dir;
     }
+
+    public function testReadsAndValidatesAdminLinks(): void
+    {
+        $dir = $this->tempModule('{"name": "mw", "version": "1", "admin": [{"route": "mw.admin", "label": "Mw", "component": "thing", "level": "edit"}]}');
+        self::assertSame([['route' => 'mw.admin', 'label' => 'Mw', 'component' => 'thing', 'level' => 'edit']], Manifest::fromDirectory($dir)->adminLinks());
+        self::assertSame([], Manifest::fromDirectory(self::FIXTURES . '/alpha')->adminLinks());
+        foreach (['{"route": "x"}', '{"route": "x", "label": "X", "component": "c", "level": "god"}', '"x"'] as $link) {
+            try {
+                Manifest::fromDirectory($this->tempModule('{"name": "mw", "version": "1", "admin": [' . $link . ']}'))->adminLinks();
+                self::fail("{$link} must be rejected");
+            } catch (ModuleException $e) {
+                self::assertStringContainsString('mw: admin[0] needs', $e->getMessage());
+            }
+        }
+    }
 }

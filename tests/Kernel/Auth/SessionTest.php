@@ -360,4 +360,20 @@ final class SessionTest extends AuthTestCase
         $session->login('01J0000000000000000000000A');
         self::assertNotSame($token, $session->token(), 'login starts a new CSRF token');
     }
+
+    public function testFlashMessagesAreKeptUntilTakenOnce(): void
+    {
+        $session = Session::fresh();
+        self::assertSame([], $session->takeFlash());
+        $session->flash('Created “<b>x</b>”.');
+        $session->flash('Sync failed', 'error');
+        self::assertTrue($session->isDirty());
+        self::assertSame([
+            ['kind' => 'status', 'message' => 'Created “<b>x</b>”.'],
+            ['kind' => 'error', 'message' => 'Sync failed'],
+        ], $session->takeFlash());
+        self::assertSame([], $session->takeFlash());
+        $this->expectException(\InvalidArgumentException::class);
+        $session->flash('x', 'warning');
+    }
 }

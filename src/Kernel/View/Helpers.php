@@ -16,6 +16,8 @@ use Xaraya\Kernel\Config\Config;
 use Xaraya\Kernel\Container\Container;
 use Xaraya\Kernel\Hooks\DisplayHooks;
 use Xaraya\Kernel\Http\Middleware\VerifyCsrf;
+use Xaraya\Kernel\Module\ModuleException;
+use Xaraya\Kernel\Module\ModuleRegistry;
 use Xaraya\Kernel\Routing\UrlGenerator;
 
 /**
@@ -37,6 +39,7 @@ final class Helpers
         'user' => false,
         'render' => true,
         'config' => false,
+        'adminLinks' => false,
     ];
 
     public function __construct(
@@ -139,6 +142,36 @@ final class Helpers
     public function include(string $name, array $data = []): string
     {
         return $this->view->renderWith($name, $data, $this, 'php');
+    }
+
+    /**
+     * The header's admin links this user may use: none for a guest (decided from the request's user alone, so a
+     * guest page reads no session and no database), otherwise each enabled module's links whose route exists and
+     * whose level the user holds.
+     *
+     * @return list<array{url: string, label: string}>
+     */
+    public function adminLinks(): array
+    {
+        if ($this->user() === null) {
+            return [];
+        }
+        $urls = $this->container->get(UrlGenerator::class);
+        $out = [];
+        foreach ($this->container->get(ModuleRegistry::class)->enabled() as $manifest) {
+            try {
+                $links = $manifest->adminLinks();
+            } catch (ModuleException) {
+                continue;
+            }
+            foreach ($links as $link) {
+                if ($urls->has($link['route']) && $this->can($link['level'], $manifest->name, $link['component'])) {
+                    $out[] = ['url' => $urls->generate($link['route']), 'label' => $this->t($link['label'])];
+                }
+            }
+        }
+
+        return $out;
     }
 
     public function config(string $key, mixed $default = null): mixed

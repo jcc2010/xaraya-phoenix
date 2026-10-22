@@ -16,6 +16,9 @@ final class Session
     /** The cookie value: 32 random bytes in unpadded base64url. */
     public const ID = '/^[A-Za-z0-9_-]{43}$/D';
 
+    /** The data key holding flash messages until the next page shows them. */
+    public const FLASH = '_flash';
+
     private bool $dirty = false;
 
     private ?string $replaced = null;
@@ -114,6 +117,48 @@ final class Session
         }
 
         return $token;
+    }
+
+    /**
+     * Queues a message for the next page that calls takeFlash(). The text is plain: whoever renders it escapes it.
+     *
+     * @param string $kind "status" or "error"
+     */
+    public function flash(string $message, string $kind = 'status'): void
+    {
+        if ($kind !== 'status' && $kind !== 'error') {
+            throw new \InvalidArgumentException("Flash kind must be 'status' or 'error', got '{$kind}'");
+        }
+        $queue = $this->flashQueue();
+        $queue[] = ['kind' => $kind, 'message' => $message];
+        $this->set(self::FLASH, $queue);
+    }
+
+    /**
+     * Returns the queued flash messages and removes them, so each is shown once.
+     *
+     * @return list<array{kind: string, message: string}>
+     */
+    public function takeFlash(): array
+    {
+        $queue = $this->flashQueue();
+        $this->forget(self::FLASH);
+
+        return $queue;
+    }
+
+    /** @return list<array{kind: string, message: string}> */
+    private function flashQueue(): array
+    {
+        $out = [];
+        $stored = $this->get(self::FLASH);
+        foreach (is_array($stored) ? $stored : [] as $entry) {
+            if (is_array($entry) && is_string($entry['kind'] ?? null) && is_string($entry['message'] ?? null)) {
+                $out[] = ['kind' => $entry['kind'], 'message' => $entry['message']];
+            }
+        }
+
+        return $out;
     }
 
     /**
