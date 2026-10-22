@@ -77,6 +77,10 @@ final class MailerTest extends AppTestCase
     {
         $dir = $this->tmp . '/ro';
         mkdir($dir, 0500);
+        if (is_writable($dir)) {
+            chmod($dir, 0700);
+            self::markTestSkipped('The directory stays writable (running as root ignores the mode)');
+        }
         try {
             (new LogMailer($dir, 'site@example.com'))->send(new Message('ada@example.com', 'x', 'y'));
             self::fail('expected MailException');

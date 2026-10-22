@@ -74,7 +74,9 @@ refused) and cannot contain a NUL character. Changing a password ends that user'
 `/logout` and `/password/*` belong to the kernel; a module cannot register them.
 
 - **Roles:** Administrators (admin on everything), Editors (delete on every module whose manifest sets
-  `"content": true`), Authors, Members and Anonymous (read on everything). A role may have a parent and gets its grants.
+  `"content": true`), Authors, Members and Anonymous. Anonymous has read on everything, and every request has
+  Anonymous, signed in or not. Authors and Members hold no seeded grants beyond blog's Authors grants (below).
+  A role may have a parent and gets its grants.
   Modules seed their own grants on `module:enable` with `"grants": [{"role", "component", "instance", "level"}]`;
   re-enabling restores a deleted default grant but keeps a changed level. There is no admin UI yet: roles, parents
   and grants are changed in the database.
@@ -92,7 +94,9 @@ refused) and cannot contain a NUL character. Changing a password ends that user'
   `SESSION_MAX_LIFETIME` seconds after creation or the last login (default 86400, so users sign in daily). The id
   changes at login and logout. A session whose row is gone (logout, expiry, password change) is dead: it is never
   resurrected, even by a request that was already in flight. Any response that sets a session cookie is sent with
-  `Cache-Control: private, no-cache`.
+  `Cache-Control: private, no-cache`, and an error page for a request with a session cookie or a signed-in user
+  (session or token) with `Cache-Control: private, no-store`. An error page saves nothing to the session, but its
+  forms (the logout button) carry the session's token.
 - **CSRF:** every POST, PUT, PATCH and DELETE needs the session's token, from `$x->csrf()` (a hidden `_csrf` field)
   or an `X-CSRF-Token` header (the field wins if both are sent), unless its route is marked `csrf:off`. Token
   routes are marked `csrf:off`, because a bearer token is not sent by the browser on its own. A missing or wrong
@@ -206,7 +210,8 @@ user acts as a guest, only through its scopes. A token's scopes decide which tok
 applies only where a controller calls it. Modules add scopes with `"scopes": ["<module>:<name>"]` in `module.json`
 (the hello example declares `hello:write`). A request authenticated by a token never creates or saves a session (no
 cookie) and its response is sent with `Cache-Control: private, no-store`. Send it as `Authorization: Bearer xar_…`;
-a token in a query string is ignored. The two Micropub routes (`/micropub` and `/micropub/media`) also accept it
+a token in a query string is ignored. On a route, `token:` must come before `auth` or `auth:…`, because the token
+sets the identity those check. The two Micropub routes (`/micropub` and `/micropub/media`) also accept it
 as an `access_token` form field, but not both that and the header; no other route does.
 
 The JSON API takes and returns JSON Feed 1.1 items (scope `blog:write`):

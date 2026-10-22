@@ -34,6 +34,7 @@ final class PostPageTest extends BlogPageTestCase
         [$response, $html] = $this->both("/s/{$id}");
         self::assertSecureHtml($response);
         self::assertSame('public, max-age=60', $response->getHeaderLine('Cache-Control'));
+        self::assertFalse($response->hasHeader('Set-Cookie'), 'an anonymous page mints no session');
         self::assertNotSame('', $response->getHeaderLine('ETag'));
         self::assertFalse($response->hasHeader('Last-Modified'));
         foreach ([

@@ -51,6 +51,7 @@ final class HomePageTest extends BlogPageTestCase
         [$response, $html] = $this->both('/blog/notes');
         self::assertSecureHtml($response);
         self::assertSame('public, max-age=60', $response->getHeaderLine('Cache-Control'));
+        self::assertFalse($response->hasHeader('Set-Cookie'), 'an anonymous page mints no session');
         foreach ([
             '<html lang="en">',
             '<title>Notes</title>',

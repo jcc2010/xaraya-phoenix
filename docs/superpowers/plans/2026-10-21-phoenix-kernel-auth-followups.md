@@ -50,6 +50,8 @@ definition of done. Items tagged (final wave) were flagged as candidates for the
 - The rebuild migrations are fragile on a manual re-run or a MySQL mid-failure (guard the `tokens_next` table and the column). MySQL keeps the `_next_` index names.
 - A manifest module named `media` could co-own `media:write`: reserve the base prefixes.
 - No test that a user token is limited to that user's roles; blog-files-absent is untested; no expired-token case.
+- MySQL keeps the `tokens_next_*` index and FK names after the rename. FK names are schema-global, so a future rebuild that creates `tokens_next` again could collide with them.
+- Route rule: `token:` must come before `auth`/`auth:` on a route, because the token sets the identity. No route combines them today (README tokens section says so).
 
 ## Mail
 
@@ -61,4 +63,6 @@ definition of done. Items tagged (final wave) were flagged as candidates for the
 - Duplicate-insert retry branch in `Throttle` is untested end to end (needs a final `Connection`). The JSON 429 is untested. `testADeletedUserIsAGuest` never reaches the missing-user branch (the FK cascades). No tests for `_csrf[]` arrays, the JSON header, or body-over-header precedence; none for HEAD redirects, logout cookie replay, or the private Cache-Control on the signed-in login block page. The enumeration test drops Set-Cookie (mask the value instead).
 - Task 13 and 15 tests passed before their implementation existed, so they act as pins, not RED proofs (F9).
 - `SessionTest.php` was seen as binary by diff: check for a stray byte.
+- No test for an integer `owner_id` (`Auth::field` casts ints; only string owners are tested).
+- `Authenticate` checks `isActive()` itself and `Auth::actAs()` checks it again (duplicate check).
 - The blog Plan B follow-ups still list `nosniff` on media and Micropub JSON errors and where `ApiAccess` lives.
