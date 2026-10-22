@@ -18,7 +18,8 @@ use Xaraya\Kernel\Config\Config;
  * Global middleware: loads the session named by the cookie (session.cookie, default "xar_session") into the
  * Session::class request attribute, and after the response saves it, renews the cookie or expires it. The cookie
  * is HttpOnly and SameSite=Lax, and Secure unless app.debug is on and the request came over plain HTTP.
- * A response that used a session or sets its cookie is marked Cache-Control: private, no-cache.
+ * A response that used a session or sets its cookie is marked Cache-Control: private, no-cache. A frozen session
+ * (a bearer-token request) is left exactly as it was: nothing is saved or touched and no cookie is sent.
  */
 final class SessionMiddleware implements MiddlewareInterface
 {
@@ -31,6 +32,9 @@ final class SessionMiddleware implements MiddlewareInterface
         $cookie = $request->getCookieParams()[$name] ?? null;
         $session = (is_string($cookie) ? $this->store->load($cookie, $now) : null) ?? Session::fresh();
         $response = $handler->handle($request->withAttribute(Session::class, $session));
+        if ($session->isFrozen()) {
+            return $response;
+        }
 
         $lifetime = 60 * max(1, (int) $this->config->get('session.lifetime', 120));
         $expire = false;

@@ -9,6 +9,7 @@ use InvalidArgumentException;
 use RuntimeException;
 use SensitiveParameter;
 use Xaraya\Kernel\Db\Connection;
+use Xaraya\Kernel\Module\ModuleRegistry;
 use Xaraya\Kernel\Support\Ulid;
 
 final class TokenRepository
@@ -20,7 +21,18 @@ final class TokenRepository
 
     private const ALPHABET = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
 
-    public function __construct(private readonly Connection $db) {}
+    public function __construct(private readonly Connection $db, private readonly ModuleRegistry $modules) {}
+
+    /** @return list<string> Token::SCOPES plus the scopes of every enabled module */
+    public function scopes(): array
+    {
+        $scopes = Token::SCOPES;
+        foreach ($this->modules->enabled() as $manifest) {
+            array_push($scopes, ...$manifest->scopes());
+        }
+
+        return array_values(array_unique($scopes));
+    }
 
     /** A new plaintext token: "xar_" and 40 base62 characters from random_bytes, without modulo bias. */
     public static function generate(): string
@@ -53,15 +65,15 @@ final class TokenRepository
      * @param list<string> $scopes
      * @return array{0: Token, 1: string} the stored token and its plaintext, which is never stored
      */
-    public function create(string $name, array $scopes, ?int $blogId, ?DateTimeImmutable $expiresAt, DateTimeImmutable $now): array
+    public function create(string $name, array $scopes, ?int $blogId, ?DateTimeImmutable $expiresAt, DateTimeImmutable $now, ?string $userId = null): array
     {
         $name = trim($name);
         if ($name === '' || mb_strlen($name) > 64) {
             throw new InvalidArgumentException('A token needs a name of 1 to 64 characters');
         }
         $scopes = array_values(array_unique($scopes));
-        if ($scopes === [] || array_diff($scopes, Token::SCOPES) !== []) {
-            throw new InvalidArgumentException('Scopes must be one or more of: ' . implode(', ', Token::SCOPES));
+        if ($scopes === [] || array_diff($scopes, $this->scopes()) !== []) {
+            throw new InvalidArgumentException('Scopes must be one or more of: ' . implode(', ', $this->scopes()));
         }
         if ($expiresAt !== null && $expiresAt <= $now) {
             throw new InvalidArgumentException('A token must expire in the future');
@@ -74,6 +86,7 @@ final class TokenRepository
             'token_hash' => self::hash($plaintext),
             'scopes' => $scopes,
             'blog_id' => $blogId,
+            'user_id' => $userId,
             'last_used_at' => null,
             'expires_at' => $expiresAt,
             'created_at' => $now,

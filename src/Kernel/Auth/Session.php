@@ -20,6 +20,8 @@ final class Session
 
     private ?string $replaced = null;
 
+    private bool $frozen = false;
+
     /**
      * @param array<string, mixed> $data
      * @param ?DateTimeImmutable $createdAt when the session's absolute lifetime started; null until it is first saved
@@ -155,6 +157,20 @@ final class Session
     public function isEmpty(): bool
     {
         return $this->userId === null && $this->data === [];
+    }
+
+    /**
+     * Marks the session as not this request's: a request a bearer token authenticated never mints, saves, touches or
+     * renews a session, and sends no cookie, whatever its code does to this object.
+     */
+    public function freeze(): void
+    {
+        $this->frozen = true;
+    }
+
+    public function isFrozen(): bool
+    {
+        return $this->frozen;
     }
 
     /** The hash of a row regenerate() left behind, which the store must delete. */

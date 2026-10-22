@@ -236,6 +236,24 @@ final class Manifest
         return $out;
     }
 
+    /**
+     * Bearer-token scopes this module adds to the tokens module's base set, each "<module>:<name>".
+     *
+     * @return list<string>
+     */
+    public function scopes(): array
+    {
+        $out = [];
+        foreach ((array) ($this->data['scopes'] ?? []) as $scope) {
+            if (!is_string($scope) || preg_match('/^' . preg_quote($this->name, '/') . ':[a-z][a-z0-9_-]{0,31}$/D', $scope) !== 1) {
+                throw new ModuleException("{$this->name}: scopes must be strings like \"{$this->name}:write\"");
+            }
+            $out[] = $scope;
+        }
+
+        return array_values(array_unique($out));
+    }
+
     /** @return array<string, string> */
     public function requiredModules(): array
     {

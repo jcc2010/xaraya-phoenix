@@ -8,9 +8,13 @@ use DateTimeImmutable;
 use DateTimeZone;
 use Psr\Http\Message\ServerRequestInterface;
 
-/** A stored API token. The plaintext is never kept: only its sha256 is in xar_tokens. */
+/**
+ * A stored API token. The plaintext is never kept: only its sha256 is in xar_tokens. A token with a user acts as that
+ * user (Auth::can uses their roles); one without acts only through its scopes, as a guest.
+ */
 final class Token
 {
+    /** The base scopes; enabled modules add theirs with "scopes" in module.json (TokenRepository::scopes()). */
     public const SCOPES = ['blog:write', 'media:write'];
 
     /** @param list<string> $scopes */
@@ -22,6 +26,7 @@ final class Token
         public readonly ?DateTimeImmutable $lastUsedAt,
         public readonly ?DateTimeImmutable $expiresAt,
         public readonly DateTimeImmutable $createdAt,
+        public readonly ?string $userId = null,
     ) {}
 
     /** @param array<string, mixed> $row */
@@ -41,6 +46,7 @@ final class Token
             $date('last_used_at'),
             $date('expires_at'),
             $date('created_at') ?? new DateTimeImmutable('@0'),
+            isset($row['user_id']) ? (string) $row['user_id'] : null,
         );
     }
 

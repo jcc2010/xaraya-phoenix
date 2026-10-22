@@ -8,11 +8,19 @@ use Xaraya\Module\Tokens\TokenRepository;
 
 final class TokenCommandsTest extends TokensTestCase
 {
-    public function testTokensNeedTheBlogModule(): void
+    public function testTokensWorkWithoutTheBlogModuleButCannotPinABlog(): void
     {
-        [$code, , $err] = $this->xar(['module:enable', 'tokens']);
+        [$code, $out, $err] = $this->xar(['module:enable', 'tokens']);
+        self::assertSame(0, $code, $out . $err);
+        [$code, , $err] = $this->xar(['token:create', '--name=x', '--scopes=blog:write', '--blog=notes']);
         self::assertSame(1, $code);
-        self::assertStringContainsString("requires 'blog'", $err);
+        self::assertStringContainsString('--blog needs the blog module, which is not enabled', $err);
+        [$code, $out, $err] = $this->xar(['token:create', '--name=x', '--scopes=blog:write']);
+        self::assertSame(0, $code, $err);
+        self::assertStringContainsString("'x' (blog:write).", $out);
+        [$code, $list] = $this->xar(['token:list']);
+        self::assertSame(0, $code);
+        self::assertMatchesRegularExpression('/x\s+blog:write\s+\*\s/', $list);
     }
 
     public function testCreatePrintsTheTokenOnceAndStoresItsHash(): void

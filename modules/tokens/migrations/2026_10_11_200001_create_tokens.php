@@ -6,6 +6,10 @@ use Xaraya\Kernel\Db\Migrations\Migration;
 use Xaraya\Kernel\Db\Schema\Blueprint;
 use Xaraya\Kernel\Db\Schema\Schema;
 
+/**
+ * blog_id pins a token to one blog. It is a plain column, not a foreign key to blogs: tokens work without the blog
+ * module. (Plan B installs had the key; 2026_10_21_200000_drop_blog_foreign_key_from_tokens removes it.)
+ */
 return new class extends Migration {
     public function up(Schema $schema): void
     {
@@ -18,7 +22,6 @@ return new class extends Migration {
             $t->datetime('last_used_at')->nullable();
             $t->datetime('expires_at')->nullable();
             $t->datetime('created_at');
-            $t->foreign('blog_id', 'blogs');
         });
     }
 

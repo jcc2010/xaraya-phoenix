@@ -1,0 +1,7 @@
+{
+  "name": "apiprobe",
+  "version": "1.0.0",
+  "requires": { "kernel": "^0.1", "modules": { "tokens": "^0.1" } },
+  "routes": "Xaraya\\Module\\Apiprobe\\Routes",
+  "scopes": ["apiprobe:write"]
+}
