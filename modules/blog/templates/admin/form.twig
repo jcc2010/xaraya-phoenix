@@ -1,0 +1,69 @@
+{{ render('blog::admin/flash', {flash: flash}) }}
+<h1>{{ t(heading) }} <small>{{ blog.title }}</small></h1>
+{% if formErrors is not empty %}
+<div class="form-error" role="alert"><ul>
+{% for message in formErrors %}
+<li>{{ message }}</li>
+{% endfor %}
+</ul></div>
+{% endif %}
+<form class="admin-form" method="post" action="{{ action }}">
+{{ csrf() }}
+<p class="admin-field">
+<label for="post-kind">{{ t('Kind') }}</label>
+<select id="post-kind" name="kind"{% if errors.kind is defined %} aria-invalid="true" aria-describedby="post-kind-error"{% endif %}>
+{% for kind in kinds %}
+<option value="{{ kind.value }}"{% if kind.value == values.kind %} selected{% endif %}>{{ t(kind.label) }}</option>
+{% endfor %}
+</select>
+{{ render('blog::admin/field-error', {id: 'post-kind', error: errors.kind ?? null}) }}
+</p>
+<p class="admin-field">
+<label for="post-title">{{ t('Title') }}</label>
+<input id="post-title" name="title" value="{{ values.title }}"{% if errors.title is defined %} aria-invalid="true" aria-describedby="post-title-error"{% endif %}>
+{{ render('blog::admin/field-error', {id: 'post-title', error: errors.title ?? null}) }}
+</p>
+<p class="admin-field">
+<label for="post-content">{{ t('Content (HTML)') }}</label>
+<textarea id="post-content" name="content" rows="12"{% if errors.content is defined %} aria-invalid="true" aria-describedby="post-content-error"{% endif %}>{{ values.content }}</textarea>
+{{ render('blog::admin/field-error', {id: 'post-content', error: errors.content ?? null}) }}
+</p>
+<p class="admin-field">
+<label for="post-external-url">{{ t('Link URL') }}</label>
+<input id="post-external-url" name="external_url" type="url" value="{{ values.external_url }}"{% if errors.external_url is defined %} aria-invalid="true" aria-describedby="post-external-url-error"{% endif %}>
+{{ render('blog::admin/field-error', {id: 'post-external-url', error: errors.external_url ?? null}) }}
+</p>
+<p class="admin-field">
+<label for="post-quote">{{ t('Quote') }}</label>
+<textarea id="post-quote" name="quote" rows="4"{% if errors.quote is defined %} aria-invalid="true" aria-describedby="post-quote-error"{% endif %}>{{ values.quote }}</textarea>
+{{ render('blog::admin/field-error', {id: 'post-quote', error: errors.quote ?? null}) }}
+</p>
+<p class="admin-field">
+<label for="post-source-name">{{ t('Source name') }}</label>
+<input id="post-source-name" name="source_name" value="{{ values.source_name }}"{% if errors.source_name is defined %} aria-invalid="true" aria-describedby="post-source-name-error"{% endif %}>
+{{ render('blog::admin/field-error', {id: 'post-source-name', error: errors.source_name ?? null}) }}
+</p>
+<p class="admin-field">
+<label for="post-source-url">{{ t('Source URL') }}</label>
+<input id="post-source-url" name="source_url" type="url" value="{{ values.source_url }}"{% if errors.source_url is defined %} aria-invalid="true" aria-describedby="post-source-url-error"{% endif %}>
+{{ render('blog::admin/field-error', {id: 'post-source-url', error: errors.source_url ?? null}) }}
+</p>
+<p class="admin-field">
+<label for="post-tags">{{ t('Tags (comma-separated)') }}</label>
+<input id="post-tags" name="tags" value="{{ values.tags }}"{% if errors.tags is defined %} aria-invalid="true" aria-describedby="post-tags-error"{% endif %}>
+{{ render('blog::admin/field-error', {id: 'post-tags', error: errors.tags ?? null}) }}
+</p>
+<p class="admin-field">
+<label for="post-date-published">{{ t('Published') }}</label>
+<input id="post-date-published" name="date_published" type="datetime-local" value="{{ values.date_published }}"{% if errors.date_published is defined %} aria-invalid="true"{% endif %} aria-describedby="post-date-published-hint{% if errors.date_published is defined %} post-date-published-error{% endif %}">
+<span class="form-hint" id="post-date-published-hint">{{ t('Time zone: {tz}. A future time schedules the post.', {tz: timezone}) }}</span>
+{{ render('blog::admin/field-error', {id: 'post-date-published', error: errors.date_published ?? null}) }}
+</p>
+{% if canPin %}
+<p class="admin-field admin-check">
+<input id="post-pinned" name="pinned" type="checkbox" value="1"{% if values.pinned %} checked{% endif %}>
+<label for="post-pinned">{{ t('Pin to the top of the blog') }}</label>
+</p>
+{% endif %}
+<p class="admin-buttons"><button type="submit" name="save" value="1">{{ t('Save') }}</button></p>
+</form>

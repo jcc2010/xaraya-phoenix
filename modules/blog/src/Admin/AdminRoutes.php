@@ -6,6 +6,7 @@ namespace Xaraya\Module\Blog\Admin;
 
 use Xaraya\Kernel\Routing\RouteCollector;
 use Xaraya\Module\Blog\Admin\Http\DashboardController;
+use Xaraya\Module\Blog\Admin\Http\PostFormController;
 use Xaraya\Module\Blog\Admin\Http\PostListController;
 
 /** The blog admin routes: all HTML, never cached, each behind an `auth:` check. */
@@ -18,6 +19,10 @@ final class AdminRoutes
                 ->middleware('auth:blog.post.edit');
             $admin->get('/{handle:[a-z0-9_-]{2,32}}/posts', [PostListController::class, 'index'], 'admin.blog.posts')
                 ->middleware('auth:blog.post.edit');
+            $admin->get('/{handle:[a-z0-9_-]{2,32}}/posts/new', [PostFormController::class, 'newForm'], 'admin.blog.post.new')
+                ->middleware('auth:blog.post.add');
+            $admin->post('/{handle:[a-z0-9_-]{2,32}}/posts/new', [PostFormController::class, 'create'], 'admin.blog.post.create')
+                ->middleware('auth:blog.post.add');
         });
     }
 }
