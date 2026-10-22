@@ -65,8 +65,9 @@ final class Auth implements Access
         $required = self::LEVELS[$level] ?? throw new InvalidArgumentException("Unknown access level '{$level}'");
         $id = self::field($item, 'id');
         $owner = self::field($item, 'owner_id');
-        $key = implode("\0", [$required, $module, $component, $item === null ? '' : 'i', $id ?? '', $owner ?? '']);
-        if (isset($this->memo[$key])) {
+        // Unambiguous whatever the strings hold; a value that is not UTF-8 (false) is simply not memoised.
+        $key = json_encode([$required, $module, $component, $item !== null, $id, $owner]);
+        if ($key !== false && isset($this->memo[$key])) {
             return $this->memo[$key];
         }
         $this->grants ??= $this->grantStore->forRoles($this->roles());
@@ -81,14 +82,21 @@ final class Auth implements Access
             }
         }
 
-        return $this->memo[$key] = $best >= $required;
+        $allowed = $best >= $required;
+        if ($key !== false) {
+            $this->memo[$key] = $allowed;
+        }
+
+        return $allowed;
     }
 
     private function instanceMatches(string $instance, mixed $item, ?string $id, ?string $owner): bool
     {
         return match (true) {
-            $instance === '*', $item === null => true,
-            $instance === 'own' => $this->user !== null && $owner === $this->user->id,
+            $instance === '*' => true,
+            // A guest owns nothing, so an "own" grant never matches one, not even for a component-level check.
+            $instance === 'own' => $this->user !== null && ($item === null || $owner === $this->user->id),
+            $item === null => true,
             default => $id !== null && $id === $instance,
         };
     }

@@ -54,7 +54,9 @@ final class LoginController extends Controller
         $now = new DateTimeImmutable('now', new DateTimeZone('UTC'));
 
         $user = $this->users->findByLogin($login);
-        $key = 'login|' . ClientIp::bucket($this->ip->of($request)) . '|' . ($user->id ?? mb_strtolower($login));
+        // A known user is counted by id (handle, email and case all share it), any other name by itself lower-cased;
+        // the prefixes keep a name that looks like an id off that user's counter.
+        $key = 'login|' . ClientIp::bucket($this->ip->of($request)) . '|' . ($user !== null ? 'u:' . $user->id : 'n:' . mb_strtolower($login));
         // Count the attempt first, then compare: the increment is atomic, so a concurrent burst cannot slip past
         // the limit. A success clears the counter, so what it holds is the failures plus this attempt.
         if ($this->throttle->hit($key, self::WINDOW, $now) > self::MAX_FAILURES) {

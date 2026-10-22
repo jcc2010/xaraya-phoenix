@@ -169,6 +169,20 @@ final class LoginTest extends AuthTestCase
         self::assertSame(303, $same64->login('ada', self::PASSWORD)->getStatusCode(), 'another account from the same /64 is not locked');
     }
 
+    public function testAnUnknownLoginNeverSharesAUsersCounter(): void
+    {
+        $app = $this->probeApp();
+        $ada = $this->user($app, 'ada');
+        $attacker = new Browser($app, '198.51.100.11');
+        // Ada's id is not a login, so it is an unknown name: it must not count against Ada's own counter.
+        $name = mb_strtolower($ada->id);
+        for ($i = 0; $i < 5; $i++) {
+            self::assertSame(422, $attacker->login($name, 'guess')->getStatusCode());
+        }
+        self::assertSame(429, $attacker->login($name, 'guess')->getStatusCode());
+        self::assertSame(303, $attacker->login('ada', self::PASSWORD)->getStatusCode(), 'Ada is not locked out');
+    }
+
     /** Swaps in a UserRepository whose password checks are counted. */
     private function countingApp(int &$checks): App
     {

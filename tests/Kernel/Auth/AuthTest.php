@@ -109,6 +109,19 @@ final class AuthTest extends AuthTestCase
         self::assertFalse($auth->can('delete', 'blog', 'post', ['id' => 'p1', 'owner_id' => $ada->id]));
     }
 
+    public function testAnOwnGrantNeverMatchesAGuestEvenWithoutAnItem(): void
+    {
+        $app = $this->installed();
+        $grants = $app->container()->get(Grants::class);
+        $grants->grant('Anonymous', 'wiki', 'note', 'own', 'delete');
+        $auth = $this->auth($app);
+        $auth->actAs(null);
+        self::assertFalse($auth->can('delete', 'wiki', 'note'), 'a guest owns nothing');
+        self::assertFalse($auth->can('delete', 'wiki', 'note', ['id' => 'n1']));
+        $auth->actAs($this->user($app, 'ada'));
+        self::assertTrue($auth->can('delete', 'wiki', 'note'), 'a signed-in user may own some instance');
+    }
+
     public function testResultsAreMemoisedUntilTheIdentityChanges(): void
     {
         $app = $this->installed();
@@ -118,5 +131,13 @@ final class AuthTest extends AuthTestCase
         self::assertFalse($auth->can('edit', 'wiki', 'page'), 'memoised for the request');
         $auth->actAs(null);
         self::assertTrue($auth->can('edit', 'wiki', 'page'));
+        // A NUL-joined key once made (id "x", owner "y\0") and (id "x\0y", no owner) the same question.
+        $app->container()->get(Grants::class)->grant('Anonymous', 'wiki', 'page', 'x', 'admin');
+        $auth->actAs(null);
+        self::assertTrue($auth->can('admin', 'wiki', 'page', ['id' => 'x', 'owner_id' => "y\0"]));
+        self::assertFalse($auth->can('admin', 'wiki', 'page', "x\0y"));
+        // Ids that are not UTF-8 are answered, just not memoised.
+        self::assertFalse($auth->can('admin', 'wiki', 'page', "x\xff"));
+        self::assertTrue($auth->can('admin', 'wiki', 'page', ['id' => 'x', 'owner_id' => "\xff"]));
     }
 }
