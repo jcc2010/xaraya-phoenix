@@ -18,6 +18,8 @@ use Xaraya\Kernel\Cli\Commands\ModuleDisableCommand;
 use Xaraya\Kernel\Cli\Commands\ModuleEnableCommand;
 use Xaraya\Kernel\Cli\Commands\ModuleListCommand;
 use Xaraya\Kernel\Cli\Commands\ServeCommand;
+use Xaraya\Kernel\Cli\Commands\UserCreateCommand;
+use Xaraya\Kernel\Cli\Commands\UserPasswordCommand;
 use Xaraya\Kernel\Module\ModuleRegistry;
 
 final class Application
@@ -34,6 +36,8 @@ final class Application
         HookEnableCommand::class,
         HookDisableCommand::class,
         AssetPublishCommand::class,
+        UserCreateCommand::class,
+        UserPasswordCommand::class,
     ];
 
     /** @var array<string, Command> */

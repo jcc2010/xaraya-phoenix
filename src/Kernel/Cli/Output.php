@@ -12,14 +12,51 @@ final class Output
     /** @var resource */
     private $stderr;
 
+    /** @var resource|null */
+    private $stdin;
+
     /**
      * @param resource|null $stdout
      * @param resource|null $stderr
+     * @param resource|null $stdin where ask() reads; STDIN when null
      */
-    public function __construct($stdout = null, $stderr = null)
+    public function __construct($stdout = null, $stderr = null, $stdin = null)
     {
         $this->stdout = $stdout ?? STDOUT;
         $this->stderr = $stderr ?? STDERR;
+        $this->stdin = $stdin;
+    }
+
+    /**
+     * Prints $question and reads one line: null at the end of input. A secret answer is not echoed on a terminal,
+     * and the terminal settings are put back however the read ends.
+     */
+    public function ask(string $question, bool $secret = false): ?string
+    {
+        $in = $this->stdin ?? STDIN;
+        fwrite($this->stdout, $question . ' ');
+        $saved = $secret && stream_isatty($in) ? trim((string) shell_exec('stty -g')) : '';
+        if ($saved !== '') {
+            shell_exec('stty -echo');
+        }
+        try {
+            $line = fgets($in);
+        } finally {
+            if ($saved !== '') {
+                shell_exec('stty ' . escapeshellarg($saved));
+                fwrite($this->stdout, PHP_EOL);
+            }
+        }
+
+        return $line === false ? null : rtrim($line, "\r\n");
+    }
+
+    /** Reads one line with no prompt (a script piping a secret in): null at the end of input. */
+    public function readLine(): ?string
+    {
+        $line = fgets($this->stdin ?? STDIN);
+
+        return $line === false ? null : rtrim($line, "\r\n");
     }
 
     public function line(string $text = ''): void

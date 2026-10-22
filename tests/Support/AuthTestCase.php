@@ -7,6 +7,8 @@ namespace Xaraya\Tests\Support;
 use Xaraya\Kernel\App;
 use Xaraya\Kernel\Auth\User;
 use Xaraya\Kernel\Auth\UserRepository;
+use Xaraya\Kernel\Cli\Application;
+use Xaraya\Kernel\Cli\Output;
 use Xaraya\Kernel\Db\Connection;
 use Xaraya\Kernel\Module\ModuleRegistry;
 
@@ -56,6 +58,27 @@ abstract class AuthTestCase extends AppTestCase
         $this->installed($overrides, [self::PROBE])->container()->get(ModuleRegistry::class)->enable('probe');
 
         return $this->app($overrides, [self::PROBE]);
+    }
+
+    /**
+     * Runs a CLI command; $stdin is what ask() reads.
+     *
+     * @param list<string> $args
+     * @return array{0: int, 1: string, 2: string} exit code, stdout, stderr
+     */
+    protected function xar(App $app, array $args, string $stdin = ''): array
+    {
+        $streams = [];
+        foreach (['out', 'err', 'in'] as $name) {
+            $streams[$name] = fopen('php://memory', 'w+') ?: throw new \RuntimeException('no memory stream');
+        }
+        fwrite($streams['in'], $stdin);
+        rewind($streams['in']);
+        $code = (new Application($app))->run(['xar', ...$args], new Output($streams['out'], $streams['err'], $streams['in']));
+        rewind($streams['out']);
+        rewind($streams['err']);
+
+        return [$code, (string) stream_get_contents($streams['out']), (string) stream_get_contents($streams['err'])];
     }
 
     protected function users(App $app): UserRepository
