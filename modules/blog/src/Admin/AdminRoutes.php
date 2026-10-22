@@ -27,6 +27,14 @@ final class AdminRoutes
                 ->middleware('auth:blog.post.add');
             $admin->post('/{handle:[a-z0-9_-]{2,32}}/sync', [BlogAdminController::class, 'sync'], 'admin.blog.sync')
                 ->middleware('auth:blog.blog.admin');
+            $admin->get('/new', [BlogAdminController::class, 'newBlogForm'], 'admin.blog.new')
+                ->middleware('auth:blog.blog.admin');
+            $admin->post('/new', [BlogAdminController::class, 'createBlog'], 'admin.blog.create')
+                ->middleware('auth:blog.blog.admin');
+            $admin->get('/{handle:[a-z0-9_-]{2,32}}/settings', [BlogAdminController::class, 'settings'], 'admin.blog.settings')
+                ->middleware('auth:blog.blog.admin');
+            $admin->post('/{handle:[a-z0-9_-]{2,32}}/settings', [BlogAdminController::class, 'saveSettings'], 'admin.blog.settings.save')
+                ->middleware('auth:blog.blog.admin');
             // Which posts the user may edit is decided per post (AdminAccess::assertEdit) in the controller.
             $admin->get('/post/{id:[0-9a-hjkmnp-tv-z]{26}}', [PostFormController::class, 'edit'], 'admin.blog.post.edit')
                 ->middleware('auth:blog.post.edit');

@@ -1,0 +1,24 @@
+{{ render('blog::admin/flash', {flash: flash}) }}
+<h1>{{ t('New blog') }}</h1>
+{% if formErrors is not empty %}
+<div class="form-error" role="alert"><ul>
+{% for message in formErrors %}
+<li>{{ message }}</li>
+{% endfor %}
+</ul></div>
+{% endif %}
+<form class="admin-form" method="post" action="{{ action }}">
+{{ csrf() }}
+<p class="admin-field">
+<label for="blog-handle">{{ t('Handle') }}</label>
+<input id="blog-handle" name="handle" value="{{ values.handle }}" pattern="[a-z0-9_-]{2,32}" required{% if errors.handle is defined %} aria-invalid="true" aria-describedby="blog-handle-error"{% endif %}>
+{{ render('blog::admin/field-error', {id: 'blog-handle', error: errors.handle ?? null}) }}
+</p>
+<p class="admin-field">
+<label for="blog-title">{{ t('Title') }}</label>
+<input id="blog-title" name="title" value="{{ values.title }}" required{% if errors.title is defined %} aria-invalid="true" aria-describedby="blog-title-error"{% endif %}>
+{{ render('blog::admin/field-error', {id: 'blog-title', error: errors.title ?? null}) }}
+</p>
+<p class="admin-mode">{{ t('Mode: native. Mirror blogs are created with') }} <code>bin/xar blog:create</code>.</p>
+<p class="admin-buttons"><button type="submit">{{ t('Create blog') }}</button></p>
+</form>
