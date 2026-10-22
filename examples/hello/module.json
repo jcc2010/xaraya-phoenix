@@ -4,6 +4,8 @@
   "requires": { "kernel": "^0.1", "modules": {} },
   "routes": "Xaraya\\Module\\Hello\\Routes",
   "migrations": "migrations",
+  "scopes": ["hello:write"],
+  "grants": [ { "role": "Members", "component": "greeting", "level": "comment" } ],
   "subscribers": [
     { "event": "Xaraya\\Kernel\\Events\\ItemCreated", "listener": "Xaraya\\Module\\Hello\\CountGreetings", "priority": 0 }
   ],

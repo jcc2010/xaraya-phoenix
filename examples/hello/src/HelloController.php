@@ -12,6 +12,7 @@ use Xaraya\Kernel\Events\EventDispatcher;
 use Xaraya\Kernel\Events\ItemCreated;
 use Xaraya\Kernel\Hooks\DisplayHooks;
 use Xaraya\Kernel\Http\Controller;
+use Xaraya\Kernel\Http\Exception\ValidationFailed;
 use Xaraya\Kernel\Support\Ulid;
 use Xaraya\Kernel\View\Page;
 
@@ -47,15 +48,40 @@ final class HelloController extends Controller
     /** @param array<string, string> $params */
     public function create(ServerRequestInterface $request, array $params): ResponseInterface
     {
-        $id = Ulid::generate();
-        $this->db->insert('greetings', ['id' => $id, 'name' => $params['name'], 'created' => new DateTimeImmutable()]);
-        $this->events->dispatch(new ItemCreated('hello', 'greeting', $id, ['name' => $params['name']]));
+        $id = $this->insert($params['name']);
         $body = $request->getParsedBody();
         /** @var array<string, mixed> $input */
         $input = is_array($body) ? $body : [];
         $this->hooks->call('item.form.save', ['module' => 'hello', 'itemtype' => 'greeting', 'id' => $id, 'name' => $params['name']], $input);
 
         return $this->json(['id' => $id], 201);
+    }
+
+    /** Administrators only (route middleware auth:hello.greeting.admin). */
+    public function admin(): Page
+    {
+        return $this->view('hello::admin', ['count' => count($this->greetings())], 'Greetings admin');
+    }
+
+    /** POST /api/hello/greetings with {"name": "ada"}: needs a bearer token with the hello:write scope. */
+    public function apiCreate(ServerRequestInterface $request): ResponseInterface
+    {
+        $input = json_decode((string) $request->getBody(), true);
+        $name = is_array($input) ? ($input['name'] ?? null) : null;
+        if (!is_string($name) || preg_match('/^[a-z]{1,64}$/D', $name) !== 1) {
+            throw new ValidationFailed(['name' => 'Must be 1 to 64 lower-case letters']);
+        }
+
+        return $this->json(['id' => $this->insert($name)], 201);
+    }
+
+    private function insert(string $name): string
+    {
+        $id = Ulid::generate();
+        $this->db->insert('greetings', ['id' => $id, 'name' => $name, 'created' => new DateTimeImmutable()]);
+        $this->events->dispatch(new ItemCreated('hello', 'greeting', $id, ['name' => $name]));
+
+        return $id;
     }
 
     /** @return list<array{id: string, name: string}> */
