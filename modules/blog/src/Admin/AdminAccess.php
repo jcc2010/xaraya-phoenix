@@ -29,6 +29,26 @@ final class AdminAccess
         return $this->access->can('edit', 'blog', 'post');
     }
 
+    /** Edit on every post (a `*` grant): an ownerless probe matches no "own" grant. */
+    public function canEditAll(): bool
+    {
+        return $this->access->can('edit', 'blog', 'post', ['id' => '', 'owner_id' => null]);
+    }
+
+    /**
+     * The owner whose private posts (scheduled, deleted) the user may list: null for someone who can edit all
+     * posts, otherwise the user's own id (never matches anything for a guest).
+     */
+    public function privateScope(): ?string
+    {
+        if ($this->canEditAll()) {
+            return null;
+        }
+        $user = $this->access->user();
+
+        return $user === null ? '' : $user->id;
+    }
+
     public function canCreate(): bool
     {
         return $this->access->can('add', 'blog', 'post');

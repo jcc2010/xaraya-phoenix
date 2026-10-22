@@ -97,11 +97,15 @@ final class PostRepository
 
     /**
      * The admin tabs' counts: published (live now), scheduled (published, dated in the future) and deleted.
+     * With $ownerId, scheduled and deleted (drafts are private) count only that owner's posts; published stays blog-wide.
      *
      * @return array{published: int, scheduled: int, deleted: int}
      */
-    public function adminCounts(int $blogId, DateTimeImmutable $now): array
+    public function adminCounts(int $blogId, DateTimeImmutable $now, ?string $ownerId = null): array
     {
+        $scope = function (Select $query) use ($ownerId): Select {
+            return $ownerId === null ? $query : $query->where('owner_id', '=', $ownerId);
+        };
         $live = fn(string $op): int => $this->db->select('posts')
             ->where('blog_id', '=', $blogId)
             ->where('status', '=', 'published')
@@ -110,8 +114,11 @@ final class PostRepository
 
         return [
             'published' => $live('<='),
-            'scheduled' => $live('>'),
-            'deleted' => $this->db->select('posts')->where('blog_id', '=', $blogId)->where('status', '=', 'deleted')->count(),
+            'scheduled' => $scope($this->db->select('posts')
+                ->where('blog_id', '=', $blogId)
+                ->where('status', '=', 'published')
+                ->where('date_published', '>', $now))->count(),
+            'deleted' => $scope($this->db->select('posts')->where('blog_id', '=', $blogId)->where('status', '=', 'deleted'))->count(),
         ];
     }
 

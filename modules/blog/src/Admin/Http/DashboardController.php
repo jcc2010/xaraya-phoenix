@@ -27,13 +27,14 @@ final class DashboardController extends Controller
     public function index(ServerRequestInterface $request): Page
     {
         $now = AdminPage::now();
+        $scope = $this->access->privateScope();
         $blogs = [];
         foreach ($this->blogs->all() as $blog) {
             $blogs[] = [
                 'handle' => $blog->handle,
                 'title' => $blog->title,
                 'mode' => $blog->mode,
-                'counts' => $this->posts->adminCounts($blog->id, $now),
+                'counts' => $this->posts->adminCounts($blog->id, $now, $scope),
                 'publicUrl' => $this->urls->generate('blog.home', ['handle' => $blog->handle]),
                 'postsUrl' => $this->blogUrl('admin.blog.posts', $blog),
                 // Mirror blogs are written by their sync, never by hand.

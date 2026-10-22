@@ -120,7 +120,65 @@ final class DashboardTest extends AdminTestCase
         foreach ($routes as $route) {
             self::assertStringStartsWith('/admin/blog', $route->path, (string) $route->name);
             self::assertTrue($route->hasMiddleware('secureHtml') && $route->hasMiddleware('noStore'), (string) $route->name);
+            self::assertFalse($route->hasMiddleware('conditional'), (string) $route->name);
+            $stack = $route->getMiddleware();
+            $auth = array_keys(preg_grep('/^auth:/', $stack) ?: []);
+            self::assertNotSame([], $auth, (string) $route->name);
+            self::assertLessThan($auth[0], array_search('noStore', $stack, true), (string) $route->name);
             self::assertCount(1, preg_grep('/^auth:blog\.(post|blog)\.[a-z]+$/', $route->getMiddleware()) ?: [], (string) $route->name);
         }
+    }
+
+    public function testAuthorsSeeOnlyTheirOwnPrivateCountsAndEditorsSeeAll(): void
+    {
+        $app = $this->site();
+        $notes = $this->nativeBlog($app, []);
+        $ada = $this->user($app, 'ada', ['Authors']);
+        $bob = $this->user($app, 'bob', ['Authors']);
+        $this->user($app, 'eve', ['Editors']);
+        $writer = $app->container()->get(PostWriter::class);
+        $this->postAs($app, $ada, $notes, ['content_html' => '<p>a</p>']);
+        foreach ([$ada, $bob, $bob] as $owner) {
+            $this->postAs($app, $owner, $notes, ['content_html' => '<p>later</p>', 'date_published' => '2999-01-01T00:00:00Z']);
+        }
+        $writer->delete($this->postAs($app, $bob, $notes, ['content_html' => '<p>gone</p>']));
+        $posts = $this->posts($app);
+        $all = ['published' => 1, 'scheduled' => 3, 'deleted' => 1];
+        self::assertSame($all, $posts->adminCounts($notes->id, $this->now()));
+        self::assertSame(['published' => 1, 'scheduled' => 1, 'deleted' => 0], $posts->adminCounts($notes->id, $this->now(), $ada->id));
+        self::assertSame(['published' => 1, 'scheduled' => 2, 'deleted' => 1], $posts->adminCounts($notes->id, $this->now(), $bob->id));
+
+        $row = static fn(string $handle): string => self::main(Html::normalize((string) self::get($app, $handle)));
+        self::assertMatchesRegularExpression('#1 published.*1 scheduled.*0 deleted#sU', $row('ada'));
+        self::assertMatchesRegularExpression('#1 published.*2 scheduled.*1 deleted#sU', $row('bob'));
+        self::assertMatchesRegularExpression('#1 published.*3 scheduled.*1 deleted#sU', $row('eve'));
+    }
+
+    public function testTheFlashTemplateRendersTheSameInBothEngines(): void
+    {
+        $out = [];
+        $this->user($this->site(), 'ada', ['Authors']);
+        foreach (['php', 'twig'] as $engine) {
+            $app = $this->site($engine);
+            $browser = $this->signIn($app, 'ada');
+            $store = $app->container()->get(SessionStore::class);
+            $now = new DateTimeImmutable('now', new DateTimeZone('UTC'));
+            $session = $store->load($browser->cookies['xar_session'], $now) ?? self::fail('no session');
+            $session->flash('Saved <b>&');
+            $session->flash('Broke "x"', 'error');
+            $store->save($session, $now, 3600);
+            $out[$engine] = self::main(Html::normalize((string) $browser->get('/admin/blog')->getBody()));
+        }
+        self::assertSame($out['php'], $out['twig']);
+        self::assertStringContainsString('role="status">Saved &lt;b&gt;&amp;</p>', $out['php']);
+        self::assertStringContainsString('role="alert">Broke &quot;x&quot;</p>', $out['php']);
+    }
+
+    private static function get(\Xaraya\Kernel\App $app, string $handle): string
+    {
+        $browser = new Browser($app);
+        $browser->login($handle, self::PASSWORD);
+
+        return (string) $browser->get('/admin/blog')->getBody();
     }
 }
