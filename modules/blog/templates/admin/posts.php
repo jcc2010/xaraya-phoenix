@@ -1,5 +1,8 @@
 <?= $x->render('blog::admin/flash', ['flash' => $flash]) ?>
 <h1><?= $x->e($x->t('Posts')) ?> <small><?= $x->e($blog['title']) ?></small></h1>
+<?php if ($blog['mode'] === 'mirror'): ?>
+<p class="admin-mirror-note"><?= $x->e($x->t('Mirror of')) ?> <?= $x->e($blog['sourceUrl']) ?>; <?= $x->e($x->t('edits come from the source.')) ?></p>
+<?php endif ?>
 <?php if ($actions !== []): ?>
 <p class="admin-actions"><?= $x->render('blog::admin/actions', ['actions' => $actions]) ?></p>
 <?php endif ?>

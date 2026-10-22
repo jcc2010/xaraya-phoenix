@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Xaraya\Module\Blog\Admin;
 
 use Xaraya\Kernel\Routing\RouteCollector;
+use Xaraya\Module\Blog\Admin\Http\BlogAdminController;
 use Xaraya\Module\Blog\Admin\Http\DashboardController;
 use Xaraya\Module\Blog\Admin\Http\PostActionsController;
 use Xaraya\Module\Blog\Admin\Http\PostFormController;
@@ -24,6 +25,8 @@ final class AdminRoutes
                 ->middleware('auth:blog.post.add');
             $admin->post('/{handle:[a-z0-9_-]{2,32}}/posts/new', [PostFormController::class, 'create'], 'admin.blog.post.create')
                 ->middleware('auth:blog.post.add');
+            $admin->post('/{handle:[a-z0-9_-]{2,32}}/sync', [BlogAdminController::class, 'sync'], 'admin.blog.sync')
+                ->middleware('auth:blog.blog.admin');
             // Which posts the user may edit is decided per post (AdminAccess::assertEdit) in the controller.
             $admin->get('/post/{id:[0-9a-hjkmnp-tv-z]{26}}', [PostFormController::class, 'edit'], 'admin.blog.post.edit')
                 ->middleware('auth:blog.post.edit');

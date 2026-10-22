@@ -138,13 +138,21 @@ final class PostListController extends Controller
     }
 
     /**
-     * The links above the list: a new post, unless the blog is a mirror or the user may not add posts.
+     * The buttons above the list: for a native blog a new post (if the user may add posts); for a mirror "Sync now"
+     * (administrators only).
      *
      * @return list<array{label: string, url: string, method: 'get'|'post', csrf: bool, fields: array<string, string>}>
      */
     public function headerActions(Blog $blog): array
     {
-        if ($blog->isMirror() || !$this->access->canCreate() || !$this->urls->has('admin.blog.post.new')) {
+        if ($blog->isMirror()) {
+            if (!$this->access->canAdminBlogs() || !$this->urls->has('admin.blog.sync')) {
+                return [];
+            }
+
+            return [['label' => 'Sync now', 'url' => $this->urls->generate('admin.blog.sync', ['handle' => $blog->handle]), 'method' => 'post', 'csrf' => true, 'fields' => []]];
+        }
+        if (!$this->access->canCreate() || !$this->urls->has('admin.blog.post.new')) {
             return [];
         }
 

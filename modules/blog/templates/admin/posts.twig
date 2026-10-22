@@ -1,5 +1,8 @@
 {{ render('blog::admin/flash', {flash: flash}) }}
 <h1>{{ t('Posts') }} <small>{{ blog.title }}</small></h1>
+{% if blog.mode == 'mirror' %}
+<p class="admin-mirror-note">{{ t('Mirror of') }} {{ blog.sourceUrl }}; {{ t('edits come from the source.') }}</p>
+{% endif %}
 {% if actions is not empty %}
 <p class="admin-actions">{{ render('blog::admin/actions', {actions: actions}) }}</p>
 {% endif %}

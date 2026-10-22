@@ -66,6 +66,7 @@ final class PostActionsController extends Controller
         $post = $this->posts->find($id) ?? throw new NotFound();
         $this->access->assertDelete($post);
         $blog = $this->blogs->findById($post->blogId) ?? throw new NotFound();
+        PostWriter::assertNative($blog);
 
         return [$blog, $post];
     }
