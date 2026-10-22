@@ -7,7 +7,7 @@
 {% endfor %}
 </ul></div>
 {% endif %}
-<form class="admin-form" method="post" action="{{ action }}">
+<form class="admin-form" method="post" action="{{ action }}" enctype="multipart/form-data">
 {{ csrf() }}
 <p class="admin-field">
 <label for="post-kind">{{ t('Kind') }}</label>
@@ -59,6 +59,27 @@
 <span class="form-hint" id="post-date-published-hint">{{ t('Time zone: {tz}. A future time schedules the post.', {tz: timezone}) }}</span>
 {{ render('blog::admin/field-error', {id: 'post-date-published', error: errors.date_published ?? null}) }}
 </p>
+{% set fileDescribedBy = ((fileNotice is not null ? 'post-file-hint' : '') ~ (errors.file is defined ? ' post-file-error' : ''))|trim %}
+<p class="admin-field">
+<label for="post-file">{{ t('Image') }}</label>
+{% if image is not null %}
+<img class="admin-image" src="{{ image.url }}" alt="">
+{% if image.uploadId is not null %}
+<input type="hidden" name="upload_id" value="{{ image.uploadId }}">
+{% endif %}
+{% endif %}
+<input id="post-file" name="file" type="file" accept="{{ imageTypes }}"{% if errors.file is defined %} aria-invalid="true"{% endif %}{% if fileDescribedBy != '' %} aria-describedby="{{ fileDescribedBy }}"{% endif %}>
+{% if fileNotice is not null %}
+<span class="form-hint" id="post-file-hint">{{ t(fileNotice) }}</span>
+{% endif %}
+{{ render('blog::admin/field-error', {id: 'post-file', error: errors.file ?? null}) }}
+</p>
+{% if image is not null and image.removable %}
+<p class="admin-field admin-check">
+<input id="post-remove-image" name="remove_image" type="checkbox" value="1"{% if values.remove_image %} checked{% endif %}>
+<label for="post-remove-image">{{ t('Remove the image') }}</label>
+</p>
+{% endif %}
 {% if canPin %}
 <p class="admin-field admin-check">
 <input id="post-pinned" name="pinned" type="checkbox" value="1"{% if values.pinned %} checked{% endif %}>

@@ -78,11 +78,14 @@ final class MediaStore
     /**
      * Stores $bytes as a new media row of $blog. The type comes from finfo (never from a client), the file name is a
      * fresh ULID with the extension of that type, under {uploads}/{handle}/. Identical bytes share one file.
+     * A non-empty $types narrows TYPES for this call (the post form takes images only); nothing is written before
+     * every check has passed.
      *
+     * @param list<string> $types
      * @return array<string, mixed> the media row
      * @throws MediaRejected when the bytes are empty, too large, of a type not allowed or not a valid image
      */
-    public function ingest(Blog $blog, string $bytes, ?string $sourceUrl, DateTimeImmutable $now): array
+    public function ingest(Blog $blog, string $bytes, ?string $sourceUrl, DateTimeImmutable $now, array $types = []): array
     {
         $size = strlen($bytes);
         if ($size === 0) {
@@ -92,6 +95,9 @@ final class MediaStore
             throw new MediaRejected(413, 'The file is larger than ' . self::MAX_BYTES . ' bytes');
         }
         $mime = (string) (new finfo(FILEINFO_MIME_TYPE))->buffer($bytes);
+        if ($types !== [] && !in_array($mime, $types, true)) {
+            throw new MediaRejected(415, 'Choose a file of type: ' . implode(', ', $types));
+        }
         $ext = self::TYPES[$mime] ?? null;
         if ($ext === null) {
             throw new MediaRejected(415, "Files of type {$mime} are not allowed; send " . implode(', ', array_keys(self::TYPES)));

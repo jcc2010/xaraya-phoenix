@@ -20,16 +20,23 @@ final class MediaUploader
 {
     public const FIELD = 'file';
 
+    /** The types the post form takes (MediaStore::TYPES without audio). */
+    public const IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/avif'];
+
     private const CHUNK = 1 << 20;
 
     public function __construct(private readonly MediaStore $store, private readonly UrlGenerator $urls) {}
 
     /**
+     * A non-empty $types allows only those of MediaStore::TYPES: any other sniffed type is a 415 "Choose a file of
+     * type: ..." (the JSON API and Micropub pass none).
+     *
+     * @param list<string> $types
      * @return array<string, mixed> the media row
      * @throws HttpException 400 without one file in FIELD or for an interrupted upload, 413 too large, 415 or 422
      * @throws RuntimeException for an upload PHP could not save (no temp dir, disk, extension): a server fault
      */
-    public function upload(Blog $blog, ServerRequestInterface $request, DateTimeImmutable $now): array
+    public function upload(Blog $blog, ServerRequestInterface $request, DateTimeImmutable $now, array $types = []): array
     {
         $file = $request->getUploadedFiles()[self::FIELD] ?? null;
         if (!$file instanceof UploadedFileInterface) {
@@ -43,7 +50,7 @@ final class MediaUploader
             default => throw new RuntimeException('The upload failed with PHP upload error ' . $file->getError()),
         };
         try {
-            return $this->store->ingest($blog, self::read($file), null, $now);
+            return $this->store->ingest($blog, self::read($file), null, $now, $types);
         } catch (MediaRejected $e) {
             throw new HttpException($e->status, $e->getMessage());
         }

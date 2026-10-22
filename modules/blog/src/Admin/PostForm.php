@@ -6,6 +6,7 @@ namespace Xaraya\Module\Blog\Admin;
 
 use DateTimeImmutable;
 use DateTimeZone;
+use Xaraya\Kernel\Support\Ulid;
 use Xaraya\Module\Blog\Blog;
 use Xaraya\Module\Blog\Post\Post;
 use Xaraya\Module\Blog\Source\JsonFeedAdapter;
@@ -52,6 +53,10 @@ final class PostForm
         public readonly string $tags,
         public readonly string $published,
         public readonly bool $pinned,
+        /** Edit only: remove the post's image (ignored when a new one is uploaded). */
+        public readonly bool $removeImage = false,
+        /** The media id of an image uploaded by an earlier submit of this form (a ULID), or ''. */
+        public readonly string $uploadId = '',
     ) {}
 
     public static function blank(): self
@@ -97,6 +102,8 @@ final class PostForm
             $s('tags'),
             $s('date_published'),
             $s('pinned') !== '',
+            $s('remove_image') !== '',
+            Ulid::isValid($s('upload_id')) ? $s('upload_id') : '',
         );
     }
 
@@ -190,6 +197,7 @@ final class PostForm
             'tags' => $this->tags,
             'date_published' => $this->published,
             'pinned' => $this->pinned,
+            'remove_image' => $this->removeImage,
         ];
     }
 

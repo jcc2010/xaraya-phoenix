@@ -12,7 +12,7 @@ $error = static fn(string $name, string $id): string => $x->render('blog::admin/
 <?php endforeach ?>
 </ul></div>
 <?php endif ?>
-<form class="admin-form" method="post" action="<?= $x->e($action) ?>">
+<form class="admin-form" method="post" action="<?= $x->e($action) ?>" enctype="multipart/form-data">
 <?= $x->csrf() ?>
 <p class="admin-field">
 <label for="post-kind"><?= $x->e($x->t('Kind')) ?></label>
@@ -64,6 +64,27 @@ $error = static fn(string $name, string $id): string => $x->render('blog::admin/
 <span class="form-hint" id="post-date-published-hint"><?= $x->e($x->t('Time zone: {tz}. A future time schedules the post.', ['tz' => $timezone])) ?></span>
 <?= $error('date_published', 'post-date-published') ?>
 </p>
+<?php $fileDescribedBy = trim(($fileNotice !== null ? 'post-file-hint' : '') . (isset($errors['file']) ? ' post-file-error' : '')) ?>
+<p class="admin-field">
+<label for="post-file"><?= $x->e($x->t('Image')) ?></label>
+<?php if ($image !== null): ?>
+<img class="admin-image" src="<?= $x->e($image['url']) ?>" alt="">
+<?php if ($image['uploadId'] !== null): ?>
+<input type="hidden" name="upload_id" value="<?= $x->e($image['uploadId']) ?>">
+<?php endif ?>
+<?php endif ?>
+<input id="post-file" name="file" type="file" accept="<?= $x->e($imageTypes) ?>"<?= isset($errors['file']) ? ' aria-invalid="true"' : '' ?><?= $fileDescribedBy !== '' ? ' aria-describedby="' . $fileDescribedBy . '"' : '' ?>>
+<?php if ($fileNotice !== null): ?>
+<span class="form-hint" id="post-file-hint"><?= $x->e($x->t($fileNotice)) ?></span>
+<?php endif ?>
+<?= $error('file', 'post-file') ?>
+</p>
+<?php if ($image !== null && $image['removable']): ?>
+<p class="admin-field admin-check">
+<input id="post-remove-image" name="remove_image" type="checkbox" value="1"<?= $values['remove_image'] ? ' checked' : '' ?>>
+<label for="post-remove-image"><?= $x->e($x->t('Remove the image')) ?></label>
+</p>
+<?php endif ?>
 <?php if ($canPin): ?>
 <p class="admin-field admin-check">
 <input id="post-pinned" name="pinned" type="checkbox" value="1"<?= $values['pinned'] ? ' checked' : '' ?>>

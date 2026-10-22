@@ -7,6 +7,7 @@ namespace Xaraya\Tests\Support;
 use Nyholm\Psr7\ServerRequest;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use Psr\Http\Message\UploadedFileInterface;
 use RuntimeException;
 use Xaraya\Kernel\App;
 
@@ -44,6 +45,23 @@ final class Browser
         $request = $this->request('POST', $path, ['Content-Type' => 'application/x-www-form-urlencoded', ...$headers], http_build_query($fields));
 
         return $this->send($request->withParsedBody($fields));
+    }
+
+    /**
+     * Posts a multipart form with files, as PHP hands it over: the fields as the parsed body, the files as uploaded
+     * files. Unless $fields has "_csrf", the token of the last page's form is added.
+     *
+     * @param array<string, string> $fields
+     * @param array<string, UploadedFileInterface> $files
+     */
+    public function upload(string $path, array $fields, array $files): ResponseInterface
+    {
+        if (!array_key_exists('_csrf', $fields) && $this->last !== null && ($token = $this->csrfField()) !== null) {
+            $fields['_csrf'] = $token;
+        }
+        $request = $this->request('POST', $path, ['Content-Type' => 'multipart/form-data; boundary=xar-test-boundary']);
+
+        return $this->send($request->withParsedBody($fields)->withUploadedFiles($files));
     }
 
     /** Opens the login page, then posts the form (with its CSRF token and the "next" it carries). */
