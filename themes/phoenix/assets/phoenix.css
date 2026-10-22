@@ -54,6 +54,7 @@ main:focus { outline: none; }
 .auth-form input { width: 100%; max-width: 24rem; padding: 0.5rem; font: inherit; color: inherit; background: var(--bg); border: 1px solid var(--muted); }
 .auth-form button, .logout-form button { padding: 0.5rem 1rem; font: inherit; }
 .form-error { padding: 0.5rem 1rem; border-left: 4px solid #c5221f; }
+.form-hint { display: block; color: var(--muted); font-size: 0.9375rem; }
 .form-notice { padding: 0.5rem 1rem; border-left: 4px solid var(--accent); }
 
 img, video, audio { max-width: 100%; height: auto; }

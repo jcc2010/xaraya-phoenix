@@ -1,0 +1,22 @@
+<h1>{{ t('Choose a new password') }}</h1>
+{% if not valid %}
+<p class="form-error" role="alert">{{ t('This link has expired or has already been used.') }}</p>
+<p><a href="{{ url('auth.forgot') }}">{{ t('Ask for a new link') }}</a></p>
+{% else %}
+{% if error %}
+<p class="form-error" id="reset-error" role="alert">{{ t(error) }}</p>
+{% endif %}
+<form class="auth-form" method="post" action="{{ url('auth.reset.submit', {token: token}) }}">
+{{ csrf() }}
+<p>
+<label for="password">{{ t('New password') }}</label>
+<input id="password" name="password" type="password" autocomplete="new-password" minlength="8" required aria-describedby="password-hint{{ error ? ' reset-error' : '' }}">
+<span class="form-hint" id="password-hint">{{ t('At least 8 characters.') }}</span>
+</p>
+<p>
+<label for="password_confirmation">{{ t('Repeat the new password') }}</label>
+<input id="password_confirmation" name="password_confirmation" type="password" autocomplete="new-password" minlength="8" required>
+</p>
+<p><button type="submit">{{ t('Change the password') }}</button></p>
+</form>
+{% endif %}

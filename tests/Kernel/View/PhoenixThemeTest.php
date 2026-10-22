@@ -66,7 +66,7 @@ final class PhoenixThemeTest extends AppTestCase
         }
         sort($names['php']);
         sort($names['twig']);
-        self::assertSame(['auth/login', 'block', 'error/404', 'error/default', 'home', 'layout'], $names['php']);
+        self::assertSame(['auth/forgot', 'auth/login', 'auth/reset', 'block', 'error/404', 'error/default', 'home', 'layout'], $names['php']);
         self::assertSame($names['php'], $names['twig']);
     }
 

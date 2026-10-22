@@ -18,3 +18,4 @@
 </p>
 <p><button type="submit"><?= $x->e($x->t('Log in')) ?></button></p>
 </form>
+<p><a href="<?= $x->e($x->url('auth.forgot')) ?>"><?= $x->e($x->t('Forgot your password?')) ?></a></p>
