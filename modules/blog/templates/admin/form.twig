@@ -65,5 +65,10 @@
 <label for="post-pinned">{{ t('Pin to the top of the blog') }}</label>
 </p>
 {% endif %}
-<p class="admin-buttons"><button type="submit" name="save" value="1">{{ t('Save') }}</button></p>
+<p class="admin-buttons"><button type="submit" name="save" value="1">{{ t('Save') }}</button> <button type="submit" name="preview" value="1">{{ t('Preview') }}</button></p>
 </form>
+{% if preview is not null %}
+<section class="admin-preview" aria-labelledby="preview-heading"><h2 id="preview-heading">{{ t('Preview') }}</h2>
+{{ render('blog::partials/post', {post: preview, full: true}) }}
+</section>
+{% endif %}

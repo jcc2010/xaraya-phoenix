@@ -36,8 +36,9 @@ final class PostViewFactory
     /**
      * @param array<string, string> $media source media URL => local URL, from MediaUrls::map()
      * @param bool $pinned true only for the card in the home page's pinned section; every other card is plain
+     * @param bool $cached false sanitises without reading or writing the cache (the admin preview of unsaved HTML)
      */
-    public function make(Blog $blog, Post $post, array $media = [], bool $pinned = false): PostView
+    public function make(Blog $blog, Post $post, array $media = [], bool $pinned = false, bool $cached = true): PostView
     {
         $doc = $post->doc;
         $athenana = self::map($doc, '_athenana');
@@ -47,8 +48,8 @@ final class PostViewFactory
             // The wyome rule: the owner's comment repeats the start of content_html; show each once.
             $content = ltrim(substr($content, strlen($comment)));
         }
-        $contentHtml = $this->clean($post, 'content', $content);
-        $commentHtml = $comment === null ? '' : $this->clean($post, 'comment', $comment);
+        $contentHtml = $this->clean($post, 'content', $content, $cached);
+        $commentHtml = $comment === null ? '' : $this->clean($post, 'comment', $comment, $cached);
         $quote = self::str($athenana, 'quote');
         $plain = Text::plain($contentHtml);
         if ($plain === '') {
@@ -131,10 +132,13 @@ final class PostViewFactory
             : sprintf('%d:%02d', $minutes, $seconds % 60);
     }
 
-    private function clean(Post $post, string $field, string $html): string
+    private function clean(Post $post, string $field, string $html, bool $cached = true): string
     {
         if (trim($html) === '') {
             return '';
+        }
+        if (!$cached) {
+            return $this->sanitizer->clean($html);
         }
         $key = self::cacheKey($post, $field, $html, $this->sanitizer->siteHost());
         $cached = $this->cache->get($key);

@@ -35,6 +35,9 @@ use Xaraya\Module\Blog\Support\Text;
  *
  * Titles, kinds and tags are derived by AthenaAdapter::toRecord(), which takes its title from Text::deriveTitle().
  * `tags` (names) and `_athenana.tags` ({name, slug}) are reconciled first: see reconcileTags().
+ *
+ * previewCreate() and previewPatch() share create()'s and replace()'s prepare steps, so a preview is checked and
+ * mapped exactly as a save would be, but writes nothing and fires no event.
  */
 final class PostWriter
 {
@@ -54,22 +57,25 @@ final class PostWriter
     public function create(Blog $blog, array $item, ?DateTimeImmutable $now = null): Post
     {
         $now ??= self::now();
-        self::assertNative($blog);
-        $item = self::withoutReserved($item);
-        $errors = (new ItemValidator())->errors($item);
-        foreach (['id', 'url'] as $field) {
-            if (array_key_exists($field, $item)) {
-                $errors[$field] = 'Is assigned by the server; leave it out';
-            }
-        }
-        self::check($errors);
-        $item['date_published'] ??= $now->format(DATE_ATOM);
-        $id = Ulid::generate();
-        $itemId = $this->appUrl() . '/s/' . $id;
-        $this->posts->insert($blog->id, $id, $this->record($item, $itemId, $id, null, $now), $now, $this->access->user()?->id);
-        $this->events->dispatch(new ItemCreated('blog', 'post', $id, ['blog' => $blog->handle, 'item_id' => $itemId]));
+        [$id, $record] = $this->prepareCreate($blog, $item, $now);
+        $this->posts->insert($blog->id, $id, $record, $now, $this->access->user()?->id);
+        $this->events->dispatch(new ItemCreated('blog', 'post', $id, ['blog' => $blog->handle, 'item_id' => $record->itemId]));
 
         return $this->posts->find($id) ?? throw new RuntimeException("Post {$id} vanished after insert");
+    }
+
+    /**
+     * The post create() would write, checked and mapped exactly as create() does it, but not written: nothing is
+     * stored and no event fires. Its id is a fresh ULID that nothing else will ever see.
+     *
+     * @param array<array-key, mixed> $item
+     */
+    public function previewCreate(Blog $blog, array $item, ?DateTimeImmutable $now = null): Post
+    {
+        $now ??= self::now();
+        [$id, $record] = $this->prepareCreate($blog, $item, $now);
+
+        return Post::fromRecord($record, $id, $blog->id, $this->access->user()?->id, $now);
     }
 
     /**
@@ -82,19 +88,8 @@ final class PostWriter
     {
         $now ??= self::now();
         $blog = $this->blogOf($post);
-        self::assertNative($blog);
-        self::assertLive($post);
-        $item = self::withoutReserved($item);
-        $errors = (new ItemValidator())->errors($item);
-        if (array_key_exists('id', $item) && $item['id'] !== $post->itemId) {
-            $errors['id'] = 'Cannot be changed';
-        }
-        if (array_key_exists('url', $item) && $item['url'] !== $this->serializer->url($blog, $post, $this->appUrl())) {
-            $errors['url'] = 'Is assigned by the server; leave it out or send it unchanged';
-        }
-        self::check($errors);
-        $item['date_published'] ??= $post->datePublished->format(DATE_ATOM);
-        $this->posts->rewrite($post, $this->record($item, $post->itemId, $post->id, $post->url, $now), $now);
+        $record = $this->prepareReplace($blog, $post, $item, $now);
+        $this->posts->rewrite($post, $record, $now);
         $this->events->dispatch(new ItemUpdated('blog', 'post', $post->id, ['blog' => $blog->handle, 'item_id' => $post->itemId]));
 
         return $this->reload($post);
@@ -109,31 +104,27 @@ final class PostWriter
      */
     public function patch(Post $post, array $partial, ?DateTimeImmutable $now = null): Post
     {
-        $blog = $this->blogOf($post);
-        self::assertNative($blog);
-        self::assertLive($post);
-        if (array_key_exists('date_published', $partial) && $partial['date_published'] === null) {
-            self::check(['date_published' => 'Cannot be removed']);
-        }
-        $current = $this->serializer->item($blog, $post, $this->appUrl());
-        if (self::isNoOp($current, $partial)) {
+        $merged = $this->merged($post, $partial);
+
+        return $merged === null ? $post : $this->replace($post, $merged, $now);
+    }
+
+    /**
+     * The post patch() would write, checked and mapped exactly as patch() does it, but not written: nothing is
+     * stored and no event fires. A no-op patch previews $post itself.
+     *
+     * @param array<array-key, mixed> $partial
+     */
+    public function previewPatch(Post $post, array $partial, ?DateTimeImmutable $now = null): Post
+    {
+        $now ??= self::now();
+        $merged = $this->merged($post, $partial);
+        if ($merged === null) {
             return $post;
         }
-        // A title that was only derived from the content (§3.1) is derived again from the patched content.
-        if (!array_key_exists('title', $partial) && self::hasDerivedTitle($post)) {
-            unset($current['title']);
-        }
-        $patchesTags = array_key_exists('tags', $partial);
-        $patchesAthenaTags = is_array($partial['_athenana'] ?? null) && array_key_exists('tags', $partial['_athenana']);
-        if ($patchesTags && !$patchesAthenaTags && $partial['tags'] === null && is_array($current['_athenana'] ?? null)) {
-            unset($current['_athenana']['tags']); // removing the names removes the tags
-        }
-        if ($patchesAthenaTags && !$patchesTags) {
-            unset($current['tags']); // the served names follow the patched {name, slug} list
-        }
-        $merged = MergePatch::apply($current, $partial);
+        $record = $this->prepareReplace($this->blogOf($post), $post, $merged, $now);
 
-        return $this->replace($post, is_array($merged) ? $merged : [], $now);
+        return Post::fromRecord($record, $post->id, $post->blogId, $post->ownerId, $now);
     }
 
     /** True when the post's title is the one Text::deriveTitle() gives its content (no title was ever sent). */
@@ -189,6 +180,87 @@ final class PostWriter
         } catch (JsonException) {
             return false; // not valid UTF-8: replace() reports it
         }
+    }
+
+    /**
+     * The item patch() replaces the post with, or null when the patch leaves the served item as it is.
+     *
+     * @param array<array-key, mixed> $partial
+     * @return array<array-key, mixed>|null
+     */
+    private function merged(Post $post, array $partial): ?array
+    {
+        $blog = $this->blogOf($post);
+        self::assertNative($blog);
+        self::assertLive($post);
+        if (array_key_exists('date_published', $partial) && $partial['date_published'] === null) {
+            self::check(['date_published' => 'Cannot be removed']);
+        }
+        $current = $this->serializer->item($blog, $post, $this->appUrl());
+        if (self::isNoOp($current, $partial)) {
+            return null;
+        }
+        // A title that was only derived from the content (§3.1) is derived again from the patched content.
+        if (!array_key_exists('title', $partial) && self::hasDerivedTitle($post)) {
+            unset($current['title']);
+        }
+        $patchesTags = array_key_exists('tags', $partial);
+        $patchesAthenaTags = is_array($partial['_athenana'] ?? null) && array_key_exists('tags', $partial['_athenana']);
+        if ($patchesTags && !$patchesAthenaTags && $partial['tags'] === null && is_array($current['_athenana'] ?? null)) {
+            unset($current['_athenana']['tags']); // removing the names removes the tags
+        }
+        if ($patchesAthenaTags && !$patchesTags) {
+            unset($current['tags']); // the served names follow the patched {name, slug} list
+        }
+        $merged = MergePatch::apply($current, $partial);
+
+        return is_array($merged) ? $merged : [];
+    }
+
+    /**
+     * create()'s checks and mapping: the new post's id and record.
+     *
+     * @param array<array-key, mixed> $item
+     * @return array{0: string, 1: PostRecord}
+     */
+    private function prepareCreate(Blog $blog, array $item, DateTimeImmutable $now): array
+    {
+        self::assertNative($blog);
+        $item = self::withoutReserved($item);
+        $errors = (new ItemValidator())->errors($item);
+        foreach (['id', 'url'] as $field) {
+            if (array_key_exists($field, $item)) {
+                $errors[$field] = 'Is assigned by the server; leave it out';
+            }
+        }
+        self::check($errors);
+        $item['date_published'] ??= $now->format(DATE_ATOM);
+        $id = Ulid::generate();
+
+        return [$id, $this->record($item, $this->appUrl() . '/s/' . $id, $id, null, $now)];
+    }
+
+    /**
+     * replace()'s checks and mapping: the record that replaces $post.
+     *
+     * @param array<array-key, mixed> $item
+     */
+    private function prepareReplace(Blog $blog, Post $post, array $item, DateTimeImmutable $now): PostRecord
+    {
+        self::assertNative($blog);
+        self::assertLive($post);
+        $item = self::withoutReserved($item);
+        $errors = (new ItemValidator())->errors($item);
+        if (array_key_exists('id', $item) && $item['id'] !== $post->itemId) {
+            $errors['id'] = 'Cannot be changed';
+        }
+        if (array_key_exists('url', $item) && $item['url'] !== $this->serializer->url($blog, $post, $this->appUrl())) {
+            $errors['url'] = 'Is assigned by the server; leave it out or send it unchanged';
+        }
+        self::check($errors);
+        $item['date_published'] ??= $post->datePublished->format(DATE_ATOM);
+
+        return $this->record($item, $post->itemId, $post->id, $post->url, $now);
     }
 
     private function blogOf(Post $post): Blog

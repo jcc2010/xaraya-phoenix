@@ -231,6 +231,20 @@ final class PostViewFactoryTest extends AppTestCase
         self::assertSame('<p>Edited</p>', $this->factory()->make(self::blog(), $edited)->contentHtml, 'new content, new key');
     }
 
+    public function testAnUncachedViewWritesNothingToTheCache(): void
+    {
+        $view = $this->factory()->make(self::blog(), self::post(), cached: false);
+        self::assertSame('<p>Hello <b>world</b></p>', $view->contentHtml);
+        self::assertSame([], glob($this->tmp . '/cache/*') ?: []);
+    }
+
+    public function testAnUncachedViewIgnoresACachedEntry(): void
+    {
+        $post = self::post();
+        (new Cache($this->tmp . '/cache'))->set(PostViewFactory::cacheKey($post, 'content', (string) $post->contentHtml, 'xar.test'), '<p>stale</p>');
+        self::assertSame('<p>Hello <b>world</b></p>', $this->factory()->make(self::blog(), $post, cached: false)->contentHtml);
+    }
+
     public function testTheCacheKeyChangesWithTheSanitiserVersionAndSiteHost(): void
     {
         $post = self::post();

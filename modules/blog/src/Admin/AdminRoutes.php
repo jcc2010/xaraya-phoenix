@@ -23,6 +23,11 @@ final class AdminRoutes
                 ->middleware('auth:blog.post.add');
             $admin->post('/{handle:[a-z0-9_-]{2,32}}/posts/new', [PostFormController::class, 'create'], 'admin.blog.post.create')
                 ->middleware('auth:blog.post.add');
+            // Which posts the user may edit is decided per post (AdminAccess::assertEdit) in the controller.
+            $admin->get('/post/{id:[0-9a-hjkmnp-tv-z]{26}}', [PostFormController::class, 'edit'], 'admin.blog.post.edit')
+                ->middleware('auth:blog.post.edit');
+            $admin->post('/post/{id:[0-9a-hjkmnp-tv-z]{26}}', [PostFormController::class, 'update'], 'admin.blog.post.update')
+                ->middleware('auth:blog.post.edit');
         });
     }
 }

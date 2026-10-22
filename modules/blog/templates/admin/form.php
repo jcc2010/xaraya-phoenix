@@ -70,5 +70,10 @@ $error = static fn(string $name, string $id): string => $x->render('blog::admin/
 <label for="post-pinned"><?= $x->e($x->t('Pin to the top of the blog')) ?></label>
 </p>
 <?php endif ?>
-<p class="admin-buttons"><button type="submit" name="save" value="1"><?= $x->e($x->t('Save')) ?></button></p>
+<p class="admin-buttons"><button type="submit" name="save" value="1"><?= $x->e($x->t('Save')) ?></button> <button type="submit" name="preview" value="1"><?= $x->e($x->t('Preview')) ?></button></p>
 </form>
+<?php if ($preview !== null): ?>
+<section class="admin-preview" aria-labelledby="preview-heading"><h2 id="preview-heading"><?= $x->e($x->t('Preview')) ?></h2>
+<?= $x->render('blog::partials/post', ['post' => $preview, 'full' => true]) ?>
+</section>
+<?php endif ?>

@@ -32,6 +32,29 @@ final class Post
         public readonly ?string $ownerId = null,
     ) {}
 
+    /** A post that is not stored (a preview): the record as `published`, last updated at $now. */
+    public static function fromRecord(PostRecord $record, string $id, int $blogId, ?string $ownerId, DateTimeImmutable $now): self
+    {
+        return new self(
+            $id,
+            $blogId,
+            $record->itemId,
+            $record->kind,
+            $record->title,
+            $record->url,
+            $record->externalUrl,
+            $record->contentHtml,
+            $record->image,
+            $record->datePublished,
+            $record->dateModified,
+            'published',
+            $record->doc,
+            $record->tags,
+            $now,
+            $ownerId,
+        );
+    }
+
     /**
      * @param array<string, mixed> $row
      * @param list<array{name: string, slug: string}> $tags
