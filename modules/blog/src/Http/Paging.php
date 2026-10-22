@@ -37,11 +37,13 @@ final class Paging
         if ($value === null) {
             return 1;
         }
-        if (!is_string($value) || preg_match('/^[1-9][0-9]{0,5}$/D', $value) !== 1) {
-            throw new HttpException(400, 'Invalid page number');
-        }
+        return self::pageNumber($value) ?? throw new HttpException(400, 'Invalid page number');
+    }
 
-        return (int) $value;
+    /** A page number as the ?page= rule accepts it (digits, no leading zero, at most six); null for anything else. */
+    public static function pageNumber(mixed $value): ?int
+    {
+        return is_string($value) && preg_match('/^[1-9][0-9]{0,5}$/D', $value) === 1 ? (int) $value : null;
     }
 
     /**

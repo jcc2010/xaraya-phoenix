@@ -6,6 +6,7 @@ namespace Xaraya\Module\Blog\Admin;
 
 use Xaraya\Kernel\Routing\RouteCollector;
 use Xaraya\Module\Blog\Admin\Http\DashboardController;
+use Xaraya\Module\Blog\Admin\Http\PostActionsController;
 use Xaraya\Module\Blog\Admin\Http\PostFormController;
 use Xaraya\Module\Blog\Admin\Http\PostListController;
 
@@ -28,6 +29,10 @@ final class AdminRoutes
                 ->middleware('auth:blog.post.edit');
             $admin->post('/post/{id:[0-9a-hjkmnp-tv-z]{26}}', [PostFormController::class, 'update'], 'admin.blog.post.update')
                 ->middleware('auth:blog.post.edit');
+            $admin->post('/post/{id:[0-9a-hjkmnp-tv-z]{26}}/delete', [PostActionsController::class, 'delete'], 'admin.blog.post.delete')
+                ->middleware('auth:blog.post.delete');
+            $admin->post('/post/{id:[0-9a-hjkmnp-tv-z]{26}}/undelete', [PostActionsController::class, 'undelete'], 'admin.blog.post.undelete')
+                ->middleware('auth:blog.post.delete');
         });
     }
 }
