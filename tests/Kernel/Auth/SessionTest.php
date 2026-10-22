@@ -376,4 +376,27 @@ final class SessionTest extends AuthTestCase
         $this->expectException(\InvalidArgumentException::class);
         $session->flash('x', 'warning');
     }
+
+    public function testFlashBeforeLoginIsDiscardedAndAFrozenSessionNeverSavesIt(): void
+    {
+        $session = Session::fresh();
+        $session->flash('before');
+        $session->login('u1');
+        self::assertSame([], $session->takeFlash(), 'login starts with fresh data');
+
+        $app = $this->app();
+        $store = $app->container()->get(SessionStore::class);
+        $middleware = new SessionMiddleware($store, $app->container()->get(Config::class));
+        $browser = new Browser($app);
+        $response = $middleware->process($browser->request('GET', '/'), new CallableHandler(static function (ServerRequestInterface $r): Response {
+            $s = $r->getAttribute(Session::class);
+            self::assertInstanceOf(Session::class, $s);
+            $s->freeze();
+            $s->flash('lost');
+
+            return new Response(200, [], 'ok');
+        }));
+        self::assertFalse($response->hasHeader('Set-Cookie'));
+        self::assertFalse($this->db($app)->hasTable('sessions') && $this->rows($app) > 0);
+    }
 }

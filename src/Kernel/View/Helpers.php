@@ -6,6 +6,7 @@ namespace Xaraya\Kernel\View;
 
 use InvalidArgumentException;
 use Psr\Http\Message\ServerRequestInterface;
+use Psr\Log\LoggerInterface;
 use Stringable;
 use Xaraya\Kernel\Assets\AssetUrls;
 use Xaraya\Kernel\Auth\Access;
@@ -165,8 +166,14 @@ final class Helpers
                 continue;
             }
             foreach ($links as $link) {
-                if ($urls->has($link['route']) && $this->can($link['level'], $manifest->name, $link['component'])) {
+                if (!$urls->has($link['route']) || !$this->can($link['level'], $manifest->name, $link['component'])) {
+                    continue;
+                }
+                try {
                     $out[] = ['url' => $urls->generate($link['route']), 'label' => $this->t($link['label'])];
+                } catch (InvalidArgumentException $e) {
+                    // A route that takes parameters has no fixed URL: skip it rather than fail every page header.
+                    $this->container->get(LoggerInterface::class)->error("Skipping admin link '{$link['route']}' of module '{$manifest->name}': {$e->getMessage()}", ['exception' => $e]);
                 }
             }
         }

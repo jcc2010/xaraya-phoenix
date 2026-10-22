@@ -120,6 +120,8 @@ final class BlocksAndHelpersTest extends AuthTestCase
 
             $browser = new Browser($app);
             $browser->login('root', self::PASSWORD);
+            self::assertSame(200, $browser->get('/')->getStatusCode(), "{$engine}: a parameterised admin route never breaks the header");
+            self::assertStringNotContainsString('Needs a parameter', $browser->body());
             self::assertStringContainsString('<nav class="admin-links" aria-label="Admin"><ul><li><a href="/probe/admin">Probe admin</a></li></ul></nav>', Html::normalize((string) $browser->get('/')->getBody()));
         }
     }

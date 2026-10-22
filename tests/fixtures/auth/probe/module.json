@@ -4,6 +4,7 @@
   "routes": "Xaraya\\Module\\Probe\\Routes",
   "admin": [
     {"route": "probe.admin", "label": "Probe admin", "component": "secret", "level": "admin"},
-    {"route": "probe.missing", "label": "Gone", "component": "secret", "level": "read"}
+    {"route": "probe.missing", "label": "Gone", "component": "secret", "level": "read"},
+    {"route": "probe.note", "label": "Needs a parameter", "component": "secret", "level": "read"}
   ]
 }

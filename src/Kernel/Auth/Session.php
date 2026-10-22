@@ -121,6 +121,8 @@ final class Session
 
     /**
      * Queues a message for the next page that calls takeFlash(). The text is plain: whoever renders it escapes it.
+     * Flash is ordinary session data: a frozen (bearer-token) request never saves it, and login() discards what was
+     * queued before it, so flash after login().
      *
      * @param string $kind "status" or "error"
      */
