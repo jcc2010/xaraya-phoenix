@@ -17,7 +17,7 @@ use Xaraya\Kernel\Http\Pipeline;
 
 final class SecureHtmlTest extends TestCase
 {
-    private const CSP = "default-src 'self'; img-src 'self' https: data:; media-src 'self' https:; style-src 'self'; script-src 'self'; frame-src 'none'; object-src 'none'; base-uri 'none'; form-action 'self'";
+    private const CSP = "default-src 'self'; img-src 'self' https: data:; media-src 'self' https:; style-src 'self'; script-src 'self'; frame-src 'none'; object-src 'none'; base-uri 'none'; form-action 'self'; frame-ancestors 'self'";
 
     private function through(\Closure $final): ResponseInterface
     {

@@ -67,5 +67,6 @@ abstract class BlogPageTestCase extends BlogTestCase
         foreach (SecureHtml::HEADERS as $name => $value) {
             self::assertSame($value, $response->getHeaderLine($name), $name);
         }
+        self::assertStringEndsWith("; form-action 'self'; frame-ancestors 'self'", $response->getHeaderLine('Content-Security-Policy'), 'no framing by other sites');
     }
 }
