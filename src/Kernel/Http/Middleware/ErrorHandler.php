@@ -14,38 +14,73 @@ use Psr\Log\LoggerInterface;
 use Throwable;
 use Xaraya\Kernel\Http\Controller;
 use Xaraya\Kernel\Http\Exception\HttpException;
+use Xaraya\Kernel\Http\Exception\RequestFailed;
 use Xaraya\Kernel\Http\Exception\ValidationFailed;
 
 final class ErrorHandler implements MiddlewareInterface
 {
-    /** @param (Closure(int, string, ServerRequestInterface): ?string)|null $renderHtml */
+    /**
+     * @param (Closure(int, string, ServerRequestInterface): ?string)|null $renderHtml
+     * @param (Closure(ServerRequestInterface): bool)|null $personal whether the request is one user's (a session
+     *        cookie, or a signed-in identity): its error response is then marked Cache-Control: private, no-store
+     */
     public function __construct(
         private readonly LoggerInterface $logger,
         private readonly bool $debug = false,
         private readonly ?Closure $renderHtml = null,
+        private readonly ?Closure $personal = null,
     ) {}
 
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
         try {
             return $handler->handle($request);
-        } catch (HttpException $e) {
-            $status = $e->status();
-            // A 5xx HttpException with no message of its own that wraps another (as Cors does) reports the cause.
-            $cause = $status >= 500 && $e->getPrevious() !== null && $e->getMessage() === HttpException::reason($status)
-                ? $e->getPrevious()
-                : $e;
-            if ($status >= 500) {
-                $this->log($cause);
-            }
-            $message = $status >= 500 && !$this->debug ? HttpException::reason($status) : $cause->getMessage();
-
-            return $this->respond($request, $status, $message, $e->headers(), $cause, $e instanceof ValidationFailed ? $e->fields() : []);
+        } catch (RequestFailed $e) {
+            // Render with the request an inner middleware saw (it carries the user's session).
+            $response = $this->handleError($e->request, $e->cause());
         } catch (Throwable $e) {
+            $response = $this->handleError($request, $e);
+        }
+        if ($this->isPersonal($request)) {
+            $response = $response->withHeader('Cache-Control', 'private, no-store');
+        }
+
+        return $response;
+    }
+
+    private function isPersonal(ServerRequestInterface $request): bool
+    {
+        if ($this->personal === null) {
+            return false;
+        }
+        try {
+            return ($this->personal)($request);
+        } catch (Throwable $e) {
+            $this->log($e);
+
+            // When in doubt, keep the page out of shared caches.
+            return true;
+        }
+    }
+
+    private function handleError(ServerRequestInterface $request, Throwable $e): ResponseInterface
+    {
+        if (!$e instanceof HttpException) {
             $this->log($e);
 
             return $this->respond($request, 500, $this->debug ? $e->getMessage() : HttpException::reason(500), [], $e);
         }
+        $status = $e->status();
+        // A 5xx HttpException with no message of its own that wraps another (as Cors does) reports the cause.
+        $cause = $status >= 500 && $e->getPrevious() !== null && $e->getMessage() === HttpException::reason($status)
+            ? $e->getPrevious()
+            : $e;
+        if ($status >= 500) {
+            $this->log($cause);
+        }
+        $message = $status >= 500 && !$this->debug ? HttpException::reason($status) : $cause->getMessage();
+
+        return $this->respond($request, $status, $message, $e->headers(), $cause, $e instanceof ValidationFailed ? $e->fields() : []);
     }
 
     private function log(Throwable $e): void

@@ -10,6 +10,7 @@ use Psr\Http\Message\ServerRequestInterface;
 use Xaraya\Kernel\Auth\Auth;
 use Xaraya\Kernel\Auth\Session;
 use Xaraya\Kernel\Auth\SessionStore;
+use Xaraya\Kernel\Auth\UserRepository;
 use Xaraya\Kernel\Http\Exception\Forbidden;
 use Xaraya\Kernel\Routing\RouteCollector;
 use Xaraya\Kernel\Routing\RouteProvider;
@@ -18,7 +19,12 @@ use Xaraya\Kernel\View\View;
 /** Test routes that expose the session and identity machinery. */
 final class Routes implements RouteProvider
 {
-    public function __construct(private readonly SessionStore $store, private readonly Auth $auth, private readonly View $view) {}
+    public function __construct(
+        private readonly SessionStore $store,
+        private readonly Auth $auth,
+        private readonly View $view,
+        private readonly UserRepository $users,
+    ) {}
 
     public function routes(RouteCollector $routes): void
     {
@@ -81,6 +87,13 @@ final class Routes implements RouteProvider
 
             return new Response(200, [], 'raced');
         }, 'probe.race');
+        // A controller that refuses whoever asks, and one that acts as a user (as a bearer token does) and then fails.
+        $routes->get('/probe/forbidden', static fn(): never => throw new Forbidden('Not for you'), 'probe.forbidden');
+        $routes->get('/probe/as/{id}', function (ServerRequestInterface $r, array $params): never {
+            $this->auth->actAs($this->users->find((string) $params['id']));
+
+            throw new Forbidden('Not for you either');
+        }, 'probe.as');
         $routes->get('/probe/boom', static function (ServerRequestInterface $r): never {
             self::session($r)->set('secret', 'session-secret-value');
 

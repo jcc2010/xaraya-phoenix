@@ -10,9 +10,11 @@ use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Log\AbstractLogger;
 use Xaraya\Kernel\Http\CallableHandler;
+use Xaraya\Kernel\Http\Exception\Forbidden;
 use Xaraya\Kernel\Http\Exception\HttpException;
 use Xaraya\Kernel\Http\Exception\MethodNotAllowed;
 use Xaraya\Kernel\Http\Exception\NotFound;
+use Xaraya\Kernel\Http\Exception\RequestFailed;
 use Xaraya\Kernel\Http\Exception\ValidationFailed;
 use Xaraya\Kernel\Http\Middleware\ErrorHandler;
 use Xaraya\Kernel\Http\Pipeline;
@@ -201,5 +203,41 @@ final class ErrorHandlerTest extends TestCase
     {
         self::assertSame('Bad Gateway', HttpException::reason(502));
         self::assertSame('Gateway Timeout', HttpException::reason(504));
+    }
+
+    public function testARequestFailedIsAnsweredForItsCauseWithTheInnerRequest(): void
+    {
+        $logger = new MemoryLogger();
+        $seen = null;
+        $eh = new ErrorHandler($logger, false, function (int $status, string $message, ServerRequestInterface $r) use (&$seen): string {
+            $seen = $r->getAttribute('inner');
+
+            return "<h1>{$status} {$message}</h1>";
+        });
+        $inner = (new ServerRequest('GET', '/x'))->withAttribute('inner', 'yes');
+        $response = $this->send($eh, new ServerRequest('GET', '/x'), new RequestFailed($inner, new Forbidden('Nope')));
+        self::assertSame(403, $response->getStatusCode());
+        self::assertSame('<h1>403 Nope</h1>', (string) $response->getBody());
+        self::assertSame('yes', $seen);
+        self::assertSame([], $logger->lines);
+
+        $response = $this->send($eh, new ServerRequest('GET', '/x'), new RequestFailed($inner, new \RuntimeException('secret')));
+        self::assertSame(500, $response->getStatusCode());
+        self::assertSame(['error: secret'], $logger->lines, 'the cause is logged');
+    }
+
+    public function testAPersonalRequestsErrorIsPrivate(): void
+    {
+        $personal = static fn(ServerRequestInterface $r): bool => $r->getHeaderLine('X-Who') !== '';
+        $eh = new ErrorHandler(new MemoryLogger(), false, null, $personal);
+        foreach (['/x', '/x.json'] as $path) {
+            self::assertSame('private, no-store', $this->send($eh, new ServerRequest('GET', $path, ['X-Who' => 'ada']), new NotFound())->getHeaderLine('Cache-Control'));
+            self::assertSame('', $this->send($eh, new ServerRequest('GET', $path), new NotFound())->getHeaderLine('Cache-Control'));
+        }
+        $logger = new MemoryLogger();
+        $broken = new ErrorHandler($logger, false, null, static fn(): bool => throw new \RuntimeException('auth down'));
+        self::assertSame('private, no-store', $this->send($broken, new ServerRequest('GET', '/x'), new NotFound())->getHeaderLine('Cache-Control'), 'fails closed');
+        self::assertSame(['error: auth down'], $logger->lines);
+        self::assertSame(204, (new Pipeline([$eh], new CallableHandler(fn() => new Response(204))))->handle(new ServerRequest('GET', '/', ['X-Who' => 'ada']))->getStatusCode());
     }
 }

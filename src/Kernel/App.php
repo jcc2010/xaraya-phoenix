@@ -200,6 +200,9 @@ final class App
             $this->debug(),
             // Built lazily: the view (theme, database for blocks and settings) is only touched for an HTML error.
             static fn(int $status, string $message, ServerRequestInterface $request): ?string => $c->get(ErrorPages::class)->render($status, $message, $request),
+            // One user's error page (a session cookie, or an identity a session or token set) is never shared.
+            static fn(ServerRequestInterface $request): bool => isset($request->getCookieParams()[SessionMiddleware::cookieName($config)])
+                || ($c->resolved(Auth::class) && $c->get(Auth::class)->check()),
         ));
 
         $c->set(Cache::class, fn(): Cache => new Cache($this->cacheDir() . '/data'));

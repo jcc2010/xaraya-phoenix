@@ -126,6 +126,8 @@ final class Session
         $this->userId = $userId;
         $this->data = [];
         $this->createdAt = null;
+        // Minted now, so even an error page (which saves nothing) shown first after login has the stored token.
+        $this->token();
     }
 
     /** Signs out: the stored session is deleted and the cookie expired. */

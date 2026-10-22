@@ -10,9 +10,11 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
+use Throwable;
 use Xaraya\Kernel\Auth\Session;
 use Xaraya\Kernel\Auth\SessionStore;
 use Xaraya\Kernel\Config\Config;
+use Xaraya\Kernel\Http\Exception\RequestFailed;
 
 /**
  * Global middleware: loads the session named by the cookie (session.cookie, default "xar_session") into the
@@ -20,6 +22,7 @@ use Xaraya\Kernel\Config\Config;
  * is HttpOnly and SameSite=Lax, and Secure unless app.debug is on and the request came over plain HTTP.
  * A response that used a session or sets its cookie is marked Cache-Control: private, no-cache. A frozen session
  * (a bearer-token request) is left exactly as it was: nothing is saved or touched and no cookie is sent.
+ * A request that throws saves nothing either; ErrorHandler renders its page with the stored session (RequestFailed).
  */
 final class SessionMiddleware implements MiddlewareInterface
 {
@@ -28,10 +31,17 @@ final class SessionMiddleware implements MiddlewareInterface
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
         $now = new DateTimeImmutable('now', new DateTimeZone('UTC'));
-        $name = $this->cookieName();
+        $name = self::cookieName($this->config);
         $cookie = $request->getCookieParams()[$name] ?? null;
         $session = (is_string($cookie) ? $this->store->load($cookie, $now) : null) ?? Session::fresh();
-        $response = $handler->handle($request->withAttribute(Session::class, $session));
+        $inner = $request->withAttribute(Session::class, $session);
+        try {
+            $response = $handler->handle($inner);
+        } catch (Throwable $e) {
+            // Nothing is saved, touched or sent for a failed request. ErrorHandler renders the page outside this
+            // middleware: a stored session goes with it, so the page's forms (logout) carry the stored token.
+            throw $session->id() !== null && !$session->isFrozen() ? new RequestFailed($inner, $e) : $e;
+        }
         if ($session->isFrozen()) {
             return $response;
         }
@@ -65,9 +75,10 @@ final class SessionMiddleware implements MiddlewareInterface
         return $response;
     }
 
-    private function cookieName(): string
+    /** The session cookie's name: session.cookie when it is a safe token, else "xar_session". */
+    public static function cookieName(Config $config): string
     {
-        $name = (string) $this->config->get('session.cookie', 'xar_session');
+        $name = (string) $config->get('session.cookie', 'xar_session');
 
         return preg_match('/^[A-Za-z0-9_-]{1,64}$/D', $name) === 1 ? $name : 'xar_session';
     }
