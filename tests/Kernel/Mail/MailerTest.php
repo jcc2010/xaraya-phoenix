@@ -73,6 +73,20 @@ final class MailerTest extends AppTestCase
         (new LogMailer($this->tmp . '/file/sub', 'site@example.com'))->send(new Message('ada@example.com', 'x', 'y'));
     }
 
+    public function testAFailedLogWriteLeavesNoFileBehind(): void
+    {
+        $dir = $this->tmp . '/ro';
+        mkdir($dir, 0500);
+        try {
+            (new LogMailer($dir, 'site@example.com'))->send(new Message('ada@example.com', 'x', 'y'));
+            self::fail('expected MailException');
+        } catch (MailException) {
+            self::assertSame([], glob($dir . '/*') ?: []);
+        } finally {
+            chmod($dir, 0700);
+        }
+    }
+
     public function testTheMailDriverHandsAnEncodedMessageToMail(): void
     {
         $calls = [];
@@ -131,8 +145,10 @@ final class MailerTest extends AppTestCase
         self::assertSame('phoenix@blog.example.com', $from('https://blog.example.com/xaraya'));
         self::assertSame('phoenix@example.invalid', $from('http://localhost:8080'));
         self::assertSame('phoenix@example.invalid', $from(''));
+        self::assertSame('phoenix@example.invalid', $from('http://127.0.0.1:8000'));
+        self::assertSame('phoenix@example.invalid', $from('http://[::1]:8000'));
         self::assertSame('me@site.org', $from('https://blog.example.com', 'me@site.org'));
-        foreach (['https://blog.example.com', 'http://localhost:8080'] as $url) {
+        foreach (['https://blog.example.com', 'http://localhost:8080', 'http://127.0.0.1:8000', 'http://[::1]:8000'] as $url) {
             self::assertNotFalse(filter_var($from($url), FILTER_VALIDATE_EMAIL));
         }
     }

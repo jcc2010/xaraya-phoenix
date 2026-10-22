@@ -41,6 +41,7 @@ return [
     ],
     'mail' => [
         // "log" writes each message to mail.path as an .eml file (development only); "mail" sends with PHP's mail().
+        // "memory" discards mail (it only keeps it in process) and is meant for tests.
         'driver' => env('MAIL_DRIVER', 'log'),
         // Empty means phoenix@<host of app.url>, or phoenix@example.invalid when that host has no dot.
         'from' => env('MAIL_FROM', ''),

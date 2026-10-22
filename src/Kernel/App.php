@@ -147,7 +147,11 @@ final class App
             $from = $config->get('mail.from');
             if (!is_string($from) || $from === '') {
                 $host = parse_url((string) $config->get('app.url', ''), PHP_URL_HOST);
-                $from = 'phoenix@' . (is_string($host) && str_contains($host, '.') ? $host : 'example.invalid');
+                $from = 'phoenix@example.invalid';
+                if (is_string($host) && str_contains($host, '.') && filter_var($host, FILTER_VALIDATE_IP) === false
+                    && filter_var('phoenix@' . $host, FILTER_VALIDATE_EMAIL) !== false) {
+                    $from = 'phoenix@' . $host;
+                }
             }
 
             return match ($config->get('mail.driver', 'log')) {
