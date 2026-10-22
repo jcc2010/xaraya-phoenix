@@ -95,6 +95,9 @@ final class Syncer
                 if (!is_string($next) || $next === '' || (!$full && $changed === 0)) {
                     break;
                 }
+                if (!self::isHttpUrl($next)) {
+                    throw new RuntimeException("Feed {$url} has a next_url that is not an absolute http(s) URL");
+                }
                 if (isset($visited[$next])) {
                     throw new RuntimeException("Feed {$url} loops back to {$next}");
                 }
@@ -114,6 +117,16 @@ final class Syncer
         } finally {
             $this->lock->release($blog->handle);
         }
+    }
+
+    /** Only absolute http(s) URLs with a host may be followed from a feed's next_url. */
+    private static function isHttpUrl(string $url): bool
+    {
+        $parts = parse_url($url);
+
+        return is_array($parts)
+            && in_array(strtolower($parts['scheme'] ?? ''), ['http', 'https'], true)
+            && ($parts['host'] ?? '') !== '';
     }
 
     /**

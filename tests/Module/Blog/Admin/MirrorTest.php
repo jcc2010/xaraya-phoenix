@@ -7,6 +7,7 @@ namespace Xaraya\Tests\Module\Blog\Admin;
 use Xaraya\Kernel\App;
 use Xaraya\Module\Blog\Blog;
 use Xaraya\Module\Blog\Source\HttpFetcher;
+use Xaraya\Module\Blog\Sync\SyncLock;
 use Xaraya\Tests\Module\Blog\Support\FeedFactory;
 use Xaraya\Tests\Module\Blog\Support\FixtureFetcher;
 use Xaraya\Tests\Support\Browser;
@@ -121,5 +122,38 @@ final class MirrorTest extends AdminTestCase
         $token = $this->token($root);
         self::assertSame(409, $root->post('/admin/blog/notes/sync', ['_csrf' => $token])->getStatusCode());
         self::assertSame(404, $root->post('/admin/blog/nope/sync', ['_csrf' => $token])->getStatusCode());
+    }
+
+    public function testAHostileNextUrlIsAnErrorFlashNotA500(): void
+    {
+        $app = $this->site();
+        $this->mirror($app);
+        $page = FeedFactory::pages(FeedFactory::items(2))[self::SOURCE];
+        $page['next_url'] = 'ftp://x/feed';
+        $app->container()->instance(HttpFetcher::class, (new FixtureFetcher())->on(self::SOURCE, FixtureFetcher::json($page)));
+        $this->user($app, 'root', ['Administrators']);
+        $root = $this->signIn($app, 'root');
+        $root->get('/admin/blog/mirror/posts');
+        self::assertSame(303, $root->post('/admin/blog/mirror/sync')->getStatusCode());
+        self::assertStringContainsString('admin-flash-error" role="alert">Sync failed:', Html::normalize((string) $root->get('/admin/blog/mirror/posts')->getBody()));
+    }
+
+    public function testAHeldLockIsAnAlreadyRunningFlash(): void
+    {
+        $app = $this->site();
+        $this->mirror($app);
+        $app->container()->instance(HttpFetcher::class, FeedFactory::fetcher(FeedFactory::pages(FeedFactory::items(3))));
+        $this->user($app, 'root', ['Administrators']);
+        $root = $this->signIn($app, 'root');
+        $root->get('/admin/blog/mirror/posts');
+        $lock = new SyncLock($this->tmp . '/locks');
+        self::assertTrue($lock->acquire('mirror'));
+        try {
+            $response = $root->post('/admin/blog/mirror/sync');
+        } finally {
+            $lock->release('mirror');
+        }
+        self::assertSame(303, $response->getStatusCode());
+        self::assertStringContainsString('mirror: already running, skipped', (string) $root->get('/admin/blog/mirror/posts')->getBody());
     }
 }

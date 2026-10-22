@@ -216,6 +216,32 @@ final class SyncerTest extends BlogTestCase
         $lock->release('mirror');
     }
 
+    /** @return iterable<string, array{string}> */
+    public static function badNextUrls(): iterable
+    {
+        yield 'ftp' => ['ftp://x/feed'];
+        yield 'relative' => ['/blog/src/feed.json?page=2'];
+        yield 'javascript' => ['javascript:alert(1)'];
+        yield 'no host' => ['https:///x'];
+    }
+
+    #[\PHPUnit\Framework\Attributes\DataProvider('badNextUrls')]
+    public function testANonHttpNextUrlIsAFetchErrorAndReleasesTheLock(string $next): void
+    {
+        $page = FeedFactory::pages(FeedFactory::items(3))[self::SOURCE];
+        $page['next_url'] = $next;
+        $fetcher = (new FixtureFetcher())->on(self::SOURCE, FixtureFetcher::json($page));
+        try {
+            $this->syncer($fetcher)->sync($this->blog(), true, $this->now());
+            self::fail('expected failure');
+        } catch (RuntimeException $e) {
+            self::assertStringContainsString('next_url', $e->getMessage());
+        }
+        $lock = new SyncLock($this->tmp . '/locks');
+        self::assertTrue($lock->acquire('mirror'), 'lock was released');
+        $lock->release('mirror');
+    }
+
     public function testEtagIsStoredOnlyAfterASuccessfulWalk(): void
     {
         $pages = FeedFactory::pages(FeedFactory::items(120));
