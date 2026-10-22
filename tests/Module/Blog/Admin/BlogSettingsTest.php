@@ -57,6 +57,41 @@ final class BlogSettingsTest extends AdminTestCase
         self::assertSame('Notes', $this->blogs($app)->find('notes')?->title);
     }
 
+    public function testBadTextAndEmptyAuthorsAreInline422s(): void
+    {
+        $app = $this->site();
+        $this->nativeBlog($app);
+        $this->blogs($app)->create(['handle' => 'mirror', 'mode' => 'mirror', 'source_url' => 'https://src.test/f.json', 'source_format' => 'athena'], $this->now());
+        $this->user($app, 'root', ['Administrators']);
+        $ok = ['title' => 'Notes', 'description_html' => '', 'author_name' => 'Ada', 'author_url' => '', 'language' => 'en', 'post_url_pattern' => '', 'media' => 'remote'];
+        foreach (['engine php' => 'php', 'engine twig' => 'twig'] as $engine) {
+            $browser = $this->signIn($this->site($engine), 'root');
+            foreach (['title', 'description_html', 'author_name', 'author_url', 'language', 'post_url_pattern'] as $field) {
+                foreach (["\xff", "a\0b"] as $bad) {
+                    $browser->get('/admin/blog/notes/settings');
+                    self::assertSame(422, $browser->post('/admin/blog/notes/settings', [$field => $bad] + $ok)->getStatusCode(), "{$engine} {$field}");
+                    self::assertStringContainsString('Must be valid UTF-8', $browser->body(), $field);
+                }
+            }
+            $browser->get('/admin/blog/mirror/settings');
+            self::assertSame(422, $browser->post('/admin/blog/mirror/settings', ['post_url_pattern' => "\xff", 'media' => 'remote'])->getStatusCode());
+            $browser->get('/admin/blog/new');
+            self::assertSame(422, $browser->post('/admin/blog/new', ['handle' => "ab\xff", 'title' => "t\0x"])->getStatusCode());
+            self::assertSame(2, substr_count($browser->body(), 'Must be valid UTF-8'));
+        }
+        $blog = $this->blogs($app)->find('notes');
+        self::assertSame(['Notes', 'Ada'], [$blog?->title, $blog?->authorName]);
+
+        $browser = $this->signIn($app, 'root');
+        $browser->get('/admin/blog/notes/settings');
+        self::assertSame(422, $browser->post('/admin/blog/notes/settings', ['author_name' => ' '] + $ok)->getStatusCode());
+        self::assertStringContainsString('Author name is required', $browser->body());
+        self::assertSame('Ada', $this->blogs($app)->find('notes')?->authorName);
+        // Lengths count characters, not bytes: 255 two-byte characters fit.
+        $browser->get('/admin/blog/notes/settings');
+        self::assertSame(303, $browser->post('/admin/blog/notes/settings', ['title' => str_repeat('é', 255)] + $ok)->getStatusCode());
+    }
+
     public function testSettingsEscapeEveryValueAndRenderTheSameInBothEnginesWhenRefused(): void
     {
         $app = $this->site();

@@ -50,6 +50,8 @@ final class BlogAdminController extends Controller
     /** Column length limits (bytes). */
     private const LIMITS = ['title' => 255, 'author_name' => 255, 'author_url' => 1024, 'post_url_pattern' => 1024, 'language' => 16];
 
+    private const BAD_TEXT = 'Must be valid UTF-8 without NUL characters';
+
     private const LABELS = ['title' => 'Title', 'author_name' => 'Author name', 'author_url' => 'Author URL', 'language' => 'Language', 'post_url_pattern' => 'Post URL pattern', 'media' => 'Media', 'handle' => 'Handle'];
 
     /** @param array<string, string> $params */
@@ -72,10 +74,18 @@ final class BlogAdminController extends Controller
             $values[$key] = is_string($body[$key] ?? null) ? trim($body[$key]) : $values[$key];
         }
         $errors = [];
+        foreach ($editable as $key) {
+            if (!self::isClean($values[$key])) {
+                $errors[$key] = self::BAD_TEXT;
+            }
+        }
         foreach (self::LIMITS as $key => $max) {
-            if (in_array($key, $editable, true) && strlen($values[$key]) > $max) {
+            if (in_array($key, $editable, true) && !isset($errors[$key]) && mb_strlen($values[$key]) > $max) {
                 $errors[$key] = self::LABELS[$key] . " must be at most {$max} characters";
             }
+        }
+        if (in_array('author_name', $editable, true) && !isset($errors['author_name']) && $values['author_name'] === '') {
+            $errors['author_name'] = 'Author name is required';
         }
         if (in_array('author_url', $editable, true) && $values['author_url'] !== '' && !isset($errors['author_url']) && !ItemValidator::isHttpUrl($values['author_url'])) {
             $errors['author_url'] = 'Author URL must be an http(s) URL';
@@ -118,12 +128,19 @@ final class BlogAdminController extends Controller
             $values[$key] = is_string($body[$key] ?? null) ? trim($body[$key]) : '';
         }
         $errors = [];
-        if (preg_match('/^[a-z0-9_-]{2,32}$/D', $values['handle']) !== 1) {
+        foreach ($values as $key => $value) {
+            if (!self::isClean($value)) {
+                $errors[$key] = self::BAD_TEXT;
+            }
+        }
+        if (!isset($errors['handle']) && preg_match('/^[a-z0-9_-]{2,32}$/D', $values['handle']) !== 1) {
             $errors['handle'] = 'Handle must match [a-z0-9_-]{2,32}';
         }
-        if ($values['title'] === '') {
+        if (isset($errors['title'])) {
+            // already refused as bad text
+        } elseif ($values['title'] === '') {
             $errors['title'] = 'Title is required';
-        } elseif (strlen($values['title']) > self::LIMITS['title']) {
+        } elseif (mb_strlen($values['title']) > self::LIMITS['title']) {
             $errors['title'] = 'Title must be at most ' . self::LIMITS['title'] . ' characters';
         }
         $formErrors = [];
@@ -148,6 +165,18 @@ final class BlogAdminController extends Controller
         }
 
         return $this->newBlogPage($request, $values, $errors, $formErrors, 422);
+    }
+
+    /** A refused value as it is shown again: invalid bytes replaced, NUL dropped, so rendering cannot fail. */
+    private static function scrub(string $value): string
+    {
+        return str_replace("\0", '', mb_scrub($value, 'UTF-8'));
+    }
+
+    /** Text a database column can hold: valid UTF-8, no NUL. */
+    private static function isClean(string $value): bool
+    {
+        return mb_check_encoding($value, 'UTF-8') && !str_contains($value, "\0");
     }
 
     private function adminBlog(string $handle): Blog
@@ -202,7 +231,7 @@ final class BlogAdminController extends Controller
             'action' => $this->urls->generate('admin.blog.settings.save', ['handle' => $blog->handle]),
             'backUrl' => $this->urls->generate('admin.blog.posts', ['handle' => $blog->handle]),
             'media' => Blog::MEDIA,
-            'values' => $values,
+            'values' => array_map(self::scrub(...), $values),
             'errors' => $errors,
             'formErrors' => $formErrors,
         ], 'Settings · ' . $blog->title, $status);
@@ -217,7 +246,7 @@ final class BlogAdminController extends Controller
     {
         return $this->page->page($request, 'blog::admin/new-blog', [
             'action' => $this->urls->generate('admin.blog.create'),
-            'values' => $values,
+            'values' => array_map(self::scrub(...), $values),
             'errors' => $errors,
             'formErrors' => $formErrors,
         ], 'New blog', $status);

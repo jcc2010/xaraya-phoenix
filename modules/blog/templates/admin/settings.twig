@@ -40,7 +40,7 @@
 </p>
 <p class="admin-field">
 <label for="blog-post-url-pattern">{{ t('Post URL pattern') }}</label>
-<input id="blog-post-url-pattern" name="post_url_pattern" value="{{ values.post_url_pattern }}"{% if errors.post_url_pattern is defined %} aria-invalid="true" aria-describedby="blog-post-url-pattern-error"{% endif %}{% if mirror and 'post_url_pattern' in synced %} disabled{% endif %}>
+<input id="blog-post-url-pattern" name="post_url_pattern" value="{{ values.post_url_pattern }}"{% if errors.post_url_pattern is defined %} aria-invalid="true" aria-describedby="blog-post-url-pattern-error"{% endif %}>
 {{ render('blog::admin/field-error', {id: 'blog-post-url-pattern', error: errors.post_url_pattern ?? null}) }}
 </p>
 <p class="admin-field">

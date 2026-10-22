@@ -44,7 +44,7 @@ $error = static fn(string $name, string $id): string => $x->render('blog::admin/
 </p>
 <p class="admin-field">
 <label for="blog-post-url-pattern"><?= $x->e($x->t('Post URL pattern')) ?></label>
-<input id="blog-post-url-pattern" name="post_url_pattern" value="<?= $x->e($values['post_url_pattern']) ?>"<?= $aria('post_url_pattern', 'blog-post-url-pattern') ?><?= $mirror && in_array('post_url_pattern', $synced, true) ? ' disabled' : '' ?>>
+<input id="blog-post-url-pattern" name="post_url_pattern" value="<?= $x->e($values['post_url_pattern']) ?>"<?= $aria('post_url_pattern', 'blog-post-url-pattern') ?>>
 <?= $error('post_url_pattern', 'blog-post-url-pattern') ?>
 </p>
 <p class="admin-field">
