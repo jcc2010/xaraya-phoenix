@@ -33,11 +33,20 @@ final class Grants
         return $this->roles()[$name]['id'] ?? throw new InvalidArgumentException("Role '{$name}' was not created");
     }
 
-    /** Sets (or clears) a role's parent. Cycles are allowed in the table; forRoles() stops at the first repeat. */
+    /** Sets (or clears) a role's parent; a role cannot be its own ancestor. Reads still stop at the first repeat, in case a table holds a cycle. */
     public function setParent(string $role, ?string $parent): void
     {
         $id = $this->roles()[$role]['id'] ?? throw new InvalidArgumentException("Unknown role '{$role}'");
         $parentId = $parent === null ? null : ($this->roles()[$parent]['id'] ?? throw new InvalidArgumentException("Unknown role '{$parent}'"));
+        $byId = [];
+        foreach ($this->roles() as $row) {
+            $byId[$row['id']] = $row['parent'];
+        }
+        for ($up = $parentId; $up !== null; $up = $byId[$up] ?? null) {
+            if ($up === $id) {
+                throw new InvalidArgumentException("Role '{$role}' cannot be its own ancestor");
+            }
+        }
         $this->db->update('roles', ['parent_id' => $parentId], ['id' => $id]);
         $this->roles = null;
     }
@@ -69,14 +78,19 @@ final class Grants
      */
     public function seed(Manifest $manifest): void
     {
-        $this->db->transaction(function () use ($manifest): void {
-            foreach ($manifest->grants() as $grant) {
-                $this->grant($grant['role'], $manifest->name, $grant['component'], $grant['instance'], $grant['level']);
-            }
-            if ($manifest->isContent()) {
-                $this->grant('Editors', $manifest->name, '*', '*', 'delete');
-            }
-        });
+        try {
+            $this->db->transaction(function () use ($manifest): void {
+                foreach ($manifest->grants() as $grant) {
+                    $this->grant($grant['role'], $manifest->name, $grant['component'], $grant['instance'], $grant['level']);
+                }
+                if ($manifest->isContent()) {
+                    $this->grant('Editors', $manifest->name, '*', '*', 'delete');
+                }
+            });
+        } catch (\Throwable $e) {
+            $this->roles = null; // roles created inside the rolled-back transaction must not stay cached
+            throw $e;
+        }
     }
 
     /**

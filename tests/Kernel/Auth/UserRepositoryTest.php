@@ -110,6 +110,30 @@ final class UserRepositoryTest extends AuthTestCase
         $users->setStatus($ada, 'banned');
     }
 
+    public function testANulPasswordCostsOneFullCheckLikeAnyOtherAndTooLongPasswordsAreRefused(): void
+    {
+        $app = $this->installed();
+        $ada = $this->user($app, 'ada');
+        $calls = [];
+        $users = new UserRepository($this->db($app), ['cost' => 4], static function (string $password, string $hash) use (&$calls): bool {
+            $calls[] = $password;
+
+            return password_verify($password, $hash);
+        });
+        self::assertFalse($users->verifyPassword($ada, "x\0y"));
+        self::assertCount(1, $calls, 'a NUL password still runs one check against the stored hash');
+        $users->verifyNothing("x\0y");
+        self::assertCount(2, $calls, 'verifyNothing runs one check too');
+        self::assertFalse($users->verifyPassword($ada, 'wrong password'));
+        self::assertCount(3, $calls);
+        self::assertTrue($users->verifyPassword($ada, self::PASSWORD));
+
+        UserRepository::checkPassword(str_repeat('a', 72));
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('at most 72 bytes');
+        UserRepository::checkPassword(str_repeat('a', 73));
+    }
+
     public function testAPasswordWithANulIsRefusedOnSetAndNeverVerifies(): void
     {
         $app = $this->installed();

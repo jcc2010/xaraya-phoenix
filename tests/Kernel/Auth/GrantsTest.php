@@ -74,6 +74,24 @@ final class GrantsTest extends AuthTestCase
         self::assertFalse($app->container()->get(ModuleRegistry::class)->isEnabled('bad'));
     }
 
+    public function testSetParentRefusesSelfAndLongerCycles(): void
+    {
+        $grants = $this->grants($this->installed());
+        $grants->ensureRole('A');
+        $grants->ensureRole('B', 'A');
+        $grants->ensureRole('C', 'B');
+        foreach ([['A', 'A'], ['A', 'B'], ['A', 'C']] as [$role, $parent]) {
+            try {
+                $grants->setParent($role, $parent);
+                self::fail("{$role} under {$parent} must be refused");
+            } catch (\InvalidArgumentException $e) {
+                self::assertStringContainsString('own ancestor', $e->getMessage());
+            }
+        }
+        $grants->setParent('C', 'A');
+        $grants->setParent('C', null);
+    }
+
     public function testForRolesFollowsParentsAndStopsAtACycle(): void
     {
         $app = $this->installed();
@@ -84,7 +102,7 @@ final class GrantsTest extends AuthTestCase
         $levels = static fn(array $rows): array => array_map(static fn(array $g): string => "{$g['module']}.{$g['component']}.{$g['instance']}:{$g['level']}", $rows);
         self::assertEqualsCanonicalizing(['wiki.page.drafts:500', 'wiki.page.*:300'], $levels($grants->forRoles(['Interns'])));
 
-        $grants->setParent('Members', 'Interns');
+        $this->db($app)->query("UPDATE {roles} SET parent_id = (SELECT id FROM (SELECT id FROM {roles} WHERE name = 'Interns') x) WHERE name = 'Members'");
         $fresh = $this->grants($this->app());
         self::assertEqualsCanonicalizing(['wiki.page.drafts:500', 'wiki.page.*:300'], $levels($fresh->forRoles(['Interns'])), 'a parent cycle ends');
         self::assertSame([], $fresh->forRoles(['Nobody']));

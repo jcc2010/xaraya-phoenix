@@ -16,9 +16,21 @@ final class UserRepository
 {
     public const HANDLE = '/^[a-z0-9_-]{2,32}$/D';
     public const MIN_PASSWORD = 8;
+    /** bcrypt ignores everything after 72 bytes, so longer passwords are refused instead of silently truncated. */
+    public const MAX_PASSWORD_BYTES = 72;
+
+    /** @var \Closure(string, string): bool */
+    private readonly \Closure $verify;
 
     /** @param array<string, int|string> $hashOptions password_hash() options, e.g. ['cost' => 12] */
-    public function __construct(private readonly Connection $db, private readonly array $hashOptions = []) {}
+    public function __construct(
+        private readonly Connection $db,
+        private readonly array $hashOptions = [],
+        ?\Closure $verify = null,
+    ) {
+        // The seam lets tests count password checks; production always uses password_verify().
+        $this->verify = $verify ?? static fn(string $password, string $hash): bool => password_verify($password, $hash);
+    }
 
     /**
      * @param list<string> $roles role names; every one must exist
@@ -104,11 +116,14 @@ final class UserRepository
     /** Checks the password; when it is right and the hash is outdated (algorithm or options), stores a new hash. */
     public function verifyPassword(User $user, #[SensitiveParameter] string $password): bool
     {
+        $hash = (string) $this->db->fetchValue('SELECT password_hash FROM {users} WHERE id = ?', [$user->id]);
         if (str_contains($password, "\0")) {
+            // Still one full check, so a NUL password costs the same as any wrong password (and as verifyNothing()).
+            ($this->verify)('', $hash);
+
             return false;
         }
-        $hash = (string) $this->db->fetchValue('SELECT password_hash FROM {users} WHERE id = ?', [$user->id]);
-        if (!password_verify($password, $hash)) {
+        if (!($this->verify)($password, $hash)) {
             return false;
         }
         if (password_needs_rehash($hash, PASSWORD_DEFAULT, $this->hashOptions)) {
@@ -127,7 +142,7 @@ final class UserRepository
         }
         $key = json_encode($this->hashOptions);
         $dummy[$key] ??= password_hash('phoenix-timing-equaliser', PASSWORD_DEFAULT, $this->hashOptions);
-        password_verify($password, $dummy[$key]);
+        ($this->verify)($password, $dummy[$key]);
     }
 
     public function setPassword(User $user, #[SensitiveParameter] string $password): void
@@ -177,6 +192,9 @@ final class UserRepository
     {
         if (str_contains($password, "\0")) {
             throw new InvalidArgumentException('A password cannot contain a NUL character');
+        }
+        if (strlen($password) > self::MAX_PASSWORD_BYTES) {
+            throw new InvalidArgumentException('A password is at most ' . self::MAX_PASSWORD_BYTES . ' bytes');
         }
         if (mb_strlen($password) < self::MIN_PASSWORD) {
             throw new InvalidArgumentException('A password is at least ' . self::MIN_PASSWORD . ' characters');
