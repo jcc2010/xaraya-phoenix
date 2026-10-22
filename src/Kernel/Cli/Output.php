@@ -29,26 +29,50 @@ final class Output
 
     /**
      * Prints $question and reads one line: null at the end of input. A secret answer is not echoed on a terminal,
-     * and the terminal settings are put back however the read ends.
+     * and the terminal settings are put back however the read ends (an exception, or Ctrl-C when pcntl exists).
      */
     public function ask(string $question, bool $secret = false): ?string
     {
         $in = $this->stdin ?? STDIN;
         fwrite($this->stdout, $question . ' ');
-        $saved = $secret && stream_isatty($in) ? trim((string) shell_exec('stty -g')) : '';
-        if ($saved !== '') {
-            shell_exec('stty -echo');
+        $saved = '';
+        if ($secret && stream_isatty($in)) {
+            $saved = trim((string) @shell_exec('stty -g 2>/dev/null'));
+            if ($saved === '') {
+                $this->error('Input will be visible; use --password-stdin');
+            } else {
+                @shell_exec('stty -echo 2>/dev/null');
+            }
+        }
+        $restore = function () use ($saved): void {
+            @shell_exec('stty ' . escapeshellarg($saved) . ' 2>/dev/null');
+        };
+        $previous = null;
+        $async = false;
+        $pcntl = $saved !== '' && function_exists('pcntl_signal');
+        if ($pcntl) {
+            $async = pcntl_async_signals(true);
+            $previous = pcntl_signal_get_handler(SIGINT);
+            pcntl_signal(SIGINT, function () use ($restore): never {
+                $restore();
+                fwrite($this->stdout, PHP_EOL);
+                exit(130);
+            });
         }
         try {
             $line = fgets($in);
         } finally {
+            if ($pcntl) {
+                pcntl_signal(SIGINT, $previous);
+                pcntl_async_signals($async);
+            }
             if ($saved !== '') {
-                shell_exec('stty ' . escapeshellarg($saved));
+                $restore();
                 fwrite($this->stdout, PHP_EOL);
             }
         }
 
-        return $line === false ? null : rtrim($line, "\r\n");
+        return $line === false ? null : self::stripTerminator($line);
     }
 
     /** Reads one line with no prompt (a script piping a secret in): null at the end of input. */
@@ -56,7 +80,13 @@ final class Output
     {
         $line = fgets($this->stdin ?? STDIN);
 
-        return $line === false ? null : rtrim($line, "\r\n");
+        return $line === false ? null : self::stripTerminator($line);
+    }
+
+    /** Exactly one line terminator: a password may end in spaces or carriage returns of its own. */
+    private static function stripTerminator(string $line): string
+    {
+        return (string) preg_replace('/\r?\n$/D', '', $line);
     }
 
     public function line(string $text = ''): void

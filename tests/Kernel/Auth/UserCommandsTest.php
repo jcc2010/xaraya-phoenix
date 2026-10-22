@@ -120,4 +120,49 @@ final class UserCommandsTest extends AuthTestCase
         self::assertStringContainsString('user:create', $out);
         self::assertStringContainsString('user:password', $out);
     }
+
+    public function testPasswordIsAtomic(): void
+    {
+        $app = $this->installed();
+        $ada = $this->user($app, 'ada');
+        $this->db($app)->query('DROP TABLE {password_resets}');
+
+        [$code] = $this->xar($app, ['user:password', 'ada', '--password-stdin'], "a replacement one\n");
+        self::assertSame(1, $code);
+        self::assertTrue($this->users($app)->verifyPassword($ada, self::PASSWORD));
+        self::assertFalse($this->users($app)->verifyPassword($ada, 'a replacement one'));
+    }
+
+    public function testUnknownRoleLeavesNoUser(): void
+    {
+        $app = $this->installed();
+        [$code] = $this->xar($app, ['user:create', 'bob', '--email=bob@example.com', '--role=Administrators,Wizards', '--password-stdin'], "some password\n");
+        self::assertSame(1, $code);
+        self::assertNull($this->users($app)->findByHandle('bob'));
+    }
+
+    public function testPasswordAndStdinTogetherIsAUsageError(): void
+    {
+        $app = $this->installed();
+        [$code, , $err] = $this->xar($app, ['user:create', 'bob', '--email=bob@example.com', '--password=' . self::PASSWORD, '--password-stdin'], "x\n");
+        self::assertSame(1, $code);
+        self::assertStringContainsString('not both', $err);
+        self::assertNull($this->users($app)->findByHandle('bob'));
+    }
+
+    public function testOnlyOneLineTerminatorIsStripped(): void
+    {
+        $app = $this->installed();
+        [$code, , $err] = $this->xar($app, ['user:create', 'crlf', '--email=crlf@example.com', '--password-stdin'], "with crlf  \r\n");
+        self::assertSame(0, $code, $err);
+        $crlf = $this->users($app)->findByHandle('crlf');
+        self::assertNotNull($crlf);
+        self::assertTrue($this->users($app)->verifyPassword($crlf, 'with crlf  '));
+
+        [$code, , $err] = $this->xar($app, ['user:create', 'nonl', '--email=nonl@example.com', '--password-stdin'], 'no newline  ');
+        self::assertSame(0, $code, $err);
+        $nonl = $this->users($app)->findByHandle('nonl');
+        self::assertNotNull($nonl);
+        self::assertTrue($this->users($app)->verifyPassword($nonl, 'no newline  '));
+    }
 }

@@ -47,9 +47,14 @@ final class UserPasswordCommand extends Command
             return 1;
         }
         $user = $this->users->findByHandle($handle) ?? throw new InvalidArgumentException("Unknown user '{$handle}'");
-        $this->users->setPassword($user, $this->password($input, $output));
-        $this->db->delete('password_resets', ['user_id' => $user->id]);
-        $ended = $this->sessions->deleteForUser($user->id);
+        $password = $this->password($input, $output);
+        // One transaction: the new password, no live reset link and no session, or none of the three.
+        $ended = $this->db->transaction(function () use ($user, $password): int {
+            $this->users->setPassword($user, $password);
+            $this->db->delete('password_resets', ['user_id' => $user->id]);
+
+            return $this->sessions->deleteForUser($user->id);
+        });
         $output->line("Changed the password of '{$user->handle}'" . ($ended > 0 ? " and ended {$ended} session(s)" : '') . '.');
 
         return 0;

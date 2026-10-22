@@ -17,6 +17,9 @@ trait AsksForPassword
     private function password(Input $input, Output $output, string $option = 'password'): string
     {
         $password = $input->option($option);
+        if ($password !== null && $input->flag($option . '-stdin')) {
+            throw new InvalidArgumentException("Give --{$option}=<password> or --{$option}-stdin, not both");
+        }
         if ($password !== null) {
             $output->error("Warning: --{$option}=<password> leaves the password in your shell history and in the process list. Prefer --{$option}-stdin or the prompt.");
 
