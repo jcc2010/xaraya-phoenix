@@ -66,3 +66,9 @@ definition of done. Items tagged (final wave) were flagged as candidates for the
 - No test for an integer `owner_id` (`Auth::field` casts ints; only string owners are tested).
 - `Authenticate` checks `isActive()` itself and `Auth::actAs()` checks it again (duplicate check).
 - The blog Plan B follow-ups still list `nosniff` on media and Micropub JSON errors and where `ApiAccess` lives.
+
+## From the final review (residual)
+
+- An error for a scopes-only bearer token (no user, no cookie) gets no `private, no-store`; shared caches don't store `Authorization` requests by default (RFC 9111 §3.5). Close it by treating an `Authorization` header as personal in the ErrorHandler hook.
+- `SecureHtml` rethrows any `HttpException` as a plain `HttpException`, so a `ValidationFailed` on a secureHtml route loses its `fields()` (predates Plan 3).
+- A session saved before this plan with no `_csrf`, whose first page is an error, shows a logout token that isn't saved; the next normal page fixes it.
