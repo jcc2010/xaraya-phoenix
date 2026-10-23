@@ -12,6 +12,7 @@ final class Page
      * @param array<string, string> $meta <meta> tags; names starting "og:" are written as property=
      * @param list<array{type: string, title: string, href: string}> $feeds <link rel="alternate"> entries
      * @param list<string> $styles extra stylesheet URLs, after the theme's own
+     * @param list<string> $scripts script URLs, loaded with defer (same-origin: the secureHtml CSP allows only 'self')
      * @param array<string, string> $headers extra response headers
      */
     public function __construct(
@@ -25,5 +26,6 @@ final class Page
         public readonly array $styles = [],
         public readonly int $status = 200,
         public readonly array $headers = [],
+        public readonly array $scripts = [],
     ) {}
 }

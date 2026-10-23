@@ -127,6 +127,7 @@ final class PhoenixThemeTest extends AppTestCase
             canonical: 'http://xar.test/',
             lang: 'fr',
             styles: ['/assets/module/blog/blog.css'],
+            scripts: ['/assets/module/blog/admin-tags.js'],
         );
         $rendered = [];
         foreach (['php', 'twig'] as $engine) {
@@ -140,7 +141,7 @@ final class PhoenixThemeTest extends AppTestCase
             '<meta property="og:type" content="website">',
             '<link rel="canonical" href="http://xar.test/">',
             '<link rel="alternate" type="application/feed+json" title="Feed" href="/feed.json">',
-            '<link rel="stylesheet" href="/assets/theme/phoenix/phoenix.css"><link rel="stylesheet" href="/assets/module/blog/blog.css">',
+            '<link rel="stylesheet" href="/assets/theme/phoenix/phoenix.css"><link rel="stylesheet" href="/assets/module/blog/blog.css"><script src="/assets/module/blog/admin-tags.js" defer></script></head>',
             '<p class="site-tagline">Small &amp; neutral</p><section class="block block-text"><p>head</p></section></header>',
             '<aside class="site-sidebar" aria-label="Sidebar"><section class="block block-text" aria-labelledby="block-2-title"><h2 class="block-title" id="block-2-title">Side</h2><p>side</p></section></aside>',
             '<p>foot<em>note</em></p>',

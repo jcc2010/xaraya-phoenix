@@ -6,19 +6,30 @@
 {% if rows is empty %}
 <p class="admin-empty">{{ t('No tags.') }}</p>
 {% else %}
-<div class="admin-scroll"><table class="admin-tags">
+{% set format = t('Showing %shown% of %total% tags.') %}
+<form class="admin-search admin-tag-filter" method="get" role="search">
+<label for="tag-filter">{{ t('Filter tags') }}</label>
+<input type="search" id="tag-filter" name="q" value="{{ q }}" maxlength="128" autocomplete="off" spellcheck="false" aria-describedby="tag-filter-count" aria-keyshortcuts="/" data-tag-filter>
+<button type="submit">{{ t('Filter') }}</button>
+<a href="{{ clearUrl }}" data-tag-clear{% if q == '' %} hidden{% endif %}>{{ t('Clear') }}</a>
+<span id="tag-filter-count" class="admin-filter-count" role="status" data-format="{{ format }}">{% if q != '' %}{{ format|replace({'%shown%': shown, '%total%': rows|length}) }}{% endif %}</span>
+</form>
+<p class="admin-empty" data-tag-empty{% if shown != 0 %} hidden{% endif %}>{{ t('No tags match the filter.') }}</p>
+<div class="admin-scroll" data-tag-table{% if shown == 0 %} hidden{% endif %}><table class="admin-tags">
+<colgroup><col class="admin-col-name"><col class="admin-col-slug"><col class="admin-col-count">{% if not mirror %}<col>{% endif %}</colgroup>
 <thead><tr><th scope="col">{{ t('Name') }}</th><th scope="col">{{ t('Slug') }}</th><th scope="col">{{ t('Posts') }}</th>{% if not mirror %}<th scope="col">{{ t('Actions') }}</th>{% endif %}</tr></thead>
 <tbody>
 {% for row in rows %}
 {% set id = 'tag-' ~ row.slug %}
-<tr id="{{ id }}">
-<td>{% if row.publicUrl %}<a href="{{ row.publicUrl }}">{{ row.name }}</a>{% else %}{{ row.name }}{% endif %}</td>
-<td><code>{{ row.slug }}</code></td>
-<td>{{ row.count }}</td>
+<tr id="{{ id }}" data-tag-row data-name="{{ row.name }}" data-slug="{{ row.slug }}"{% if row.changed %} class="admin-row-changed"{% endif %}{% if row.hidden %} hidden{% endif %}>
+<td class="admin-tag-name">{% if row.publicUrl %}<a href="{{ row.publicUrl }}">{{ row.name }}</a>{% else %}{{ row.name }}{% endif %}</td>
+<td class="admin-tag-slug" data-label="{{ t('Slug') }}"><code>{{ row.slug }}</code></td>
+<td class="admin-tag-count" data-label="{{ t('Posts') }}">{{ row.count }}</td>
 {% if not mirror %}
-<td class="admin-actions">
+<td class="admin-actions"><div class="admin-tag-actions">
 <form class="admin-tag-rename" method="post" action="{{ row.renameUrl }}">
 {{ csrf() }}
+{% if q != '' %}<input type="hidden" name="q" value="{{ q }}">{% endif %}
 <label for="{{ id }}-name">{{ t('Name') }}</label>
 <input id="{{ id }}-name" name="name" value="{{ row.values.name }}" maxlength="128"{% if row.errors.name is defined %} aria-invalid="true" aria-describedby="{{ id }}-name-error"{% endif %}>
 {{ render('blog::admin/field-error', {id: id ~ '-name', error: row.errors.name ?? null}) }}
@@ -28,7 +39,7 @@
 <button type="submit">{{ t('Rename') }}</button>
 </form>
 {{ render('blog::admin/actions', {actions: row.actions}) }}
-</td>
+</div></td>
 {% endif %}
 </tr>
 {% endfor %}

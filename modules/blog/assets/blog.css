@@ -133,7 +133,19 @@ a:focus-visible { outline: 3px solid var(--focus, #ff9e1b); outline-offset: 2px;
 .admin-blogs, .admin-posts, .admin-tags { width: 100%; border-collapse: collapse; }
 .admin-blogs th, .admin-blogs td { padding: 0.5rem; border-bottom: 1px solid #d8d8de; text-align: left; vertical-align: top; }
 .admin-posts th, .admin-posts td, .admin-tags th, .admin-tags td { padding: 0.5rem; border-bottom: 1px solid #d8d8de; text-align: left; vertical-align: top; }
-.admin-tag-rename { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 0.25rem 0.5rem; margin: 0 0.5rem 0.25rem 0; }
+/* Rename: label, field, label, field, button on one line; each error sits under its own field. */
+.admin-tag-actions { display: flex; flex-wrap: wrap; align-items: flex-start; gap: 0.25rem 0.75rem; }
+.admin-tag-rename { display: grid; grid-template-columns: auto minmax(5rem, 1fr) auto minmax(5rem, 1fr) auto; align-items: center; gap: 0.25rem 0.5rem; flex: 1 1 26rem; margin: 0; }
+.admin-tag-rename input { min-width: 0; }
+.admin-tag-rename > label:first-of-type { grid-area: 1 / 1; }
+.admin-tag-rename > input[name="name"] { grid-area: 1 / 2; }
+.admin-tag-rename > [id$="-name-error"] { grid-area: 2 / 2; }
+.admin-tag-rename > label:last-of-type { grid-area: 1 / 3; }
+.admin-tag-rename > input[name="slug"] { grid-area: 1 / 4; }
+.admin-tag-rename > [id$="-slug-error"] { grid-area: 2 / 4; }
+.admin-tag-rename > button { grid-area: 1 / 5; }
+.admin-tag-actions .admin-action { margin: 0; }
+.admin-tag-rename .field-error { font-size: 0.8125rem; }
 .admin-posts .admin-title { width: 50%; }
 .admin-tag { display: inline-block; margin: 0.25rem 0.25rem 0 0; padding: 0 0.4rem; border: 1px solid #d8d8de; border-radius: 0.25rem; font-size: 0.8125rem; color: var(--muted, #5c5c66); }
 .admin-owner, .admin-posts time { white-space: nowrap; }
@@ -142,6 +154,34 @@ a:focus-visible { outline: 3px solid var(--focus, #ff9e1b); outline-offset: 2px;
 div.admin-actions { margin: 0 0 1rem; }
 .admin-tabs { display: flex; flex-wrap: wrap; gap: 1rem; margin: 0 0 1rem; }
 .admin-search { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem; margin: 0 0 1rem; }
+.admin-tag-filter input[type="search"] { flex: 1 1 16rem; max-width: 28rem; }
+.admin-filter-count { color: var(--muted, #5c5c66); font-size: 0.875rem; }
+.admin-filter-count:empty { display: none; }
+/* Fixed widths so the columns hold still while the filter hides rows. */
+.admin-tags { table-layout: fixed; min-width: 44rem; }
+.admin-col-name { width: 22%; }
+.admin-col-slug { width: 18%; }
+.admin-col-count { width: 4.5rem; }
+.admin-tags td { overflow-wrap: anywhere; }
+.admin-tags tr.admin-row-changed { background: #eef6ff; }
+/* Narrow screens: each tag is a card (name and count, then slug, then the forms) instead of a scrolling table. */
+@media (max-width: 44rem) {
+  .admin-tags { table-layout: auto; min-width: 0; }
+  .admin-tags colgroup, .admin-tags thead { display: none; }
+  .admin-tags tr { display: grid; grid-template-columns: 1fr auto; grid-template-areas: "name count" "slug slug" "actions actions"; column-gap: 1rem; padding: 0.75rem 0.5rem; border-bottom: 1px solid #d8d8de; }
+  .admin-tags td { display: block; padding: 0.125rem 0; border: 0; }
+  .admin-tags .admin-tag-name { grid-area: name; font-weight: 600; }
+  .admin-tags .admin-tag-count { grid-area: count; }
+  .admin-tags .admin-tag-slug { grid-area: slug; }
+  .admin-tags .admin-actions { grid-area: actions; padding-top: 0.5rem; }
+  .admin-tags td[data-label]::before { content: attr(data-label) " "; color: var(--muted, #5c5c66); font-size: 0.8125rem; }
+  .admin-tag-rename { grid-template-columns: auto 1fr; flex-basis: 100%; }
+  .admin-tag-rename > label:last-of-type { grid-area: 3 / 1; }
+  .admin-tag-rename > input[name="slug"] { grid-area: 3 / 2; }
+  .admin-tag-rename > [id$="-slug-error"] { grid-area: 4 / 2; }
+  .admin-tag-rename > button { grid-area: 5 / 2; justify-self: start; }
+}
+[hidden] { display: none !important; }
 .admin-empty { color: var(--muted, #5c5c66); }
 
 @media (prefers-color-scheme: dark) {
@@ -149,6 +189,8 @@ div.admin-actions { margin: 0 0 1rem; }
   .admin-flash-error { background: #3d1513; color: #f6cfcc; border-color: #e0807b; }
   .admin-blogs th, .admin-blogs td { border-color: #3a3a44; }
   .admin-posts th, .admin-posts td, .admin-tags th, .admin-tags td, .admin-tag { border-color: #3a3a44; }
+  .admin-tags tr.admin-row-changed { background: #1d2a3a; }
+  .admin-tags tr { border-color: #3a3a44; }
 }
 
 .admin-form { max-width: 48rem; }

@@ -225,7 +225,12 @@ authors' posts, so it needs edit on every post (Editors and Administrators; Auth
 through the same write path as the API, so the feeds, tag pages and search follow, and `date_modified` is not
 changed. Renaming to a slug another tag already has merges the two; a post that had both keeps the first by
 position. Deleted posts are not touched and keep their old tags, even after an undelete. A mirror's tags come from its
-source feed, so its Tags screen is read-only.
+source feed, so its Tags screen is read-only. The filter box (`?q=`) narrows the list by name or slug, ignoring case;
+with JavaScript it filters as you type, `/` jumps to it and Escape clears it. Renames and removals keep the filter,
+and a renamed tag stays in view, highlighted, even when its new name no longer matches.
+
+Pages can load scripts: `Page::$scripts` takes same-origin URLs (the secureHtml CSP allows only `'self'`), and the
+`phoenix` layout writes them as `<script defer>`. A theme that overrides the layout must print `$scripts` itself.
 
 Posts have an owner, `owner_id`: the signed-in user who created the post in the admin, or the user a token acts as for
 the JSON API and Micropub. It decides which posts an Author may change. It never appears in the JSON or RSS feeds.

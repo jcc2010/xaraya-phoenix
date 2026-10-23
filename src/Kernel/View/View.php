@@ -61,6 +61,7 @@ final class View
             'feeds' => $page->feeds,
             'canonical' => $page->canonical,
             'styles' => $page->styles,
+            'scripts' => $page->scripts,
             'settings' => $this->themeSettings(),
         ], $x);
     }

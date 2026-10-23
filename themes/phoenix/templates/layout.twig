@@ -17,6 +17,9 @@
 {% for href in styles %}
 <link rel="stylesheet" href="{{ href }}">
 {% endfor %}
+{% for src in scripts|default([]) %}
+<script src="{{ src }}" defer></script>
+{% endfor %}
 </head>
 <body>
 <a class="skip-link" href="#main">{{ t('Skip to content') }}</a>

@@ -43,9 +43,9 @@ final class TagAdminTest extends AdminTestCase
         $this->user($app, 'eve', ['Editors']);
         foreach (['root', 'eve'] as $handle) {
             $html = self::main($this->both('/admin/blog/notes/tags', $handle));
-            preg_match_all('~<tr id="tag-([^"]+)">~', $html, $m);
+            preg_match_all('~<tr id="tag-([^"]+)" data-tag-row~', $html, $m);
             self::assertSame(['php', 'soon', 'zebra'], $m[1], $handle . ': sorted by slug; deleted posts do not count, scheduled ones do');
-            self::assertMatchesRegularExpression('~<tr id="tag-php">\s*<td><a href="/blog/notes/tag/php">PHP</a></td>\s*<td><code>php</code></td>\s*<td>2</td>~', $html);
+            self::assertMatchesRegularExpression('~<tr id="tag-php" data-tag-row data-name="PHP" data-slug="php">\s*<td class="admin-tag-name"><a href="/blog/notes/tag/php">PHP</a></td>\s*<td class="admin-tag-slug" data-label="Slug"><code>php</code></td>\s*<td class="admin-tag-count" data-label="Posts">2</td>~', $html);
             self::assertStringContainsString('action="/admin/blog/notes/tags/php/rename"', $html);
             self::assertStringContainsString('action="/admin/blog/notes/tags/php/remove"', $html);
             self::assertStringNotContainsString('ghost', $html);
@@ -90,7 +90,7 @@ final class TagAdminTest extends AdminTestCase
         $browser->get('/admin/blog/notes/tags');
         $response = $browser->post('/admin/blog/notes/tags/php/rename', ['name' => '  PHP 8  ', 'slug' => 'php']);
         self::assertSame(303, $response->getStatusCode());
-        self::assertSame('/admin/blog/notes/tags', $response->getHeaderLine('Location'));
+        self::assertSame('/admin/blog/notes/tags?tag=php#tag-php', $response->getHeaderLine('Location'));
         self::assertPrivateNoStore($response);
         self::assertSame([['name' => 'Web', 'slug' => 'web'], ['name' => 'PHP 8', 'slug' => 'php'], ['name' => 'Zebra', 'slug' => 'zebra']], $this->tagsOf($app, $one));
         self::assertSame([['name' => 'PHP 8', 'slug' => 'php']], $this->tagsOf($app, $two));
@@ -122,7 +122,7 @@ final class TagAdminTest extends AdminTestCase
         self::assertSame([['name' => 'JavaScript', 'slug' => 'javascript']], $this->tagsOf($app, $old));
         $html = self::main((string) $browser->get('/admin/blog/notes/tags')->getBody());
         self::assertStringNotContainsString('id="tag-js"', $html);
-        self::assertMatchesRegularExpression('~<tr id="tag-javascript">.*?<td>3</td>~s', $html);
+        self::assertMatchesRegularExpression('~<tr id="tag-javascript" data-tag-row[^>]*>.*?<td class="admin-tag-count" data-label="Posts">3</td>~s', $html);
     }
 
     public function testRemovingATagLeavesDeletedPostsAlone(): void
@@ -224,8 +224,8 @@ final class TagAdminTest extends AdminTestCase
         $this->user($app, 'root', ['Administrators']);
         $html = self::main($this->both('/admin/blog/mirror/tags', 'root'));
         self::assertStringContainsString('<p class="admin-mirror-note">Tags come from the source feed; edit them there.</p>', $html);
-        self::assertStringContainsString('<tr id="tag-synced">', $html);
-        self::assertStringNotContainsString('<form', $html);
+        self::assertStringContainsString('<tr id="tag-synced" data-tag-row data-name="Synced" data-slug="synced">', $html);
+        self::assertStringNotContainsString('method="post"', $html, 'only the filter form');
         $browser = $this->signIn($app, 'root');
         foreach (['rename', 'remove'] as $action) {
             $browser->get('/admin/blog/mirror/posts'); // the tags screen of a mirror has no form to take a token from
@@ -243,7 +243,7 @@ final class TagAdminTest extends AdminTestCase
         $html = self::main($this->both('/admin/blog/notes/tags', 'eve'));
         self::assertStringNotContainsString('<script>', $html);
         self::assertStringContainsString('&lt;script&gt;alert(1)&lt;/script&gt;', $html);
-        self::assertStringContainsString('<tr id="tag-script-alert-1-script">', $html);
+        self::assertStringContainsString('<tr id="tag-script-alert-1-script" data-tag-row data-name="&lt;script&gt;alert(1)&lt;/script&gt;" data-slug="script-alert-1-script">', $html);
 
         $bodies = [];
         foreach (['php', 'twig'] as $engine) {
@@ -264,5 +264,88 @@ final class TagAdminTest extends AdminTestCase
         $this->nativeBlog($app);
         $this->user($app, 'eve', ['Editors']);
         self::assertStringContainsString('<p class="admin-empty">No tags.</p>', self::main($this->both('/admin/blog/notes/tags', 'eve')));
+    }
+
+    /** @return array{0: App, 1: Blog} a blog tagged PHP, JavaScript, Élan (slug lan), Node.js (slug node-js) and Zebra; user "root" */
+    private function filterable(): array
+    {
+        $app = $this->site();
+        $blog = $this->nativeBlog($app);
+        $this->tagged($app, $blog, 'One', ['PHP', 'JavaScript']);
+        $this->tagged($app, $blog, 'Two', ['Élan', 'Node.js', 'Zebra']);
+        $this->user($app, 'root', ['Administrators']);
+
+        return [$app, $blog];
+    }
+
+    /** @return array<string, bool> slug => whether its row is hidden */
+    private static function visibility(string $html): array
+    {
+        preg_match_all('~<tr id="tag-[^"]+" data-tag-row data-name="[^"]*" data-slug="([^"]+)"( hidden)?>~', $html, $m);
+
+        return array_combine($m[1], array_map(static fn(string $h): bool => $h !== '', $m[2]));
+    }
+
+    public function testTheFilterHidesTheTagsThatDoNotMatchInBothEngines(): void
+    {
+        $this->filterable();
+        $html = self::main($this->both('/admin/blog/notes/tags?q=JA', 'root'));
+        self::assertSame(['javascript' => false, 'lan' => true, 'node-js' => true, 'php' => true, 'zebra' => true], self::visibility($html));
+        self::assertStringContainsString('<input type="search" id="tag-filter" name="q" value="JA"', $html);
+        self::assertStringContainsString('<a href="/admin/blog/notes/tags" data-tag-clear>Clear</a>', $html);
+        self::assertStringContainsString('data-format="Showing %shown% of %total% tags.">Showing 1 of 5 tags.</span>', $html);
+        self::assertStringContainsString('<p class="admin-empty" data-tag-empty hidden>', $html);
+        self::assertSame(10, substr_count($html, '<input type="hidden" name="q" value="JA">'), 'every rename and remove form carries the filter');
+
+        self::assertSame(['javascript' => true, 'lan' => false, 'node-js' => true, 'php' => true, 'zebra' => true], self::visibility(self::main($this->both('/admin/blog/notes/tags?q=%C3%A9L', 'root'))), 'case-insensitive beyond ASCII');
+        self::assertSame(['javascript' => true, 'lan' => true, 'node-js' => true, 'php' => false, 'zebra' => true], self::visibility(self::main($this->both('/admin/blog/notes/tags?q=hp', 'root'))));
+        self::assertSame(['javascript' => true, 'lan' => true, 'node-js' => false, 'php' => true, 'zebra' => true], self::visibility(self::main($this->both('/admin/blog/notes/tags?q=e-j', 'root'))), 'the slug matches too');
+    }
+
+    public function testNoMatchShowsAMessageAndNoFilterShowsEverything(): void
+    {
+        $this->filterable();
+        $html = self::main($this->both('/admin/blog/notes/tags?q=nothing', 'root'));
+        self::assertStringContainsString('<p class="admin-empty" data-tag-empty>No tags match the filter.</p><div class="admin-scroll" data-tag-table hidden>', $html);
+        self::assertStringContainsString('>Showing 0 of 5 tags.</span>', $html);
+
+        $html = $this->both('/admin/blog/notes/tags', 'root');
+        self::assertNotContains(true, self::visibility(self::main($html)));
+        self::assertStringContainsString('data-tag-clear hidden>Clear</a>', $html);
+        self::assertStringContainsString('role="status" data-format="Showing %shown% of %total% tags."></span>', $html);
+        self::assertStringNotContainsString('name="q" value=""><', $html, 'no empty hidden q');
+        self::assertStringContainsString('<script src="/assets/module/blog/admin-tags.js" defer></script>', $html);
+    }
+
+    public function testAHostileFilterIsCleanedAndEscaped(): void
+    {
+        $this->filterable();
+        $q = rawurlencode("<b>\"x\x01\x00y") . '%FF' . str_repeat('a', 200);
+        $html = self::main($this->both('/admin/blog/notes/tags?q=' . $q, 'root'));
+        self::assertMatchesRegularExpression('~name="q" value="&lt;b&gt;&quot;x y\?a{120}"~', $html);
+    }
+
+    public function testRenameAndRemoveKeepTheFilter(): void
+    {
+        [$app] = $this->filterable();
+        $browser = $this->signIn($app, 'root');
+        $browser->get('/admin/blog/notes/tags?q=ja');
+        $response = $browser->post('/admin/blog/notes/tags/javascript/rename', ['name' => 'JS', 'slug' => 'js', 'q' => 'ja']);
+        self::assertSame(303, $response->getStatusCode());
+        self::assertSame('/admin/blog/notes/tags?q=ja&tag=js#tag-js', $response->getHeaderLine('Location'));
+        $html = self::main($this->both('/admin/blog/notes/tags?q=ja&tag=js', 'root'));
+        self::assertStringContainsString('<tr id="tag-js" data-tag-row data-name="JS" data-slug="js" class="admin-row-changed">', $html, 'the renamed tag stays in view though "ja" no longer matches it');
+        self::assertStringContainsString('<p class="admin-empty" data-tag-empty hidden>', $html);
+
+        $browser->get('/admin/blog/notes/tags?q=a r');
+        $response = $browser->post('/admin/blog/notes/tags/zebra/remove', ['q' => 'a r']);
+        self::assertSame('/admin/blog/notes/tags?q=a%20r', $response->getHeaderLine('Location'));
+
+        $browser->get('/admin/blog/notes/tags?q=ph');
+        $response = $browser->post('/admin/blog/notes/tags/php/rename', ['name' => '', 'slug' => '', 'q' => 'zzz']);
+        self::assertSame(422, $response->getStatusCode());
+        $html = self::main($browser->body());
+        self::assertStringContainsString('name="q" value="zzz"', $html);
+        self::assertFalse(self::visibility($html)['php'], 'the refused row shows even when the filter would hide it');
     }
 }

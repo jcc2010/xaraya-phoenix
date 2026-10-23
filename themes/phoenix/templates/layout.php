@@ -17,6 +17,9 @@
 <?php foreach ($styles as $href): ?>
 <link rel="stylesheet" href="<?= $x->e($href) ?>">
 <?php endforeach ?>
+<?php foreach ($scripts ?? [] as $src): ?>
+<script src="<?= $x->e($src) ?>" defer></script>
+<?php endforeach ?>
 </head>
 <body>
 <a class="skip-link" href="#main"><?= $x->e($x->t('Skip to content')) ?></a>

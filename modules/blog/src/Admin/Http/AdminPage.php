@@ -40,8 +40,11 @@ final class AdminPage
         return is_array($body) ? $body : [];
     }
 
-    /** @param array<string, mixed> $data body template variables; "flash" is added (and the queue emptied) */
-    public function page(ServerRequestInterface $request, string $template, array $data, string $title, int $status = 200): Page
+    /**
+     * @param array<string, mixed> $data body template variables; "flash" is added (and the queue emptied)
+     * @param list<string> $scripts published module asset paths ("module/blog/…"), loaded with defer
+     */
+    public function page(ServerRequestInterface $request, string $template, array $data, string $title, int $status = 200, array $scripts = []): Page
     {
         return new Page(
             $template,
@@ -49,6 +52,7 @@ final class AdminPage
             title: $title . ' · Admin',
             styles: [$this->assets->url('module/blog/blog.css')],
             status: $status,
+            scripts: array_map($this->assets->url(...), $scripts),
         );
     }
 
