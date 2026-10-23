@@ -9,7 +9,7 @@ These are findings from the blog pages reviews (SDD ledger) that were deliberate
 - [Final] Search highlights matches inside words (`speci<mark>fi</mark>c`), as LIKE substring semantics allow. Consider highlighting only at word starts.
 - [Task 12] A page past the last search result links back one page at a time, when it could link to the last real page. `findMany` has no status filter, so a post deleted between the index query and the fetch can still show. The `q` length is checked after `trim()`.
 - [Task 13] `CurrentBlog::of` isn't memoised, so a page runs four lookups (more on `/s/{id}`). It also resolves the blog from posts that aren't live, which is safe only because those pages 404 first. The `blog:blocks` check and seed aren't atomic. `tagCounts` applies its LIMIT before `TagCloud::withUrls` filters out unroutable slugs, so the cloud can come up one short.
-- [Task 10] `TagCloud` sorts with `<=>`, which compares numeric-looking names numerically. When a tag is spelled with different cases, `MIN(t.name)` picks one in a way that varies by database.
+- [Task 10] `TagCloud` sorts with `<=>`, which compares numeric-looking names numerically. (Done: a slug's name is now its smallest name in byte order on every database, and `tagCounts` breaks count ties by `strcmp` on the slug.)
 - [Task 6] Comment de-duplication `ltrim`s whitespace after the prefix.
 - [Task 5] `blog:reindex <handle> --all` lets the handle win silently.
 - [Task 3] Snippets can start mid-word when a word is longer than 50 characters. An NFD combining mark can fall outside `<mark>`. Each hit folds the whole text.

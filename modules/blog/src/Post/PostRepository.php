@@ -307,40 +307,48 @@ final class PostRepository
     }
 
     /**
-     * Tags with at least one live post, most used first, then by slug. A slug's name is its smallest stored name.
+     * Tags with at least one live post, most used first, then by slug. A slug's name is its smallest stored name
+     * (see tagTotals()).
      *
      * @return list<array{name: string, slug: string, count: int}>
      */
     public function tagCounts(int $blogId, DateTimeImmutable $now, ?int $limit = null): array
     {
-        $sql = 'SELECT t.slug AS slug, MIN(t.name) AS name, COUNT(*) AS uses FROM {post_tags} t JOIN {posts} p ON p.id = t.post_id'
-            . ' WHERE t.blog_id = ? AND p.blog_id = ? AND p.status = ? AND p.date_published <= ?'
-            . ' GROUP BY t.slug ORDER BY uses DESC, t.slug ASC'
-            . ($limit === null ? '' : ' LIMIT ' . max(0, $limit));
-        $rows = $this->db->fetchAll($sql, [$blogId, $blogId, 'published', $now]);
+        $tags = $this->tagTotals('p.status = ? AND p.date_published <= ?', [$blogId, $blogId, 'published', $now]);
+        usort($tags, static fn(array $a, array $b): int => $b['count'] <=> $a['count'] ?: strcmp($a['slug'], $b['slug']));
 
-        return array_map(static fn(array $row): array => [
-            'name' => (string) $row['name'],
-            'slug' => (string) $row['slug'],
-            'count' => (int) $row['uses'],
-        ], $rows);
+        return $limit === null ? $tags : array_slice($tags, 0, max(0, $limit));
     }
 
     /**
      * Every tag of a blog's non-deleted posts (scheduled ones included), by slug: the admin tags screen. A slug's
-     * name is its smallest stored name in byte order, picked here rather than with MIN(), whose answer for "PHP"
-     * against "php" depends on the database's collation (Postgres differs from SQLite and MySQL's utf8mb4_bin).
+     * name is its smallest stored name (see tagTotals()).
      *
      * @return list<array{name: string, slug: string, count: int}>
      */
     public function adminTagCounts(int $blogId): array
     {
+        $tags = $this->tagTotals('p.status = ?', [$blogId, $blogId, 'published']);
+        usort($tags, static fn(array $a, array $b): int => strcmp($a['slug'], $b['slug']));
+
+        return $tags;
+    }
+
+    /**
+     * Each tag of a blog's posts matching $where, with how many posts carry it. A slug's name is its smallest stored
+     * name in byte order, picked here rather than with MIN(), whose answer for "PHP" against "php" depends on the
+     * database's collation (Postgres differs from SQLite and MySQL's utf8mb4_bin).
+     *
+     * @param list<mixed> $params the blog id twice, then $where's parameters
+     * @return list<array{name: string, slug: string, count: int}>
+     */
+    private function tagTotals(string $where, array $params): array
+    {
         // A post has one row per slug (the primary key), so the counts of a slug's names add up to its posts.
         $sql = 'SELECT t.slug AS slug, t.name AS name, COUNT(*) AS uses FROM {post_tags} t JOIN {posts} p ON p.id = t.post_id'
-            . ' WHERE t.blog_id = ? AND p.blog_id = ? AND p.status = ?'
-            . ' GROUP BY t.slug, t.name';
+            . " WHERE t.blog_id = ? AND p.blog_id = ? AND {$where} GROUP BY t.slug, t.name";
         $tags = [];
-        foreach ($this->db->fetchAll($sql, [$blogId, $blogId, 'published']) as $row) {
+        foreach ($this->db->fetchAll($sql, $params) as $row) {
             $slug = (string) $row['slug'];
             $name = (string) $row['name'];
             $tag = $tags[$slug] ?? ['name' => $name, 'slug' => $slug, 'count' => 0];
@@ -350,7 +358,6 @@ final class PostRepository
                 'count' => $tag['count'] + (int) $row['uses'],
             ];
         }
-        ksort($tags, SORT_STRING);
 
         return array_values($tags);
     }

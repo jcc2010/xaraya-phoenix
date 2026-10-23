@@ -38,6 +38,23 @@ final class TagsPageTest extends BlogPageTestCase
         }
     }
 
+    public function testASlugSpelledTwoWaysShowsItsSmallestNameOnEveryDatabase(): void
+    {
+        $app = $this->enableBlog();
+        $blog = $this->nativeBlog($app);
+        $this->addPost($app, $blog, self::postRecord(1, ['tags' => [['name' => 'php', 'slug' => 'php']]]));
+        $this->addPost($app, $blog, self::postRecord(2, ['tags' => [['name' => 'PHP', 'slug' => 'php']]]));
+        $this->addPost($app, $blog, self::postRecord(3, ['tags' => [['name' => 'Php', 'slug' => 'php'], ['name' => 'Ten', 'slug' => '10'], ['name' => 'Nine', 'slug' => '9']]]));
+
+        $counts = $app->container()->get(PostRepository::class)->tagCounts($blog->id, $this->now());
+        self::assertSame([
+            ['name' => 'PHP', 'slug' => 'php', 'count' => 3],
+            ['name' => 'Ten', 'slug' => '10', 'count' => 1],
+            ['name' => 'Nine', 'slug' => '9', 'count' => 1],
+        ], $counts, 'byte order, not the collation: "PHP" < "Php" < "php", and slug "10" before "9"');
+        self::assertSame([['name' => 'PHP', 'slug' => 'php', 'count' => 3]], $app->container()->get(PostRepository::class)->tagCounts($blog->id, $this->now(), 1));
+    }
+
     public function testTagsNoRouteCanMatchAreLeftOutOfTheCloud(): void
     {
         $app = $this->enableBlog();
