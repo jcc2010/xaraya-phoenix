@@ -177,7 +177,7 @@ final class MediaApiTest extends ApiTestCase
         $huge = 'GIF89a' . pack('vv', 10000, 10000) . "\x00\x00\x00";
         $response = $this->upload(['file' => self::file($this->fixture('huge.gif', $huge), 'huge.gif', 'image/gif')]);
         self::assertSame(422, $response->getStatusCode());
-        self::assertSame('The file is not a valid image/gif image', self::error($response)['message']);
+        self::assertSame('The image is 10000×10000; images may have at most 50 million pixels', self::error($response)['message']);
         self::assertSame(0, $this->mediaRows());
     }
 
