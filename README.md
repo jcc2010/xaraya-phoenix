@@ -191,7 +191,8 @@ is rendered (and cached under `var/cache/data`); stored posts and the JSON/RSS f
 send a strict `Content-Security-Policy` and load no scripts or iframes: a video is a link to YouTube.
 Images (in post HTML, photos, galleries, video thumbnails and podcast covers) are requested with no `Referer`
 (`referrerpolicy="no-referrer"`), because some hosts such as Athena block hotlinking. A podcast's `<audio>` cannot carry
-that policy. The sanitiser cache key is versioned, so upgrading needs no `cache:clear`.
+that attribute, so blog pages also send `Referrer-Policy: same-origin`: other sites never get a Referer from them
+(error pages keep secureHtml's `strict-origin-when-cross-origin`). The sanitiser cache key is versioned, so upgrading needs no `cache:clear`.
 
 New installs get four sidebar blocks (search, about, recent posts, tags) on every `blog.*` page. An install
 that enabled the blog module before they existed creates them with `bin/xar blog:blocks`.

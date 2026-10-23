@@ -103,7 +103,7 @@ final class SearchPageTest extends BlogPageTestCase
             '?q=' . str_repeat('é', 201) => 'The search query is longer than 200 characters',
         ] as $query => $message) {
             [$response, $html] = $this->both('/blog/notes/search' . $query, 400);
-            self::assertSecureHtml($response);
+            self::assertSecureHtml($response, self::ERROR_REFERRER);
             self::assertStringContainsString("<h1>400 Bad Request</h1><p>{$message}</p>", $html, $query);
         }
         $this->both('/blog/notes/search?q=' . str_repeat('é', 200));

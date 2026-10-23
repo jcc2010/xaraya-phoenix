@@ -76,7 +76,7 @@ final class PostPageTest extends BlogPageTestCase
         $app->container()->get(PostRepository::class)->tombstone($blog->id, ['item-2'], $this->now());
         foreach ([$scheduled, $deleted, '01m3t19wn8reaww81zg1m47tjq'] as $id) {
             [$response, $html] = $this->both("/s/{$id}", 404);
-            self::assertSecureHtml($response);
+            self::assertSecureHtml($response, self::ERROR_REFERRER);
             self::assertStringContainsString('<title>404 Not Found</title>', $html);
             self::assertStringContainsString('<h1>Page not found</h1>', $html);
         }

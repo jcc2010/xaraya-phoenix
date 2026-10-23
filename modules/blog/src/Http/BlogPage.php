@@ -79,7 +79,9 @@ final class BlogPage
             canonical: $canonical,
             lang: $blog->language,
             styles: [$this->assets->url('module/blog/blog.css')],
-            headers: ['Cache-Control' => 'public, max-age=60'],
+            // same-origin, not secureHtml's strict-origin-when-cross-origin: media hosts that refuse hotlinks (Athena
+            // 403s a cross-origin Referer) must not get one, and <audio>/<video> have no referrerpolicy attribute.
+            headers: ['Cache-Control' => 'public, max-age=60', 'Referrer-Policy' => 'same-origin'],
         );
     }
 

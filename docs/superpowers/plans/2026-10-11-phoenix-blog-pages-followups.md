@@ -4,7 +4,7 @@ These are findings from the blog pages reviews (SDD ledger) that were deliberate
 
 ## Behaviour
 
-- [Final] Podcast `<audio>` still sends a Referer (`referrerpolicy` isn't defined for media elements), so audio hosted on a hotlink-protected origin like Athena would 403. If that happens, set a page-level `Referrer-Policy: same-origin` from `BlogPage::page()`.
+- [Done] Podcast `<audio>` sent a Referer (`referrerpolicy` isn't defined for media elements). Blog pages now send `Referrer-Policy: same-origin` from `BlogPage::page()`.
 - [Final] Theme overrides that emit their own `<img>` must add `referrerpolicy="no-referrer"` themselves (documented in the README).
 - [Final] Search highlights matches inside words (`speci<mark>fi</mark>c`), as LIKE substring semantics allow. Consider highlighting only at word starts.
 - [Task 12] A page past the last search result links back one page at a time, when it could link to the last real page. `findMany` has no status filter, so a post deleted between the index query and the fetch can still show. The `q` length is checked after `trim()`.

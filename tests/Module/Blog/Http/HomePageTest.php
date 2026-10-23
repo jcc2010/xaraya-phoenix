@@ -87,7 +87,7 @@ final class HomePageTest extends BlogPageTestCase
         self::assertStringContainsString('<p class="blog-empty">No posts yet.</p>', self::main($html));
         self::assertStringNotContainsString('class="pager"', $html);
         [$response, $html] = $this->both('/blog/nope', 404);
-        self::assertSecureHtml($response);
+        self::assertSecureHtml($response, self::ERROR_REFERRER);
         self::assertStringContainsString('<h1>Page not found</h1>', $html);
     }
 
@@ -146,7 +146,7 @@ final class HomePageTest extends BlogPageTestCase
         $scheduled = $this->addPost($this->site, $this->blog, self::postRecord(9, ['title' => 'Scheduled', 'date' => $this->now()->modify('+1 year')]));
         foreach (['?before=!!!', '?before=', '?before[]=x', '?before=' . str_repeat('A', 201)] as $query) {
             [$response, $html] = $this->both('/blog/notes' . $query, 400);
-            self::assertSecureHtml($response);
+            self::assertSecureHtml($response, self::ERROR_REFERRER);
             self::assertStringContainsString('<h1>400 Bad Request</h1><p>Invalid before cursor</p>', $html, $query);
         }
         // A well-formed cursor from the far future still never reaches a scheduled post.

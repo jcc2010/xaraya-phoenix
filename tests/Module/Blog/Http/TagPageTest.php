@@ -45,7 +45,7 @@ final class TagPageTest extends BlogPageTestCase
         $this->addPost($app, $blog, self::postRecord(2, ['tags' => $tag]));
         $app->container()->get(PostRepository::class)->tombstone($blog->id, ['item-2'], $this->now());
         [$response, $html] = $this->both('/blog/notes/tag/gone', 404);
-        self::assertSecureHtml($response);
+        self::assertSecureHtml($response, self::ERROR_REFERRER);
         self::assertStringContainsString('<h1>Page not found</h1>', $html);
         $this->both('/blog/notes/tag/never', 404);
         $this->both('/blog/nope/tag/gone', 404);
@@ -74,7 +74,7 @@ final class TagPageTest extends BlogPageTestCase
         $this->addPost($app, $blog, self::postRecord(1, ['tags' => [['name' => 't', 'slug' => 't']]]));
         foreach (['?before=!!!', '?before=', '?before[]=x', '?before=' . rtrim(strtr(base64_encode('2026-13-45 99:99:99|01m3t19wn8reaww81zg1m47tjq'), '+/', '-_'), '=')] as $query) {
             [$response, $html] = $this->both('/blog/notes/tag/t' . $query, 400);
-            self::assertSecureHtml($response);
+            self::assertSecureHtml($response, self::ERROR_REFERRER);
             self::assertStringContainsString('<h1>400 Bad Request</h1><p>Invalid before cursor</p>', $html, $query);
         }
     }

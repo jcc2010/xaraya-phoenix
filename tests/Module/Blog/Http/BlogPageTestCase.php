@@ -61,10 +61,14 @@ abstract class BlogPageTestCase extends BlogTestCase
         return preg_match('#<main[^>]*>(.*)</main>#s', $html, $m) === 1 ? $m[1] : '';
     }
 
-    protected static function assertSecureHtml(ResponseInterface $response): void
+    /** Error pages (404, 400) come from the ErrorHandler and keep secureHtml's Referrer-Policy. */
+    protected const ERROR_REFERRER = SecureHtml::HEADERS['Referrer-Policy'];
+
+    /** A blog page's headers: secureHtml's, except Referrer-Policy, which blog pages set to same-origin. */
+    protected static function assertSecureHtml(ResponseInterface $response, string $referrerPolicy = 'same-origin'): void
     {
         self::assertSame('text/html; charset=utf-8', $response->getHeaderLine('Content-Type'));
-        foreach (SecureHtml::HEADERS as $name => $value) {
+        foreach ([...SecureHtml::HEADERS, 'Referrer-Policy' => $referrerPolicy] as $name => $value) {
             self::assertSame($value, $response->getHeaderLine($name), $name);
         }
         self::assertStringEndsWith("; form-action 'self'; frame-ancestors 'self'", $response->getHeaderLine('Content-Security-Policy'), 'no framing by other sites');
