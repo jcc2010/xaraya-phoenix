@@ -295,6 +295,14 @@ final class Manifest
         return $out;
     }
 
+    /** `"requires": {"appUrl": true}`: the module builds absolute URLs from app.url, so it must be set. */
+    public function requiresAppUrl(): bool
+    {
+        $requires = $this->data['requires'] ?? [];
+
+        return is_array($requires) && ($requires['appUrl'] ?? false) === true;
+    }
+
     public function isContent(): bool
     {
         return ($this->data['content'] ?? false) === true;

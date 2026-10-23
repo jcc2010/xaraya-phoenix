@@ -29,6 +29,7 @@ final class ModuleRegistry
         private readonly Migrator $migrator,
         private readonly array $paths,
         private readonly string $kernelMigrations,
+        private readonly string $appUrl = '',
     ) {}
 
     /** @return array<string, Manifest> */
@@ -78,6 +79,24 @@ final class ModuleRegistry
         return $this->enabledCache = $this->sortByDependencies($enabled);
     }
 
+    /**
+     * Checks what a module needs from the config: an absolute http(s) app.url for `"requires": {"appUrl": true}`.
+     * Runs on enable and on every boot, so a module that would build broken links never runs.
+     *
+     * @throws ModuleException
+     */
+    public function assertRequirements(Manifest $manifest): void
+    {
+        if (!$manifest->requiresAppUrl()) {
+            return;
+        }
+        $scheme = parse_url($this->appUrl, PHP_URL_SCHEME);
+        $host = parse_url($this->appUrl, PHP_URL_HOST);
+        if (!in_array(is_string($scheme) ? strtolower($scheme) : '', ['http', 'https'], true) || !is_string($host) || $host === '') {
+            throw new ModuleException("Module '{$manifest->name}' needs app.url (APP_URL) set to the site's absolute URL, such as https://example.com");
+        }
+    }
+
     /** Forgets the memoised enabled() list, after xar_modules was changed by other code. */
     public function refresh(): void
     {
@@ -103,6 +122,7 @@ final class ModuleRegistry
     public function enable(string $name): void
     {
         $manifest = $this->get($name);
+        $this->assertRequirements($manifest);
         foreach (array_keys($manifest->requiredModules()) as $dependency) {
             if (!$this->isEnabled($dependency)) {
                 throw new ModuleException("Module '{$name}' requires '{$dependency}'; enable it first");

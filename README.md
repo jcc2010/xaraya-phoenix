@@ -267,7 +267,10 @@ native blogs and edit blog settings in the admin. Switching a blog's mode and cr
 
 ### Writing natively: tokens, the JSON API and Micropub
 
-A native blog is written in Phoenix itself. Enable the two modules, create the blog and a token:
+A native blog is written in Phoenix itself. Enable the two modules, create the blog and a token. Both modules build
+absolute URLs (media `Location`s, new posts' ids), so they need `APP_URL` set to the site's absolute http(s) URL:
+`module:enable` refuses without it, and so does every boot once they are enabled (`bin/xar` then retries in safe mode,
+so `module:disable` still works).
 
 ```sh
 bin/xar module:enable tokens

@@ -128,6 +128,7 @@ final class App
                 $c->get(Migrator::class),
                 array_values(array_map(fn(mixed $p): string => $this->path((string) $p), (array) $config->get('modules.paths', ['modules']))),
                 __DIR__ . '/migrations',
+                (string) $config->get('app.url', ''),
             );
             $registry->onEnable(static function (Manifest $manifest, bool $firstInstall) use ($c): void {
                 $c->get(HookBindings::class)->seed($manifest);
@@ -476,6 +477,7 @@ final class App
         }
         $events = $this->container->get(EventDispatcher::class);
         foreach ($registry->enabled() as $manifest) {
+            $registry->assertRequirements($manifest);
             $providerClass = $manifest->provider();
             if ($providerClass !== null) {
                 $provider = $this->container->make($providerClass);

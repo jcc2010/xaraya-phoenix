@@ -14,7 +14,7 @@ These are findings from the Plan B reviews that were deliberately deferred (see 
 
 ## Worth doing next
 
-- **Require `app.url`.** When `tokens` or `micropub` is enabled, require `app.url` at boot. Media `Location`, `media:localize`'s own-upload skip, and new posts' `item_id` all assume it is set. (Kernel Plan 3: password reset links refuse to be sent without an absolute `app.url`; the boot check is still open.)
+- [Done] **Require `app.url`.** `tokens` and `micropub` declare `"requires": {"appUrl": true}`; `module:enable` and every boot refuse without an absolute http(s) `app.url`.
 - **Missing `nosniff`.** The media upload JSON response and Micropub's own JSON errors still don't send `X-Content-Type-Options: nosniff`.
 - **Where `ApiAccess` lives.** `ApiAccess` lives in the blog module but is a tokens concern; micropub imports a blog HTTP class to use it. Move it to something like `Token::assertAllows(int $blogId)`.
 - **Item-id lookup across blogs.** The Micropub item-id lookup takes the first blog that matches. When the token is pinned to a blog, it should prefer that blog.
