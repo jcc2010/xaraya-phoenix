@@ -230,7 +230,8 @@ final class ImageUploadTest extends AdminTestCase
             $browser = $this->signIn($this->site($engine), 'ada');
             $browser->get('/admin/blog/notes/posts/new');
             $browser->upload('/admin/blog/notes/posts/new', ['kind' => 'note', 'content' => '<p>x</p>', 'preview' => '1'], ['file' => $this->file('p.png', $this->png(), 'image/png')]);
-            $previews[$engine] = Html::normalize(preg_replace(['/name="_csrf" value="[^"]*"/', '/[0-9a-hjkmnp-tv-z]{26}/'], ['name="_csrf" value=""', 'ULID'], $browser->body()) ?? '');
+            // The preview is dated "now", which can tick over a second between the two engines: mask it.
+            $previews[$engine] = Html::normalize(preg_replace(['/name="_csrf" value="[^"]*"/', '/[0-9a-hjkmnp-tv-z]{26}/', '/datetime="[^"]*"/'], ['name="_csrf" value=""', 'ULID', 'datetime=""'], $browser->body()) ?? '');
         }
         self::assertSame($previews['php'], $previews['twig']);
     }

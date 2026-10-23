@@ -102,7 +102,8 @@ final class PostEditTest extends AdminTestCase
                 'kind' => 'highlight', 'title' => '"><b>t</b>', 'content' => '<p>Hi</p><script>x</script>', 'quote' => 'Q', 'tags' => 'x, y', 'preview' => '1',
             ]);
             self::assertSame(200, $response->getStatusCode(), $engine);
-            $html[$engine] = Html::normalize(preg_replace('/name="_csrf" value="[^"]*"/', 'name="_csrf" value=""', $browser->body()) ?? '');
+            // The preview is dated "now", which can tick over a second between the two engines: mask it.
+            $html[$engine] = Html::normalize(preg_replace(['/name="_csrf" value="[^"]*"/', '/datetime="[^"]*"/'], ['name="_csrf" value=""', 'datetime=""'], $browser->body()) ?? '');
         }
         self::assertSame($html['php'], $html['twig']);
         $preview = (string) strstr(self::main($html['php']), '<section class="admin-preview"');
