@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Xaraya\Kernel\Events;
 
 use LogicException;
+use Psr\Log\LoggerInterface;
+use Throwable;
 use Xaraya\Kernel\Container\Container;
 
 final class EventDispatcher
@@ -32,13 +34,39 @@ final class EventDispatcher
             if ($event instanceof Event && $event->isPropagationStopped()) {
                 break;
             }
-            $listener($event);
+            $this->resolve($listener)($event);
         }
 
         return $event;
     }
 
-    /** @return list<callable> */
+    /**
+     * dispatch() for news about something already done (a post committed): each listener runs on its own, and one
+     * that throws is logged and skipped, so it can neither undo the caller's success (a client would retry and
+     * duplicate the post) nor keep the listeners after it (the search index) from running.
+     *
+     * @template T of object
+     * @param T $event
+     * @return T
+     */
+    public function notify(object $event): object
+    {
+        foreach ($this->listenersFor($event) as $listener) {
+            if ($event instanceof Event && $event->isPropagationStopped()) {
+                break;
+            }
+            try {
+                // Resolved here, so a listener that cannot even be built is isolated too.
+                $this->resolve($listener)($event);
+            } catch (Throwable $e) {
+                $this->container->get(LoggerInterface::class)->error('A listener for ' . $event::class . ' failed: ' . $e->getMessage(), ['exception' => $e]);
+            }
+        }
+
+        return $event;
+    }
+
+    /** @return list<callable|string> in calling order, not yet resolved */
     private function listenersFor(object $event): array
     {
         $types = [$event::class, ...array_values(class_parents($event) ?: []), ...array_values(class_implements($event) ?: [])];
@@ -50,7 +78,7 @@ final class EventDispatcher
         }
         usort($matched, fn(array $a, array $b): int => [$b['priority'], $a['order']] <=> [$a['priority'], $b['order']]);
 
-        return array_map(fn(array $entry): callable => $this->resolve($entry['listener']), $matched);
+        return array_column($matched, 'listener');
     }
 
     private function resolve(callable|string $listener): callable

@@ -18,7 +18,7 @@ These are findings from the Plan B reviews that were deliberately deferred (see 
 - **Missing `nosniff`.** The media upload JSON response and Micropub's own JSON errors still don't send `X-Content-Type-Options: nosniff`.
 - **Where `ApiAccess` lives.** `ApiAccess` lives in the blog module but is a tokens concern; micropub imports a blog HTTP class to use it. Move it to something like `Token::assertAllows(int $blogId)`.
 - **Item-id lookup across blogs.** The Micropub item-id lookup takes the first blog that matches. When the token is pinned to a blog, it should prefer that blog.
-- **Listener failures after commit.** A listener that throws after the commit makes `PostWriter::create` throw even though the post was saved, so a client retry creates a duplicate. Today this is safe only because `SearchIndexer` catches its own failures.
+- [Done] **Listener failures after commit.** PostWriter now uses `EventDispatcher::notify()`: each listener runs on its own, and a failure is logged without failing the write or skipping later listeners.
 
 ## Behaviour
 

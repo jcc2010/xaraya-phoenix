@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace Xaraya\Tests\Module\Blog\Write;
 
+use RuntimeException;
 use Xaraya\Kernel\Db\Connection;
 use Xaraya\Kernel\Events\EventDispatcher;
 use Xaraya\Kernel\Events\ItemCreated;
+use Xaraya\Kernel\Events\ItemEvent;
 use Xaraya\Kernel\Http\Exception\HttpException;
 use Xaraya\Kernel\Support\Ulid;
 use Xaraya\Module\Blog\Post\PostRepository;
@@ -159,5 +161,23 @@ final class PostWriterCreateTest extends PostWriterTestCase
         $post = $this->writer()->create($this->blog, ['title' => 'Searchable walrus']);
         self::assertSame([['blog', 'post', 'notes', false]], $seen);
         self::assertSame([$post->id], $this->app->container()->get(SearchIndex::class)->search($this->blog->id, 'walrus', 10, 0)['ids']);
+    }
+
+    public function testAFailingListenerNeitherFailsTheWriteNorStopsTheOthers(): void
+    {
+        $events = $this->app->container()->get(EventDispatcher::class);
+        $events->listen(ItemEvent::class, static function (): void {
+            throw new RuntimeException('listener exploded');
+        }, 100);
+        $events->listen(ItemEvent::class, 'Xaraya\\Tests\\NoSuchListener', 90);
+        $post = $this->writer()->create($this->blog, ['title' => 'Searchable walrus']);
+        self::assertNotNull($this->app->container()->get(PostRepository::class)->find($post->id), 'the post is saved and returned');
+        self::assertSame([$post->id], $this->app->container()->get(SearchIndex::class)->search($this->blog->id, 'walrus', 10, 0)['ids'], 'later listeners still ran');
+        $post = $this->writer()->patch($post, ['title' => 'Edited walrus']);
+        $post = $this->writer()->delete($post);
+        $this->writer()->undelete($post);
+        $log = implode('', array_map('file_get_contents', glob($this->tmp . '/logs/*') ?: []));
+        self::assertSame(4, substr_count($log, 'listener exploded'), 'create, patch, delete and undelete each logged it');
+        self::assertStringContainsString('NoSuchListener', $log);
     }
 }

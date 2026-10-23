@@ -79,7 +79,7 @@ final class MicropubCreateTest extends MicropubTestCase
             $this->form(['content' => 'Bad', 'access_token' => $bad], ''),
             $this->form(['h' => 'card', 'access_token' => $this->token], ''),
         ];
-        // A listener that throws turns an accepted create into a 500, which the error handler logs with its trace.
+        // A listener that throws is logged with its trace (the create itself still succeeds).
         $app = $this->app();
         $app->container()->get(EventDispatcher::class)->listen(ItemCreated::class, static function (): never {
             throw new RuntimeException('listener exploded');
@@ -88,9 +88,9 @@ final class MicropubCreateTest extends MicropubTestCase
             ->withHeader('Content-Type', 'application/x-www-form-urlencoded')
             ->withBody(Stream::create(http_build_query(['content' => 'Logged?', 'access_token' => $this->token])))
             ->withParsedBody(['content' => 'Logged?', 'access_token' => $this->token]);
-        $failed = $app->handle($request);
-        self::assertSame(500, $failed->getStatusCode());
-        $responses[] = $failed;
+        $created = $app->handle($request);
+        self::assertSame(201, $created->getStatusCode());
+        $responses[] = $created;
 
         $log = implode('', array_map('file_get_contents', glob($this->tmp . '/logs/*') ?: []));
         self::assertStringContainsString('listener exploded', $log, 'the failure was logged');

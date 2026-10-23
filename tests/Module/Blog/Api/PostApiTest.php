@@ -226,7 +226,7 @@ final class PostApiTest extends ApiTestCase
             $this->api('POST', '/api/blogs/notes/posts?access_token=' . $this->token, null, ['title' => 'x']),
             $this->api('GET', '/api/posts/' . str_repeat('z', 26), $this->token),
         ];
-        // A listener that throws turns an accepted write into a 500, which the error handler logs with its trace.
+        // A listener that throws is logged with its trace (the write itself still succeeds).
         $app = $this->app();
         $app->container()->get(EventDispatcher::class)->listen(ItemCreated::class, static function (): never {
             throw new RuntimeException('listener exploded');
@@ -235,9 +235,9 @@ final class PostApiTest extends ApiTestCase
             ->withHeader('Authorization', 'Bearer ' . $this->token)
             ->withHeader('Content-Type', 'application/json')
             ->withBody(Stream::create('{"title":"Logged?"}'));
-        $failed = $app->handle($request);
-        self::assertSame(500, $failed->getStatusCode());
-        $responses[] = $failed;
+        $created = $app->handle($request);
+        self::assertSame(201, $created->getStatusCode());
+        $responses[] = $created;
 
         $log = implode('', array_map('file_get_contents', glob($this->tmp . '/logs/*') ?: []));
         self::assertStringContainsString('listener exploded', $log, 'the failure was logged');

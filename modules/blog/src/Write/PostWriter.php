@@ -59,7 +59,7 @@ final class PostWriter
         $now ??= self::now();
         [$id, $record] = $this->prepareCreate($blog, $item, $now);
         $this->posts->insert($blog->id, $id, $record, $now, $this->access->user()?->id);
-        $this->events->dispatch(new ItemCreated('blog', 'post', $id, ['blog' => $blog->handle, 'item_id' => $record->itemId]));
+        $this->events->notify(new ItemCreated('blog', 'post', $id, ['blog' => $blog->handle, 'item_id' => $record->itemId]));
 
         return $this->posts->find($id) ?? throw new RuntimeException("Post {$id} vanished after insert");
     }
@@ -90,7 +90,7 @@ final class PostWriter
         $blog = $this->blogOf($post);
         $record = $this->prepareReplace($blog, $post, $item, $now);
         $this->posts->rewrite($post, $record, $now);
-        $this->events->dispatch(new ItemUpdated('blog', 'post', $post->id, ['blog' => $blog->handle, 'item_id' => $post->itemId]));
+        $this->events->notify(new ItemUpdated('blog', 'post', $post->id, ['blog' => $blog->handle, 'item_id' => $post->itemId]));
 
         return $this->reload($post);
     }
@@ -141,7 +141,7 @@ final class PostWriter
         $blog = $this->blogOf($post);
         self::assertNative($blog);
         if ($this->posts->setStatus($post->id, 'deleted', $now ?? self::now())) {
-            $this->events->dispatch(new ItemDeleted('blog', 'post', $post->id, ['blog' => $blog->handle]));
+            $this->events->notify(new ItemDeleted('blog', 'post', $post->id, ['blog' => $blog->handle]));
         }
 
         return $this->reload($post);
@@ -153,7 +153,7 @@ final class PostWriter
         $blog = $this->blogOf($post);
         self::assertNative($blog);
         if ($this->posts->setStatus($post->id, 'published', $now ?? self::now())) {
-            $this->events->dispatch(new ItemUpdated('blog', 'post', $post->id, ['blog' => $blog->handle, 'item_id' => $post->itemId]));
+            $this->events->notify(new ItemUpdated('blog', 'post', $post->id, ['blog' => $blog->handle, 'item_id' => $post->itemId]));
         }
 
         return $this->reload($post);
