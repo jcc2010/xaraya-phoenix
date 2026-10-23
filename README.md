@@ -219,6 +219,14 @@ header shows a "Blog admin" link to anyone who may edit posts. Admin pages are n
 
 Pinning a post needs Editor (edit on `blog · blog`). Blog settings and new blogs need Administrator.
 
+Each blog's Tags screen (`/admin/blog/<handle>/tags`, linked from the dashboard and the posts list) lists every tag
+on its non-deleted posts with how many carry it, and renames or removes a tag across all of them. It rewrites other
+authors' posts, so it needs edit on every post (Editors and Administrators; Authors get a 403). Each post is patched
+through the same write path as the API, so the feeds, tag pages and search follow, and `date_modified` is not
+changed. Renaming to a slug another tag already has merges the two; a post that had both keeps the first by
+position. Deleted posts are not touched and keep their old tags, even after an undelete. A mirror's tags come from its
+source feed, so its Tags screen is read-only.
+
 Posts have an owner, `owner_id`: the signed-in user who created the post in the admin, or the user a token acts as for
 the JSON API and Micropub. It decides which posts an Author may change. It never appears in the JSON or RSS feeds.
 Posts created before ownership existed (synced, imported or written by a scope-only token) have no owner, so only

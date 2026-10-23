@@ -217,11 +217,11 @@ final class BlogSettingsTest extends AdminTestCase
         $blog = $this->nativeBlog($app);
         $this->blogs($app)->create(['handle' => 'mirror', 'mode' => 'mirror', 'source_url' => 'https://src.test/blog/src/feed.json', 'source_format' => 'athena'], $this->now());
         $root = $this->user($app, 'root', ['Administrators']);
-        $post = $this->postAs($app, $root, $blog, ['title' => 'Kept', 'content_html' => '<p>x</p>']);
+        $post = $this->postAs($app, $root, $blog, ['title' => 'Kept', 'content_html' => '<p>x</p>', 'tags' => ['PHP']]);
         $paths = [
             '/admin/blog/new', '/admin/blog/notes/posts/new', '/admin/blog/post/' . $post->id,
             '/admin/blog/post/' . $post->id . '/delete', '/admin/blog/post/' . $post->id . '/undelete',
-            '/admin/blog/mirror/sync', '/admin/blog/notes/settings',
+            '/admin/blog/mirror/sync', '/admin/blog/notes/settings', '/admin/blog/notes/tags/php/rename', '/admin/blog/notes/tags/php/remove',
         ];
         $posts = array_filter(
             $app->container()->get(Router::class)->routes(),
@@ -233,7 +233,7 @@ final class BlogSettingsTest extends AdminTestCase
         $other->get('/admin/blog/new');
         $foreign = (string) $other->csrfField();
         $browser = $this->signIn($app, 'root');
-        $fields = ['handle' => 'evil', 'title' => 'Hijacked', 'kind' => 'note', 'content' => '<p>x</p>', 'save' => '1'];
+        $fields = ['handle' => 'evil', 'title' => 'Hijacked', 'kind' => 'note', 'content' => '<p>x</p>', 'save' => '1', 'name' => 'Hijacked', 'slug' => ''];
         foreach ($paths as $path) {
             foreach (['' => 'missing', $foreign => 'foreign'] as $token => $label) {
                 self::assertSame(403, $browser->post($path, ['_csrf' => (string) $token] + $fields)->getStatusCode(), "{$path}: {$label}");
@@ -242,6 +242,7 @@ final class BlogSettingsTest extends AdminTestCase
         self::assertNull($this->blogs($app)->find('evil'));
         self::assertSame('Kept', $this->posts($app)->find($post->id)?->title);
         self::assertSame('published', $this->posts($app)->find($post->id)?->status);
+        self::assertSame([['name' => 'PHP', 'slug' => 'php']], $this->posts($app)->find($post->id)?->tags);
         self::assertSame('Notes', $this->blogs($app)->find('notes')?->title);
     }
 }

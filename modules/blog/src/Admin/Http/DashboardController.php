@@ -40,6 +40,8 @@ final class DashboardController extends Controller
                 // Mirror blogs are written by their sync, never by hand.
                 'newPostUrl' => $blog->isMirror() || !$this->access->canCreate() ? null : $this->blogUrl('admin.blog.post.new', $blog),
                 'settingsUrl' => $this->access->canAdminBlogs() ? $this->blogUrl('admin.blog.settings', $blog) : null,
+                // Renaming a tag rewrites other authors' posts.
+                'tagsUrl' => $this->access->canEditAll() ? $this->blogUrl('admin.blog.tags', $blog) : null,
             ];
         }
 

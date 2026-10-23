@@ -327,6 +327,40 @@ final class PostRepository
     }
 
     /**
+     * Every tag of a blog's non-deleted posts (scheduled ones included), by slug: the admin tags screen. A slug's
+     * name is its smallest stored name, as in tagCounts().
+     *
+     * @return list<array{name: string, slug: string, count: int}>
+     */
+    public function adminTagCounts(int $blogId): array
+    {
+        $sql = 'SELECT t.slug AS slug, MIN(t.name) AS name, COUNT(DISTINCT t.post_id) AS uses FROM {post_tags} t JOIN {posts} p ON p.id = t.post_id'
+            . ' WHERE t.blog_id = ? AND p.blog_id = ? AND p.status = ?'
+            . ' GROUP BY t.slug ORDER BY t.slug ASC';
+        $rows = $this->db->fetchAll($sql, [$blogId, $blogId, 'published']);
+
+        return array_map(static fn(array $row): array => [
+            'name' => (string) $row['name'],
+            'slug' => (string) $row['slug'],
+            'count' => (int) $row['uses'],
+        ], $rows);
+    }
+
+    /**
+     * A blog's non-deleted posts (scheduled ones included) carrying the tag $slug (compared exactly), in id order.
+     *
+     * @return list<Post>
+     */
+    public function liveWithTag(int $blogId, string $slug): array
+    {
+        $sql = 'SELECT p.* FROM {posts} p WHERE p.blog_id = ? AND p.status = ?'
+            . ' AND EXISTS (SELECT 1 FROM {post_tags} t WHERE t.post_id = p.id AND t.blog_id = ? AND t.slug = ?)'
+            . ' ORDER BY p.id';
+
+        return $this->hydrate($this->db->fetchAll($sql, [$blogId, 'published', $blogId, $slug]));
+    }
+
+    /**
      * Published posts of a blog, scheduled ones included, in id order after $afterId: the chunks blog:reindex walks.
      *
      * @return list<Post>

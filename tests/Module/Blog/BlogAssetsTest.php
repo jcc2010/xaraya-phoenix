@@ -30,7 +30,7 @@ final class BlogAssetsTest extends BlogTestCase
     public function testTheAdminListsAreStyledAndScrollSideways(): void
     {
         $css = $this->css();
-        foreach (['.admin-blogs, .admin-posts {', '.admin-posts th, .admin-posts td', '.admin-tag {', '.admin-action {', '.admin-tabs {', '.admin-search {', '.admin-scroll { overflow-x: auto; }'] as $needle) {
+        foreach (['.admin-blogs, .admin-posts, .admin-tags {', '.admin-posts th, .admin-posts td', '.admin-tags th, .admin-tags td', '.admin-tag-rename {', '.admin-tag {', '.admin-action {', '.admin-tabs {', '.admin-search {', '.admin-scroll { overflow-x: auto; }'] as $needle) {
             self::assertStringContainsString($needle, $css);
         }
         self::assertMatchesRegularExpression('/prefers-color-scheme: dark\)[^@]*\.admin-posts th, \.admin-posts td/s', $css, 'the borders have a dark-mode colour');

@@ -140,24 +140,25 @@ final class PostListController extends Controller
 
     /**
      * The buttons above the list: for a native blog a new post (if the user may add posts); for a mirror "Sync now"
-     * (administrators only).
+     * (administrators only). Then the tags screen, for those who may edit every post.
      *
      * @return list<array{label: string, url: string, method: 'get'|'post', csrf: bool, fields: array<string, string>}>
      */
     public function headerActions(Blog $blog): array
     {
+        $actions = [];
         if ($blog->isMirror()) {
-            if (!$this->access->canAdminBlogs() || !$this->urls->has('admin.blog.sync')) {
-                return [];
+            if ($this->access->canAdminBlogs() && $this->urls->has('admin.blog.sync')) {
+                $actions[] = ['label' => 'Sync now', 'url' => $this->urls->generate('admin.blog.sync', ['handle' => $blog->handle]), 'method' => 'post', 'csrf' => true, 'fields' => []];
             }
-
-            return [['label' => 'Sync now', 'url' => $this->urls->generate('admin.blog.sync', ['handle' => $blog->handle]), 'method' => 'post', 'csrf' => true, 'fields' => []]];
+        } elseif ($this->access->canCreate() && $this->urls->has('admin.blog.post.new')) {
+            $actions[] = ['label' => 'New post', 'url' => $this->urls->generate('admin.blog.post.new', ['handle' => $blog->handle]), 'method' => 'get', 'csrf' => false, 'fields' => []];
         }
-        if (!$this->access->canCreate() || !$this->urls->has('admin.blog.post.new')) {
-            return [];
+        if ($this->access->canEditAll() && $this->urls->has('admin.blog.tags')) {
+            $actions[] = ['label' => 'Tags', 'url' => $this->urls->generate('admin.blog.tags', ['handle' => $blog->handle]), 'method' => 'get', 'csrf' => false, 'fields' => []];
         }
 
-        return [['label' => 'New post', 'url' => $this->urls->generate('admin.blog.post.new', ['handle' => $blog->handle]), 'method' => 'get', 'csrf' => false, 'fields' => []]];
+        return $actions;
     }
 
     private function listUrl(Blog $blog, string $tab, string $q, int $page): string

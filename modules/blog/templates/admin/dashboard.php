@@ -15,6 +15,7 @@
 <a href="<?= $x->e($b['publicUrl']) ?>"><?= $x->e($x->t('View blog')) ?></a>
 <?php if ($b['postsUrl']): ?> <a href="<?= $x->e($b['postsUrl']) ?>"><?= $x->e($x->t('Posts')) ?></a><?php endif ?>
 <?php if ($b['newPostUrl']): ?> <a href="<?= $x->e($b['newPostUrl']) ?>"><?= $x->e($x->t('New post')) ?></a><?php endif ?>
+<?php if ($b['tagsUrl']): ?> <a href="<?= $x->e($b['tagsUrl']) ?>"><?= $x->e($x->t('Tags')) ?></a><?php endif ?>
 <?php if ($b['settingsUrl']): ?> <a href="<?= $x->e($b['settingsUrl']) ?>"><?= $x->e($x->t('Settings')) ?></a><?php endif ?>
 </td>
 </tr>

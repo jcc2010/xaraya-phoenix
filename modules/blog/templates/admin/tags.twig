@@ -1,0 +1,38 @@
+{{ render('blog::admin/flash', {flash: flash}) }}
+<h1>{{ t('Tags') }} <small>{{ blog.title }}</small></h1>
+{% if mirror %}
+<p class="admin-mirror-note">{{ t('Tags come from the source feed; edit them there.') }}</p>
+{% endif %}
+{% if rows is empty %}
+<p class="admin-empty">{{ t('No tags.') }}</p>
+{% else %}
+<div class="admin-scroll"><table class="admin-tags">
+<thead><tr><th scope="col">{{ t('Name') }}</th><th scope="col">{{ t('Slug') }}</th><th scope="col">{{ t('Posts') }}</th>{% if not mirror %}<th scope="col">{{ t('Actions') }}</th>{% endif %}</tr></thead>
+<tbody>
+{% for row in rows %}
+{% set id = 'tag-' ~ row.slug %}
+<tr id="{{ id }}">
+<td>{% if row.publicUrl %}<a href="{{ row.publicUrl }}">{{ row.name }}</a>{% else %}{{ row.name }}{% endif %}</td>
+<td><code>{{ row.slug }}</code></td>
+<td>{{ row.count }}</td>
+{% if not mirror %}
+<td class="admin-actions">
+<form class="admin-tag-rename" method="post" action="{{ row.renameUrl }}">
+{{ csrf() }}
+<label for="{{ id }}-name">{{ t('Name') }}</label>
+<input id="{{ id }}-name" name="name" value="{{ row.values.name }}" maxlength="128"{% if row.errors.name is defined %} aria-invalid="true" aria-describedby="{{ id }}-name-error"{% endif %}>
+{{ render('blog::admin/field-error', {id: id ~ '-name', error: row.errors.name ?? null}) }}
+<label for="{{ id }}-slug">{{ t('Slug') }}</label>
+<input id="{{ id }}-slug" name="slug" value="{{ row.values.slug }}" maxlength="128"{% if row.errors.slug is defined %} aria-invalid="true" aria-describedby="{{ id }}-slug-error"{% endif %}>
+{{ render('blog::admin/field-error', {id: id ~ '-slug', error: row.errors.slug ?? null}) }}
+<button type="submit">{{ t('Rename') }}</button>
+</form>
+{{ render('blog::admin/actions', {actions: row.actions}) }}
+</td>
+{% endif %}
+</tr>
+{% endfor %}
+</tbody>
+</table></div>
+{% endif %}
+<p><a href="{{ backUrl }}">{{ t('Back to posts') }}</a></p>
