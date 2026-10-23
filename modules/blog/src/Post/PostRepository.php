@@ -328,22 +328,31 @@ final class PostRepository
 
     /**
      * Every tag of a blog's non-deleted posts (scheduled ones included), by slug: the admin tags screen. A slug's
-     * name is its smallest stored name, as in tagCounts().
+     * name is its smallest stored name in byte order, picked here rather than with MIN(), whose answer for "PHP"
+     * against "php" depends on the database's collation (Postgres differs from SQLite and MySQL's utf8mb4_bin).
      *
      * @return list<array{name: string, slug: string, count: int}>
      */
     public function adminTagCounts(int $blogId): array
     {
-        $sql = 'SELECT t.slug AS slug, MIN(t.name) AS name, COUNT(DISTINCT t.post_id) AS uses FROM {post_tags} t JOIN {posts} p ON p.id = t.post_id'
+        // A post has one row per slug (the primary key), so the counts of a slug's names add up to its posts.
+        $sql = 'SELECT t.slug AS slug, t.name AS name, COUNT(*) AS uses FROM {post_tags} t JOIN {posts} p ON p.id = t.post_id'
             . ' WHERE t.blog_id = ? AND p.blog_id = ? AND p.status = ?'
-            . ' GROUP BY t.slug ORDER BY t.slug ASC';
-        $rows = $this->db->fetchAll($sql, [$blogId, $blogId, 'published']);
+            . ' GROUP BY t.slug, t.name';
+        $tags = [];
+        foreach ($this->db->fetchAll($sql, [$blogId, $blogId, 'published']) as $row) {
+            $slug = (string) $row['slug'];
+            $name = (string) $row['name'];
+            $tag = $tags[$slug] ?? ['name' => $name, 'slug' => $slug, 'count' => 0];
+            $tags[$slug] = [
+                'name' => strcmp($name, $tag['name']) < 0 ? $name : $tag['name'],
+                'slug' => $slug,
+                'count' => $tag['count'] + (int) $row['uses'],
+            ];
+        }
+        ksort($tags, SORT_STRING);
 
-        return array_map(static fn(array $row): array => [
-            'name' => (string) $row['name'],
-            'slug' => (string) $row['slug'],
-            'count' => (int) $row['uses'],
-        ], $rows);
+        return array_values($tags);
     }
 
     /**
