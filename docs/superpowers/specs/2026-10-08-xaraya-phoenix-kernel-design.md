@@ -51,11 +51,11 @@ Each sub-project gets its own spec, plan and implementation cycle.
 | 1+2 | Kernel, plus users and access, plus blocks | **this document** |
 | 4 | Blog module (Athena-native model, admin, public pages, `feed.json`, `/s/{id}.json`, RSS) | next |
 | 5a | Athena feed importer and incremental sync | |
-| 3 | Dynamic data and categories modules (storage model fixed in §2.4 below) | |
-| 5b | Generic JSON → dynamic-data mapper; WordPress and Ghost importers | |
+| 3 | Dynamic data and categories modules (storage model fixed in §2.4 below) | **Deferred** (2026-10-23): tags cover categories, and posts keep every feed field, so the blog needs neither. Revisit dynamic data when a non-post content type is wanted. |
+| 5b | Generic JSON → dynamic-data mapper; WordPress and Ghost importers | Deferred with 3 (importers could map to posts instead) |
 | 6 | Docker image, docs, 1.0 *Cyclops* release | |
 
-Build order: kernel → blog → Athena import → DD and categories → generic JSON → packaging.
+Build order: kernel → blog → Athena import → packaging. Dynamic data, categories and the generic JSON mapper are deferred (see the table).
 
 ### 0.4 Non-goals for the kernel
 
@@ -179,7 +179,7 @@ Module state (enabled or disabled, installed version) is stored in `xar_modules`
 
 ### 2.4 Dynamic-data storage model
 
-The modules themselves are sub-project 3. The kernel's schema builder must support this model:
+The modules themselves are sub-project 3, deferred on 2026-10-23. The model below is kept for when it is picked up; the kernel's schema builder supports it:
 
 | Table | Columns | Purpose |
 |---|---|---|
@@ -453,7 +453,7 @@ Both engines get the same helper set:
 
 - The first commit on `next` moves `html/`, `templates/`, `developer/` and the legacy PHPStan/PHPUnit config into `legacy/`.
 - Nothing under `legacy/` is autoloaded.
-- `legacy/` is deleted before 1.0 *Cyclops*, once dynamic data and categories have been ported.
+- `legacy/` is deleted before 1.0 *Cyclops*. (It no longer waits on a dynamic data or categories port; both are deferred.)
 
 ---
 
