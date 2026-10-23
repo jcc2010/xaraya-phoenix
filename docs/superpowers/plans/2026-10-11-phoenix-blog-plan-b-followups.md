@@ -37,10 +37,10 @@ These are findings from the Plan B reviews that were deliberately deferred (see 
 - Non-UTC offsets and fractional seconds are normalised to UTC seconds, the same as sync.
 
 **Uploads**
-- AVIF skips the 50 MP cap, so a client-side decompression bomb is possible.
+- [Done] AVIF is held to the 50 MP cap (getimagesize reads it without GD).
 - A file is orphaned if the DB insert fails after the write.
 - File permissions follow the umask.
-- An image over 50 MP is reported as "not a valid image".
+- [Done] An image over 50 MP is reported as too large, with its size.
 
 **`media:localize`**
 - It exits 0 and sets `media=local` even when every download fails.

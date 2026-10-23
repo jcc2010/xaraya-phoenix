@@ -26,6 +26,9 @@ final class MediaStore
     ];
     public const MAX_BYTES = 10_000_000;
 
+    /** Width × height an image may declare. */
+    public const MAX_PIXELS = 50_000_000;
+
     public function __construct(
         private readonly Connection $db,
         private readonly HttpFetcher $fetcher,
@@ -102,8 +105,8 @@ final class MediaStore
         if ($ext === null) {
             throw new MediaRejected(415, "Files of type {$mime} are not allowed; send " . implode(', ', array_keys(self::TYPES)));
         }
-        if (str_starts_with($mime, 'image/') && $mime !== 'image/avif' && !self::isRealImage($bytes)) {
-            throw new MediaRejected(422, "The file is not a valid {$mime} image");
+        if (str_starts_with($mime, 'image/')) {
+            self::assertRealImage($bytes, $mime);
         }
         $sha = hash('sha256', $bytes);
         $same = $this->db->select('media')->columns('path')->where('blog_id', '=', $blog->id)->where('sha256', '=', $sha)->first();
@@ -184,12 +187,22 @@ final class MediaStore
         return $handle . '/' . $name;
     }
 
-    private static function isRealImage(string $bytes): bool
+    /**
+     * The image's header must parse and declare at most MAX_PIXELS, so a small file can't claim a size that would
+     * exhaust memory when a client decodes it (AVIF included: getimagesize reads it without GD since PHP 8.2).
+     * No GD decode: the check must behave the same on every host, with or without GD.
+     *
+     * @throws MediaRejected
+     */
+    private static function assertRealImage(string $bytes, string $mime): void
     {
         $info = @getimagesizefromstring($bytes);
-
-        // No GD decode: the check must behave the same on every host, with or without GD.
-        return $info !== false && $info[0] >= 1 && $info[1] >= 1 && $info[0] * $info[1] <= 50_000_000;
+        if ($info === false || $info[0] < 1 || $info[1] < 1) {
+            throw new MediaRejected(422, "The file is not a valid {$mime} image");
+        }
+        if ($info[0] * $info[1] > self::MAX_PIXELS) {
+            throw new MediaRejected(422, "The image is {$info[0]}×{$info[1]}; images may have at most 50 million pixels");
+        }
     }
 
     /** @return array{0: ?int, 1: ?int} */

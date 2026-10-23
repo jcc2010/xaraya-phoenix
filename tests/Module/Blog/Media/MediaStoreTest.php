@@ -7,6 +7,7 @@ namespace Xaraya\Tests\Module\Blog\Media;
 use RuntimeException;
 use Xaraya\Module\Blog\Blog;
 use Xaraya\Module\Blog\Media\MediaLocalizer;
+use Xaraya\Module\Blog\Media\MediaRejected;
 use Xaraya\Module\Blog\Media\MediaStore;
 use Xaraya\Module\Blog\Post\PostRecord;
 use Xaraya\Module\Blog\Source\FetchResult;
@@ -88,6 +89,33 @@ final class MediaStoreTest extends BlogTestCase
         self::assertNotNull($row);
         self::assertSame([2, 3], [(int) $row['width'], (int) $row['height']]);
         self::assertNull($this->store->store($this->blog, self::pngHeader(10_000, 5_001), null, $this->now()), 'over 50M pixels');
+    }
+
+    /** A 3×2 AVIF made by GD's imageavif(); its ispe box declares the size. */
+    private const AVIF = 'AAAAIGZ0eXBhdmlmAAAAAGF2aWZtaWYxbWlhZk1BMUIAAADrbWV0YQAAAAAAAAAhaGRscgAAAAAAAAAAcGljdAAAAAAAAAAAAAAAAAAAAAAOcGl0bQAAAAAAAQAAAB5pbG9jAAAAAEQAAAEAAQAAAAEAAAETAAAAIQAAAChpaW5mAAAAAAABAAAAGmluZmUCAAAAAAEAAGF2MDFDb2xvcgAAAABqaXBycAAAAEtpcGNvAAAAFGlzcGUAAAAAAAAAAwAAAAIAAAAQcGl4aQAAAAADCAgIAAAADGF2MUOBAAwAAAAAE2NvbHJuY2x4AAEADQABgAAAABdpcG1hAAAAAAAAAAEAAQQBAoMEAAAAKW1kYXQSAAoIGAQrRAQ0BhAyExeHh4YhhJJJPkAAAJA+bMNYw1Y=';
+
+    public function testAvifIsHeldToThePixelCapToo(): void
+    {
+        $avif = (string) base64_decode(self::AVIF, true);
+        $row = $this->store->ingest($this->blog, $avif, null, $this->now());
+        self::assertSame(['image/avif', 3, 2], [$row['mime'], (int) $row['width'], (int) $row['height']]);
+
+        // The same file claiming 10,000 × 10,000 in its ispe box: a decompression bomb for whoever decodes it.
+        $bomb = str_replace("ispe\0\0\0\0\0\0\0\x03\0\0\0\x02", "ispe\0\0\0\0\0\0\x27\x10\0\0\x27\x10", $avif);
+        self::assertNotSame($avif, $bomb);
+        try {
+            $this->store->ingest($this->blog, $bomb, null, $this->now());
+            self::fail('accepted a 100-megapixel AVIF');
+        } catch (MediaRejected $e) {
+            self::assertSame(422, $e->status);
+            self::assertSame('The image is 10000×10000; images may have at most 50 million pixels', $e->getMessage());
+        }
+        try {
+            $this->store->ingest($this->blog, self::pngHeader(10_000, 5_001), null, $this->now());
+            self::fail('accepted a 50,005,000-pixel PNG');
+        } catch (MediaRejected $e) {
+            self::assertStringContainsString('at most 50 million pixels', $e->getMessage(), 'too big is not "not valid"');
+        }
     }
 
     public function testLocalizeNeverThrowsEvenWhenTheLookupFails(): void
