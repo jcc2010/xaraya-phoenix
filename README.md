@@ -3,13 +3,16 @@
 A small, modern fork of [Xaraya](https://github.com/xaraya/core): a blogging engine that speaks
 Athena's JSON Feed format natively, and a content manager that can import other JSON sources.
 
-Status: early development on the `next` branch. Release codenames follow the X-Men
-(1.0 *Cyclops*). The original Xaraya tree was removed on 2026-10-23; it lives on in git history and upstream.
+Status: 1.0 *Cyclops*, developed on the `next` branch. Release codenames follow the X-Men. The original
+Xaraya tree was removed on 2026-10-23; it lives on in git history and upstream.
 
 ## Requirements
 
-- PHP 8.3+ with pdo, mbstring, json
+- PHP 8.3+ with pdo, mbstring, json, dom, fileinfo
 - SQLite (default), MySQL 8 / MariaDB 10.6+, or Postgres 14+
+
+Guides: [installing](docs/install.md) (Docker or your own server), [upgrading and backups](docs/upgrade.md), and
+[mirroring an Athena blog and moving off it](docs/athena.md).
 
 ## Quick start
 

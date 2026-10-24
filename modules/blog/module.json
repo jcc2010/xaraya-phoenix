@@ -1,8 +1,8 @@
 {
   "name": "blog",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "content": true,
-  "requires": { "kernel": "^0.1", "modules": {} },
+  "requires": { "kernel": "^1.0", "modules": {} },
   "provider": "Xaraya\\Module\\Blog\\BlogServiceProvider",
   "routes": "Xaraya\\Module\\Blog\\Routes",
   "migrations": "migrations",

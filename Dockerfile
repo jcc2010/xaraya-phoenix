@@ -3,7 +3,7 @@
 FROM php:8.4-apache
 
 RUN apt-get update \
-    && apt-get install -y --no-install-recommends libpq-dev unzip \
+    && apt-get install -y --no-install-recommends libpq-dev sqlite3 unzip \
     && docker-php-ext-install -j"$(nproc)" pdo_mysql pdo_pgsql opcache \
     && rm -rf /var/lib/apt/lists/* \
     && a2enmod headers \

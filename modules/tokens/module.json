@@ -1,7 +1,7 @@
 {
   "name": "tokens",
-  "version": "0.1.0",
-  "requires": { "kernel": "^0.1", "modules": {}, "appUrl": true },
+  "version": "1.0.0",
+  "requires": { "kernel": "^1.0", "modules": {}, "appUrl": true },
   "migrations": "migrations",
   "middleware": { "token": "Xaraya\\Module\\Tokens\\TokenMiddleware" },
   "commands": [
