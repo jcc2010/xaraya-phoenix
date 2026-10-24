@@ -39,7 +39,7 @@ The fork is a **new kernel inside the fork**:
 - **Product:** Xaraya Phoenix.
 - **Namespace:** `Xaraya\`.
 - **CLI:** `xar`.
-- **Release codenames:** X-Men characters in order (1.0 *Cyclops*, 1.1 *Storm*, 1.2 *Nightcrawler*, …). These are internal labels only.
+- **Release codenames:** X-Men characters in order (3.0 *Cyclops*, 3.1 *Storm*, 3.2 *Nightcrawler*, …). These are internal labels only. Versions start at 3.0 (decided 2026-10-23) so they sort after upstream Xaraya's 2.x tags, which the fork carries.
 - **Legacy constant:** `VERSION_ID = 'Bermuda'` from upstream is retired.
 
 ### 0.3 Sub-project roadmap
@@ -53,7 +53,7 @@ Each sub-project gets its own spec, plan and implementation cycle.
 | 5a | Athena feed importer and incremental sync | |
 | 3 | Dynamic data and categories modules (storage model fixed in §2.4 below) | **Deferred** (2026-10-23): tags cover categories, and posts keep every feed field, so the blog needs neither. Revisit dynamic data when a non-post content type is wanted. |
 | 5b | Generic JSON → dynamic-data mapper; WordPress and Ghost importers | Deferred with 3 (importers could map to posts instead) |
-| 6 | Docker image, docs, 1.0 *Cyclops* release | |
+| 6 | Docker image, docs, 3.0 *Cyclops* release (first planned as 1.0) | Done 2026-10-23 |
 
 Build order: kernel → blog → Athena import → packaging. Dynamic data, categories and the generic JSON mapper are deferred (see the table).
 
@@ -453,7 +453,7 @@ Both engines get the same helper set:
 
 - The first commit on `next` moves `html/`, `templates/`, `developer/` and the legacy PHPStan/PHPUnit config into `legacy/`.
 - Nothing under `legacy/` is autoloaded.
-- `legacy/` was deleted on 2026-10-23, before 1.0 *Cyclops* (dynamic data and categories are deferred, so nothing waited on it).
+- `legacy/` was deleted on 2026-10-23, before 3.0 *Cyclops* (dynamic data and categories are deferred, so nothing waited on it).
 
 ---
 

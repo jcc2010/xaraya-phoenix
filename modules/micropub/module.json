@@ -1,7 +1,7 @@
 {
   "name": "micropub",
-  "version": "1.0.0",
-  "requires": { "kernel": "^1.0", "modules": { "blog": "^1.0", "tokens": "^1.0" }, "appUrl": true },
+  "version": "3.0.0",
+  "requires": { "kernel": "^3.0", "modules": { "blog": "^3.0", "tokens": "^3.0" }, "appUrl": true },
   "routes": "Xaraya\\Module\\Micropub\\Routes",
   "middleware": {
     "micropubErrors": "Xaraya\\Module\\Micropub\\MicropubErrors",

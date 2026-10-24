@@ -1,9 +1,10 @@
 # Changelog
 
-## 1.0.0 *Cyclops* (2026-10-23)
+## 3.0.0 *Cyclops* (2026-10-23)
 
 The first release of Xaraya Phoenix, a small, modern fork of Xaraya. It is a blogging engine that speaks Athena's
-JSON Feed natively.
+JSON Feed natively. It is numbered 3.0, not 1.0, so that it sorts after upstream Xaraya's 2.x tags, which the fork
+carries.
 
 **Kernel**
 
@@ -39,7 +40,7 @@ JSON Feed natively.
 - Guides: [installing](docs/install.md), [upgrading and backups](docs/upgrade.md), and
   [Athena mirroring and cut-over](docs/athena.md).
 
-**Not in 1.0**
+**Not in 3.0**
 
 - Dynamic data and categories (tags cover categories).
 - The generic JSON importer.

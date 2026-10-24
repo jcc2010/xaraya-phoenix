@@ -25,7 +25,7 @@ use Xaraya\Module\Blog\View\PostViewFactory;
 final class BlogServiceProvider implements ServiceProvider
 {
     /** Kept in sync with modules/blog/module.json (asserted by StreamFetcherTest). */
-    public const VERSION = '1.0.0';
+    public const VERSION = '3.0.0';
 
     public function register(Container $container): void
     {
