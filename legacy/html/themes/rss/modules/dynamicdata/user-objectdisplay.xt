@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<xar:template xmlns:xar="http://xaraya.com/2004/blocklayout">
-    <xar:foreach in="$properties" key="$name">
-        <xar:element name="#$properties.$name:name#">
-        #$xar->prep()->text($properties.$name:value)#</xar:element>
-    </xar:foreach>
-</xar:template>

@@ -453,7 +453,7 @@ Both engines get the same helper set:
 
 - The first commit on `next` moves `html/`, `templates/`, `developer/` and the legacy PHPStan/PHPUnit config into `legacy/`.
 - Nothing under `legacy/` is autoloaded.
-- `legacy/` is deleted before 1.0 *Cyclops*. (It no longer waits on a dynamic data or categories port; both are deferred.)
+- `legacy/` was deleted on 2026-10-23, before 1.0 *Cyclops* (dynamic data and categories are deferred, so nothing waited on it).
 
 ---
 

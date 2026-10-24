@@ -4,7 +4,7 @@ A small, modern fork of [Xaraya](https://github.com/xaraya/core): a blogging eng
 Athena's JSON Feed format natively, and a content manager that can import other JSON sources.
 
 Status: early development on the `next` branch. Release codenames follow the X-Men
-(1.0 *Cyclops*). The original Xaraya tree is kept read-only in `legacy/` until 1.0.
+(1.0 *Cyclops*). The original Xaraya tree was removed on 2026-10-23; it lives on in git history and upstream.
 
 ## Requirements
 

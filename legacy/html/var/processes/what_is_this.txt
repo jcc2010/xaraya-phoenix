@@ -1,1 +1,0 @@
-This directory contains workflow process definition files, such as those created by the Workflow module.
