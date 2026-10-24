@@ -1,0 +1,15 @@
+.git
+.github
+.env
+.phpunit.cache
+.php-cs-fixer.cache
+.vscode
+.idea
+vendor
+var
+public/assets
+tests
+docs
+phpstan.neon
+*.md
+!README.md

@@ -66,3 +66,34 @@ jobs:
       - run: composer install --no-interaction --no-progress
       - run: composer stan
       - run: composer cs
+
+  docker:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: docker build -t phoenix .
+      - name: First start installs
+        run: |
+          docker volume create phoenix-var
+          docker run -d --name app -p 8080:80 -v phoenix-var:/app/var \
+            -e XAR_ADMIN=admin -e XAR_ADMIN_EMAIL=admin@example.test -e XAR_ADMIN_PASSWORD=ci-only-password-123 phoenix
+          for i in $(seq 1 30); do curl -fsS -o /dev/null http://localhost:8080/login && break; sleep 1; done
+          docker logs app
+          docker logs app 2>&1 | grep -q "Created the administrator 'admin'"
+          curl -fsS http://localhost:8080/login | grep -q 'name="password"'
+          test "$(curl -s -o /dev/null -w '%{http_code}' http://localhost:8080/admin/blog)" = 302
+          curl -fsS -o /dev/null http://localhost:8080/assets/module/blog/blog.css
+          test "$(curl -s -o /dev/null -w '%{http_code}' http://localhost:8080/assets/module/blog/nope.php)" != 200
+          docker exec app runuser -u www-data -- php bin/xar blog:create notes --mode=native --title=Notes
+          curl -fsS http://localhost:8080/blog/notes/feed.json | grep -q '"Notes"'
+          curl -fsS -o /dev/null http://localhost:8080/blog/notes
+      - name: A restart keeps the data and only migrates
+        run: |
+          docker rm -f app
+          docker run -d --name app -p 8080:80 -v phoenix-var:/app/var phoenix
+          for i in $(seq 1 30); do curl -fsS -o /dev/null http://localhost:8080/login && break; sleep 1; done
+          docker logs app
+          docker logs app 2>&1 | grep -q 'Nothing to migrate'
+          curl -fsS http://localhost:8080/blog/notes/feed.json | grep -q '"Notes"'
+      - if: failure()
+        run: docker logs app || true

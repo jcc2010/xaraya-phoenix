@@ -1,0 +1,44 @@
+# docker compose up -d   →   http://localhost:8080 (SQLite in the "phoenix-var" volume)
+# For Postgres: docker compose --profile pgsql up -d, with DB_DSN/DB_USER/DB_PASSWORD below switched to it.
+services:
+  app:
+    build: .
+    image: xaraya-phoenix
+    ports:
+      - "8080:80"
+    environment:
+      APP_URL: http://localhost:8080
+      # First start only: creates this administrator and enables the modules listed.
+      XAR_ADMIN: admin
+      XAR_ADMIN_EMAIL: admin@example.com
+      XAR_ADMIN_PASSWORD_FILE: /run/secrets/admin_password
+      XAR_MODULES: blog
+      # MAIL_DRIVER: smtp
+      # MAIL_HOST: smtp.example.com
+      # DB_DSN: pgsql:host=db;port=5432;dbname=phoenix
+      # DB_USER: phoenix
+      # DB_PASSWORD: change-me
+    secrets:
+      - admin_password
+    volumes:
+      - phoenix-var:/app/var
+    restart: unless-stopped
+
+  db:
+    image: postgres:16
+    profiles: [pgsql]
+    environment:
+      POSTGRES_DB: phoenix
+      POSTGRES_USER: phoenix
+      POSTGRES_PASSWORD: change-me
+    volumes:
+      - phoenix-db:/var/lib/postgresql/data
+    restart: unless-stopped
+
+secrets:
+  admin_password:
+    file: ./admin_password.txt
+
+volumes:
+  phoenix-var:
+  phoenix-db:
