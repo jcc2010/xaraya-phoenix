@@ -32,8 +32,8 @@ How a mirror behaves:
   With Docker, run the same commands from the host's cron through
   `docker compose exec -T app runuser -u www-data -- php bin/xar …`.
 - **Media can come along.** Athena refuses image requests that come from another site, so Phoenix requests every image
-  with no `Referer`. To hold copies yourself, run `bin/xar media:localize wyome`, which downloads the blog's media and
-  serves it from `/media/…`.
+  with no `Referer`. To hold copies yourself, run `bin/xar media:localize wyome`, which downloads the blog's media, including
+  images inside post text, and serves it from `/media/…`. Do this before you cut over if Athena might go away.
 
 ## 2. Check
 

@@ -15,6 +15,7 @@ use Xaraya\Kernel\Support\HtmlSanitizer;
 use Xaraya\Kernel\Support\SafeUrl;
 use Xaraya\Module\Blog\Blog;
 use Xaraya\Module\Blog\Feed\ItemSerializer;
+use Xaraya\Module\Blog\Media\InlineImages;
 use Xaraya\Module\Blog\Post\Post;
 use Xaraya\Module\Blog\Source\JsonFeedAdapter;
 use Xaraya\Module\Blog\Support\Text;
@@ -48,8 +49,8 @@ final class PostViewFactory
             // The wyome rule: the owner's comment repeats the start of content_html; show each once.
             $content = ltrim(substr($content, strlen($comment)));
         }
-        $contentHtml = $this->clean($post, 'content', $content, $cached);
-        $commentHtml = $comment === null ? '' : $this->clean($post, 'comment', $comment, $cached);
+        $contentHtml = $this->clean($post, 'content', InlineImages::rewrite($content, $media), $cached);
+        $commentHtml = $comment === null ? '' : $this->clean($post, 'comment', InlineImages::rewrite($comment, $media), $cached);
         $quote = self::str($athenana, 'quote');
         $plain = Text::plain($contentHtml);
         if ($plain === '') {

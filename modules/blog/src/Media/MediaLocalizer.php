@@ -26,6 +26,11 @@ final class MediaLocalizer
         foreach (self::listAt($doc, 'attachments') as $attachment) {
             $urls[] = is_array($attachment) ? ($attachment['url'] ?? null) : null;
         }
+        array_push($urls, ...InlineImages::sources($post->contentHtml ?? ''));
+        $comment = self::at($doc, '_athenana', 'comment');
+        if (is_string($comment)) {
+            array_push($urls, ...InlineImages::sources($comment));
+        }
         $valid = array_filter($urls, static fn(mixed $url): bool => is_string($url) && preg_match('#^https?://#i', $url) === 1);
 
         return array_values(array_unique($valid));

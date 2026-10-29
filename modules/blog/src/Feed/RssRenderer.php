@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Xaraya\Module\Blog\Feed;
 
 use Xaraya\Module\Blog\Blog;
+use Xaraya\Module\Blog\Media\InlineImages;
 use Xaraya\Module\Blog\Post\Post;
 use Xaraya\Module\Blog\Support\Text;
 
@@ -40,7 +41,7 @@ final class RssRenderer
                 . '<title>' . $x($post->title) . "</title>\n"
                 . '<link>' . $x($url) . "</link>\n"
                 . '<guid isPermaLink="true">' . $x($url) . "</guid>\n"
-                . '<description>' . $x(($post->contentHtml ?? '') . $permalink) . "</description>\n"
+                . '<description>' . $x(InlineImages::rewrite($post->contentHtml ?? '', $media) . $permalink) . "</description>\n"
                 . '<pubDate>' . $post->datePublished->format(DATE_RSS) . "</pubDate>\n"
                 . '<dc:creator>' . $x($blog->authorName) . "</dc:creator>\n";
             foreach ($post->tags as $tag) {

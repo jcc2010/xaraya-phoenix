@@ -27,8 +27,11 @@ final class LocalMediaTest extends BlogTestCase
         ], $this->now());
         $items = FeedFactory::items(2);
         $items[0]['image'] = 'https://img.test/a.png';
+        $items[1]['content_html'] = '<p>Look:</p><img src="https://img.test/inline.png" alt="">';
+        $png = (string) base64_decode(MediaStoreTest::PNG, true);
         $fetcher = FeedFactory::fetcher(FeedFactory::pages($items))
-            ->on('https://img.test/a.png', new FetchResult(200, (string) base64_decode(MediaStoreTest::PNG, true)));
+            ->on('https://img.test/a.png', new FetchResult(200, $png))
+            ->on('https://img.test/inline.png', new FetchResult(200, $png));
         $this->fetcher = $fetcher;
         $app->container()->instance(HttpFetcher::class, $fetcher);
         $app->container()->get(Syncer::class)->sync($blog, true, $this->now());
@@ -60,6 +63,32 @@ final class LocalMediaTest extends BlogTestCase
         $id = substr((string) parse_url($image, PHP_URL_PATH), 7, 26);
         self::assertSame(404, $app->handle(new ServerRequest('GET', "/media/{$id}.jpg"))->getStatusCode(), 'wrong extension');
         self::assertSame(404, $app->handle(new ServerRequest('GET', '/media/01aaaaaaaaaaaaaaaaaaaaaaaa.png'))->getStatusCode());
+    }
+
+    public function testLocalBlogRewritesImagesInsidePostHtml(): void
+    {
+        $app = $this->seeded('local');
+        $feed = json_decode((string) $app->handle(new ServerRequest('GET', '/blog/src/feed.json'))->getBody(), true);
+        $html = (string) $feed['items'][1]['content_html'];
+        self::assertMatchesRegularExpression('#^<p>Look:</p><img src="http://xar\.test/media/[0-9a-z]{26}\.png" alt="">$#', $html);
+        preg_match('#src="([^"]+)"#', $html, $m);
+        $local = $m[1];
+
+        $rss = (string) $app->handle(new ServerRequest('GET', '/blog/src/feed.xml'))->getBody();
+        self::assertStringContainsString(htmlspecialchars('<img src="' . $local . '"', ENT_XML1 | ENT_QUOTES), $rss);
+        self::assertStringNotContainsString('img.test/inline.png', $rss);
+
+        $id = substr((string) $feed['items'][1]['id'], -26);
+        $page = (string) $app->handle(new ServerRequest('GET', '/s/' . $id))->getBody();
+        self::assertStringContainsString('src="' . $local . '"', $page);
+        self::assertStringNotContainsString('img.test/inline.png', $page);
+    }
+
+    public function testRemoteBlogKeepsInlineImages(): void
+    {
+        $app = $this->seeded('remote');
+        $feed = json_decode((string) $app->handle(new ServerRequest('GET', '/blog/src/feed.json'))->getBody(), true);
+        self::assertSame('<p>Look:</p><img src="https://img.test/inline.png" alt="">', $feed['items'][1]['content_html']);
     }
 
     public function testRemoteBlogKeepsSourceUrls(): void

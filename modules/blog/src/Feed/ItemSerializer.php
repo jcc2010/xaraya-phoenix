@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Xaraya\Module\Blog\Feed;
 
 use Xaraya\Module\Blog\Blog;
+use Xaraya\Module\Blog\Media\InlineImages;
 use Xaraya\Module\Blog\Post\Post;
 
 final class ItemSerializer
@@ -83,7 +84,7 @@ final class ItemSerializer
     private static function rewrite(mixed $value, array $media): mixed
     {
         if (is_string($value)) {
-            return $media[$value] ?? $value;
+            return $media[$value] ?? InlineImages::rewrite($value, $media);
         }
         if (is_array($value)) {
             return array_map(static fn(mixed $v): mixed => self::rewrite($v, $media), $value);

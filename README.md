@@ -174,7 +174,8 @@ is over 30 minutes old (the earlier run may be hung).
 
 A quick sync stops at the first unchanged page. A full sync also catches edits to old posts and
 deletions, and refuses to delete anything if the source suddenly shows under half of the posts.
-Add `--media=local` at creation to download images and serve them from `/media/…`. This downloads
+Add `--media=local` at creation to download images (including `<img>` tags inside posts) and serve them from
+`/media/…`. This downloads
 third-party files referenced by the posts onto your server. Fetches only go to public hosts: loopback,
 private, link-local and other internal addresses are refused unless `blog.fetch_allow_private` is
 set to true in the config.
