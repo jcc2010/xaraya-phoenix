@@ -34,6 +34,9 @@ final class PublicTargetTest extends TestCase
             'ula fd' => ['http://[fd12:3456::1]/feed.json'],
             'ipv6 link-local' => ['http://[fe80::1]/feed.json'],
             'ipv6 multicast' => ['http://[ff02::1]/feed.json'],
+            'nat64 local-use' => ['http://[64:ff9b:1::5db8:d822]/feed.json'],
+            'teredo' => ['http://[2001:0:4136:e378:8000:63bf:3fff:fdd2]/feed.json'],
+            '6to4 relay anycast' => ['http://192.88.99.1/feed.json'],
             'localhost name' => ['http://localhost/feed.json'],
             'ftp scheme' => ['ftp://93.184.216.34/feed.json'],
         ];
@@ -52,7 +55,8 @@ final class PublicTargetTest extends TestCase
         StreamFetcher::assertPublicTarget('http://93.184.216.34/feed.json');
         StreamFetcher::assertPublicTarget('https://93.184.216.34:8443/feed.json?x=1');
         StreamFetcher::assertPublicTarget('https://[2606:2800:220:1:248:1893:25c8:1946]/feed.json');
-        $this->addToAssertionCount(3);
+        StreamFetcher::assertPublicTarget('https://[2001:4860:4860::8888]/feed.json');
+        $this->addToAssertionCount(4);
     }
 
     public function testRedirectFromPublicHostToLoopbackIsRefused(): void

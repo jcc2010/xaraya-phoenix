@@ -20,11 +20,11 @@ How Plan B (`2026-10-11-phoenix-blog-plan-b.md`) settled these:
 - `tombstone()` is unchanged (sync only); native deletes are one conditional `UPDATE` (`setStatus()`). Cross-blog isolation is tested for tokens, the API and Micropub.
 - Uploads read at most 10 MB + 1 byte from the upload stream. Nothing deletes media yet, so no refcount is needed.
 - Listener policy: writes dispatch item events only after the transaction commits, as sync does; `SearchIndexer` swallows and logs its own failures.
-- Inline `<img src>` rewriting is still open.
+- [Done] Inline `<img src>` in `content_html` and the Athena comment is downloaded by sync and `media:localize`, and rewritten in the JSON feed, RSS and pages when media is local.
 
 ## Parked
 
-- StreamFetcher deadline is not total during the header phase (`fopen` blocks while a server drips headers). Mitigated by `timeout` in the documented cron lines. Fix: `stream_socket_client` + own HTTP/1.0 parsing inside the deadline loop, or ext-curl.
+- [Done: own HTTP/1.0 client over `stream_socket_client`; the deadline covers connect, TLS, headers and body] StreamFetcher deadline is not total during the header phase (`fopen` blocks while a server drips headers). Mitigated by `timeout` in the documented cron lines. Fix: `stream_socket_client` + own HTTP/1.0 parsing inside the deadline loop, or ext-curl.
 
 ## Full deferred list (from the ledger)
 
@@ -42,4 +42,4 @@ How Plan B (`2026-10-11-phoenix-blog-plan-b.md`) settled these:
 - [Task 8] localize() pre-select outside try; GD branch untested (pixel cap masks it); orphaned file if insert fails; DECISION for user: require ext-gd? (without GD, small-header polyglots pass validation; nosniff/CSP are backstop)
 - [Task 9] native-post guard depends on current app.url prefix; --source/--format accepted when switching to native; --force path consequences untested
 - [Task 10] parity uses assertEquals (loose types/order) — consider assertSame after recursive ksort; README Blog section placed after License line
-- [FINAL] STALE_LOCK 30m < legit 2h full sync → spurious "may be hung" warnings; DNS lookup outside deadline; NAT64 local-use/Teredo/6to4-relay ranges unblocked; TLS mismatch error text vague; no test for native null-hash re-save → UPDATED; AAAA-only hosts refused (document)
+- [FINAL] STALE_LOCK 30m < legit 2h full sync → spurious "may be hung" warnings; DNS lookup outside deadline (still: PHP can't interrupt it; checked right after); [Done] NAT64 local-use/Teredo/6to4-relay ranges blocked; [Done] TLS errors name the host and certificate; no test for native null-hash re-save → UPDATED; AAAA-only hosts refused (document)

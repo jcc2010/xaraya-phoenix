@@ -1,5 +1,12 @@
 # Changelog
 
+## Unreleased
+
+- Local media now covers `<img>` tags inside post text: sync and `media:localize` download them, and the JSON feed,
+  RSS and pages serve the local copies.
+- Fetches (sync and media) run on Phoenix's own HTTP/1.0 client, so the time limit also covers a server that sends
+  its headers slowly. NAT64 local-use, Teredo and 6to4-relay addresses are refused as well.
+
 ## 3.0.0 *Cyclops* (2026-10-23)
 
 The first release of Xaraya Phoenix, a small, modern fork of Xaraya. It is a blogging engine that speaks Athena's

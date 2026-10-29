@@ -15,18 +15,22 @@ use Xaraya\Module\Blog\BlogServiceProvider;
  * checked: the scheme must be http(s) and, unless private hosts are allowed, every address the host
  * resolves to must be public. The connection is pinned to the validated address (the Host header and
  * TLS peer name keep the original host), so a DNS rebind between check and connect cannot change the
- * target. One deadline covers every hop and the whole body.
+ * target. The request is plain HTTP/1.0 over a socket, so one deadline covers every hop: connect, TLS handshake,
+ * headers and body. Only the DNS lookup can't be interrupted; the deadline is checked as soon as it returns.
  */
 final class StreamFetcher implements HttpFetcher
 {
     public const MAX_REDIRECTS = 5;
+    public const MAX_HEADER_BYTES = 65_536;
 
+    /** @param array<string, mixed> $tls extra `ssl` stream-context options (tests pass a cafile) */
     public function __construct(
         private readonly string $userAgent = 'XarayaPhoenix/' . BlogServiceProvider::VERSION,
         private readonly float $timeout = 15.0,
         private readonly int $maxBytes = 20_000_000,
         private readonly float $deadline = 60.0,
         private readonly bool $allowPrivateHosts = false,
+        private readonly array $tls = [],
     ) {}
 
     public function get(string $url, ?string $etag = null): FetchResult
@@ -38,11 +42,9 @@ final class StreamFetcher implements HttpFetcher
         $current = $url;
         for ($hops = 0; ; $hops++) {
             $target = self::target($current, $this->allowPrivateHosts);
-            $handle = $this->open($current, $target, $etag, $start);
+            $this->checkDeadline($current, $start);
+            [$socket, $status, $parsed, $rest] = $this->request($current, $target, $etag, $start);
             try {
-                $wrapperData = stream_get_meta_data($handle)['wrapper_data'] ?? [];
-                $responseHeaders = is_array($wrapperData) ? array_values(array_filter($wrapperData, 'is_string')) : [];
-                [$status, $parsed] = self::parseHeaders($responseHeaders);
                 $location = $parsed['location'] ?? null;
                 if (in_array($status, [301, 302, 303, 307, 308], true) && $location !== null && $location !== '') {
                     if ($hops >= self::MAX_REDIRECTS) {
@@ -51,9 +53,14 @@ final class StreamFetcher implements HttpFetcher
                     $current = self::resolveLocation($current, $location);
                     continue;
                 }
-                $body = $this->readBody($handle, $current, $start);
+                $chunked = str_contains(strtolower($parsed['transfer-encoding'] ?? ''), 'chunked');
+                $length = !$chunked && isset($parsed['content-length']) && ctype_digit($parsed['content-length']) ? (int) $parsed['content-length'] : null;
+                $body = $this->readBody($socket, $current, $start, $rest, $length);
+                if ($chunked) {
+                    $body = self::dechunk($body, $current);
+                }
             } finally {
-                fclose($handle);
+                fclose($socket);
             }
 
             return new FetchResult($status, $body, $parsed['etag'] ?? null, $parsed['content-type'] ?? null);
@@ -115,7 +122,9 @@ final class StreamFetcher implements HttpFetcher
                 return self::isPublicIp((string) inet_ntop(substr($packed, 2, 4)))
                     && filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE) !== false;
             }
-            foreach (['fc00::' => 7, 'fe80::' => 10, 'fec0::' => 10, 'ff00::' => 8, '2001:db8::' => 32, '100::' => 64] as $net => $bits) {
+            // Also refused: NAT64 local-use (64:ff9b:1::/48) and Teredo (2001::/32), whose IPv4 can't be judged.
+            $blocked6 = ['fc00::' => 7, 'fe80::' => 10, 'fec0::' => 10, 'ff00::' => 8, '2001:db8::' => 32, '100::' => 64, '64:ff9b:1::' => 48, '2001::' => 32];
+            foreach ($blocked6 as $net => $bits) {
                 if (self::inCidr($packed, $net, $bits)) {
                     return false;
                 }
@@ -123,7 +132,7 @@ final class StreamFetcher implements HttpFetcher
         } else {
             $blocked = [
                 '0.0.0.0' => 8, '10.0.0.0' => 8, '100.64.0.0' => 10, '127.0.0.0' => 8, '169.254.0.0' => 16,
-                '172.16.0.0' => 12, '192.0.0.0' => 24, '192.0.2.0' => 24, '192.168.0.0' => 16, '198.18.0.0' => 15,
+                '172.16.0.0' => 12, '192.0.0.0' => 24, '192.0.2.0' => 24, '192.88.99.0' => 24, '192.168.0.0' => 16, '198.18.0.0' => 15,
                 '198.51.100.0' => 24, '203.0.113.0' => 24, '224.0.0.0' => 4, '240.0.0.0' => 4,
             ];
             foreach ($blocked as $net => $bits) {
@@ -139,7 +148,7 @@ final class StreamFetcher implements HttpFetcher
     /**
      * Validates one hop and picks the address to connect to.
      *
-     * @return array{scheme: string, host: string, authority: string, ip: string, port: ?int, request: string}
+     * @return array{scheme: string, host: string, authority: string, ip: string, port: ?int, path: string}
      */
     private static function target(string $url, bool $allowPrivate): array
     {
@@ -166,97 +175,208 @@ final class StreamFetcher implements HttpFetcher
             }
         }
         $port = isset($parts['port']) ? (int) $parts['port'] : null;
-        $ip = $ips[0];
-        $ipHost = str_contains($ip, ':') ? "[{$ip}]" : $ip;
-        $request = $scheme . '://' . $ipHost . ($port !== null ? ':' . $port : '')
-            . ($parts['path'] ?? '/') . (isset($parts['query']) ? '?' . $parts['query'] : '');
+        $path = ($parts['path'] ?? '') === '' ? '/' : $parts['path'];
+        $path .= isset($parts['query']) ? '?' . $parts['query'] : '';
+        if (preg_match('/[\x00-\x20\x7f]/', $path) === 1) {
+            throw new RuntimeException("Refusing to fetch {$url}: the path contains spaces or control characters");
+        }
 
         return [
             'scheme' => $scheme,
             'host' => $bare,
             'authority' => $host . ($port !== null ? ':' . $port : ''),
-            'ip' => $ip,
+            'ip' => $ips[0],
             'port' => $port,
-            'request' => $request,
+            'path' => $path,
         ];
     }
 
     /**
-     * @param array{scheme: string, host: string, authority: string, ip: string, port: ?int, request: string} $target
-     * @return resource
+     * Connects to the validated address, sends the request and reads the response headers, all within the deadline.
+     *
+     * @param array{scheme: string, host: string, authority: string, ip: string, port: ?int, path: string} $target
+     * @return array{0: resource, 1: int, 2: array<string, string>, 3: string} socket, status, headers, body bytes read so far
      */
-    private function open(string $url, array $target, ?string $etag, float $start)
+    private function request(string $url, array $target, ?string $etag, float $start): array
     {
-        $headers = [
-            'Host: ' . $target['authority'],
-            'User-Agent: ' . $this->userAgent,
-            'Accept: application/feed+json, application/json;q=0.9, */*;q=0.1',
-        ];
-        if ($etag !== null) {
-            $headers[] = 'If-None-Match: ' . $etag;
-        }
-        $options = ['http' => [
-            'method' => 'GET',
-            'header' => implode("\r\n", $headers),
-            'timeout' => $this->readTimeout($url, $start),
-            'ignore_errors' => true,
-            'follow_location' => 0,
-            'max_redirects' => 1,
-        ]];
-        if ($target['scheme'] === 'https') {
-            $options['ssl'] = [
-                'peer_name' => $target['host'],
-                'verify_peer' => true,
-                'verify_peer_name' => true,
-                'SNI_enabled' => true,
-            ];
-        }
-        $handle = @fopen($target['request'], 'rb', false, stream_context_create($options));
-        if ($handle === false) {
+        $https = $target['scheme'] === 'https';
+        $ip = str_contains($target['ip'], ':') ? "[{$target['ip']}]" : $target['ip'];
+        $remote = ($https ? 'ssl://' : 'tcp://') . $ip . ':' . ($target['port'] ?? ($https ? 443 : 80));
+        $context = stream_context_create(['ssl' => [
+            'peer_name' => $target['host'],
+            'verify_peer' => true,
+            'verify_peer_name' => true,
+            'SNI_enabled' => true,
+            'crypto_method' => STREAM_CRYPTO_METHOD_TLSv1_2_CLIENT | STREAM_CRYPTO_METHOD_TLSv1_3_CLIENT,
+        ] + $this->tls]);
+        // For ssl:// the connect timeout also bounds the TLS handshake.
+        $socket = @stream_socket_client($remote, $errno, $error, $this->readTimeout($url, $start), STREAM_CLIENT_CONNECT, $context);
+        if ($socket === false) {
             $this->checkDeadline($url, $start);
-            $error = error_get_last()['message'] ?? 'unknown error';
+            $reason = (string) $error !== '' ? (string) $error : (error_get_last()['message'] ?? 'unknown error');
+            if ($https && ($errno === 0 || str_contains($reason, 'SSL') || str_contains($reason, 'crypto'))) {
+                $reason = 'TLS handshake with ' . $target['host'] . ' failed (' . $reason . '); check its certificate';
+            }
 
-            throw new RuntimeException("Fetching {$url} failed: {$error}");
+            throw new RuntimeException("Fetching {$url} failed: {$reason}");
         }
         try {
-            $this->checkDeadline($url, $start);
+            $headers = [
+                "GET {$target['path']} HTTP/1.0",
+                'Host: ' . $target['authority'],
+                'User-Agent: ' . $this->userAgent,
+                'Accept: application/feed+json, application/json;q=0.9, */*;q=0.1',
+                'Accept-Encoding: identity',
+                'Connection: close',
+            ];
+            if ($etag !== null && preg_match('/^[\x20-\x7e]*$/', $etag) === 1) {
+                $headers[] = 'If-None-Match: ' . $etag;
+            }
+            $this->write($socket, implode("\r\n", $headers) . "\r\n\r\n", $url, $start);
+            [$status, $parsed, $rest] = $this->readHeaders($socket, $url, $start);
         } catch (RuntimeException $e) {
-            fclose($handle);
+            fclose($socket);
 
             throw $e;
         }
 
-        return $handle;
+        return [$socket, $status, $parsed, $rest];
     }
 
-    /** @param resource $handle */
-    private function readBody($handle, string $url, float $start): string
+    /** @param resource $socket */
+    private function write($socket, string $data, string $url, float $start): void
     {
-        $body = '';
-        while (!feof($handle)) {
-            $timeout = $this->readTimeout($url, $start);
-            stream_set_timeout($handle, (int) floor($timeout), (int) (($timeout - floor($timeout)) * 1_000_000));
-            $chunk = @fread($handle, 8192);
-            if (stream_get_meta_data($handle)['timed_out']) {
-                if ($timeout < $this->timeout) {
-                    throw new RuntimeException("Fetching {$url} exceeded the {$this->deadline}s deadline");
+        while ($data !== '') {
+            $this->setTimeout($socket, $this->readTimeout($url, $start));
+            $written = @fwrite($socket, $data);
+            if ($written === false || $written === 0) {
+                $this->checkDeadline($url, $start);
+
+                throw new RuntimeException("Fetching {$url} failed: the connection closed while sending the request");
+            }
+            $data = substr($data, $written);
+        }
+    }
+
+    /**
+     * Reads up to the blank line that ends the headers; 1xx interim responses are skipped.
+     *
+     * @param resource $socket
+     * @return array{0: int, 1: array<string, string>, 2: string} status, headers, the body bytes already read
+     */
+    private function readHeaders($socket, string $url, float $start): array
+    {
+        $buffer = '';
+        while (true) {
+            if (preg_match('/\r?\n\r?\n/', $buffer, $m, PREG_OFFSET_CAPTURE) === 1) {
+                $head = substr($buffer, 0, $m[0][1]);
+                $buffer = substr($buffer, $m[0][1] + strlen($m[0][0]));
+                [$status, $headers] = self::parseHeaders(preg_split('/\r?\n/', $head) ?: []);
+                if ($status >= 100 && $status < 200) {
+                    continue;
                 }
 
-                throw new RuntimeException("Fetching {$url} timed out after {$this->timeout}s without data");
+                return [$status, $headers, $buffer];
             }
-            if ($chunk === false) {
-                $error = error_get_last()['message'] ?? 'unknown error';
+            if (strlen($buffer) > self::MAX_HEADER_BYTES) {
+                throw new RuntimeException("Response headers from {$url} exceed " . self::MAX_HEADER_BYTES . ' bytes');
+            }
+            $chunk = $this->read($socket, $url, $start);
+            if ($chunk === '') {
+                throw new RuntimeException("Fetching {$url} failed: the connection closed before the response headers ended");
+            }
+            $buffer .= $chunk;
+        }
+    }
 
-                throw new RuntimeException("Fetching {$url} failed: {$error}");
-            }
-            $body .= $chunk;
+    /** @param resource $socket */
+    private function readBody($socket, string $url, float $start, string $body, ?int $length): string
+    {
+        if ($length !== null && $length > $this->maxBytes) {
+            throw new RuntimeException("Response from {$url} exceeds {$this->maxBytes} bytes");
+        }
+        while ($length === null || strlen($body) < $length) {
             if (strlen($body) > $this->maxBytes) {
                 throw new RuntimeException("Response from {$url} exceeds {$this->maxBytes} bytes");
             }
-            $this->checkDeadline($url, $start);
+            $chunk = $this->read($socket, $url, $start);
+            if ($chunk === '') {
+                break;
+            }
+            $body .= $chunk;
+        }
+        if (strlen($body) > $this->maxBytes) {
+            throw new RuntimeException("Response from {$url} exceeds {$this->maxBytes} bytes");
+        }
+        if ($length !== null && strlen($body) < $length) {
+            throw new RuntimeException("Fetching {$url} failed: the connection closed after " . strlen($body) . " of {$length} bytes");
         }
 
-        return $body;
+        return $length === null ? $body : substr($body, 0, $length);
+    }
+
+    /** Decodes a chunked body (some proxies chunk even for HTTP/1.0 clients); a truncated one is an error. */
+    private static function dechunk(string $raw, string $url): string
+    {
+        $out = '';
+        $at = 0;
+        while (true) {
+            $eol = strpos($raw, "\n", $at);
+            if ($eol === false) {
+                throw new RuntimeException("Fetching {$url} failed: the chunked body is truncated");
+            }
+            $line = trim(explode(';', substr($raw, $at, $eol - $at), 2)[0]);
+            if ($line === '' || !ctype_xdigit($line) || strlen($line) > 8) {
+                throw new RuntimeException("Fetching {$url} failed: malformed chunk size");
+            }
+            $size = (int) hexdec($line);
+            $at = $eol + 1;
+            if ($size === 0) {
+                return $out;
+            }
+            if ($at + $size > strlen($raw)) {
+                throw new RuntimeException("Fetching {$url} failed: the chunked body is truncated");
+            }
+            $out .= substr($raw, $at, $size);
+            $at += $size;
+            $at += substr($raw, $at, 2) === "\r\n" ? 2 : (($raw[$at] ?? '') === "\n" ? 1 : 0);
+        }
+    }
+
+    /**
+     * One read within the deadline; '' at end of stream.
+     *
+     * @param resource $socket
+     */
+    private function read($socket, string $url, float $start): string
+    {
+        if (feof($socket)) {
+            return '';
+        }
+        $timeout = $this->readTimeout($url, $start);
+        $this->setTimeout($socket, $timeout);
+        $chunk = @fread($socket, 8192);
+        if (stream_get_meta_data($socket)['timed_out']) {
+            if ($timeout < $this->timeout) {
+                throw new RuntimeException("Fetching {$url} exceeded the {$this->deadline}s deadline");
+            }
+
+            throw new RuntimeException("Fetching {$url} timed out after {$this->timeout}s without data");
+        }
+        if ($chunk === false) {
+            $error = error_get_last()['message'] ?? 'unknown error';
+
+            throw new RuntimeException("Fetching {$url} failed: {$error}");
+        }
+        $this->checkDeadline($url, $start);
+
+        return $chunk;
+    }
+
+    /** @param resource $socket */
+    private function setTimeout($socket, float $timeout): void
+    {
+        stream_set_timeout($socket, (int) floor($timeout), (int) (($timeout - floor($timeout)) * 1_000_000));
     }
 
     /** The per-read timeout, capped by what is left of the deadline. */
